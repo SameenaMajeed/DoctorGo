@@ -1,0 +1,91 @@
+2025-02-24T11:46:01.587Z [ERROR]: Error Response - Status: 401, Message: Login failed. Please check your credentials.
+2025-02-24T11:50:15.888Z [ERROR]: Error Response - Status: 401, Message: Login failed. Please check your credentials.
+2025-02-24T11:50:51.699Z [ERROR]: Error Response - Status: 401, Message: Login failed. Please check your credentials.
+2025-02-24T11:55:26.174Z [ERROR]: Error Response - Status: 401, Message: Login failed. Please check your credentials.
+2025-02-24T11:56:11.670Z [ERROR]: Error Response - Status: 401, Message: Login failed. Please check your credentials.
+2025-02-24T12:02:37.052Z [ERROR]: Error Response - Status: 401, Message: Login failed. Please check your credentials.
+2025-02-24T12:03:46.254Z [ERROR]: Error Response - Status: 401, Message: Login failed. Please check your credentials.
+2025-02-24T16:08:19.365Z [ERROR]: Error Response - Status: 400, Message: No file uploaded.
+2025-02-24T16:12:05.704Z [ERROR]: Error Response - Status: 400, Message: No file uploaded.
+2025-02-24T16:16:13.992Z [ERROR]: Error Response - Status: 400, Message: No file uploaded.
+2025-02-24T16:21:21.619Z [ERROR]: Error Response - Status: 400, Message: No file uploaded.
+2025-02-24T16:25:37.032Z [ERROR]: Error Response - Status: 400, Message: No file uploaded.
+2025-02-24T16:35:04.511Z [ERROR]: Error Response - Status: 400, Message: No file uploaded.
+2025-02-24T16:50:40.332Z [ERROR]: Error Response - Status: 400, Message: Doctor validation failed: experience: Path `experience` is required., timeSlot: Path `timeSlot` is required., role: Path `role` is required., ticketPrice: Path `ticketPrice` is required.
+2025-02-25T04:29:01.000Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:29:26.363Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:29:26.645Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:29:26.958Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:29:27.911Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:29:50.936Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:21.257Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:21.875Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:31.993Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:33.105Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:33.346Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:33.561Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:33.956Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:34.437Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:34.789Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:35.099Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:35.277Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:35.866Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:36.070Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:36.317Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:46.555Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:47.984Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:48.275Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:51.140Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:53.051Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:53.705Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:54.601Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:54.762Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:55.070Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:55.343Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:55.797Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:56.177Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:56.565Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:56.704Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:56.876Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:57.379Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:57.608Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:30:57.834Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:03.595Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:22.904Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:29.214Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:29.858Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:31.031Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:31.387Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:32.085Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:32.451Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:32.740Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:32.927Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:33.616Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:34.020Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:34.257Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:34.601Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:34.849Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:35.094Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:39.593Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:45.546Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:46.165Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:46.387Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:46.943Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:49.078Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:49.526Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:49.736Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:49.998Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:50.172Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:50.948Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:51.210Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:51.537Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:52.022Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:52.252Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:31:52.415Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:32:01.204Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:33:12.492Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:34:24.407Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T04:34:59.782Z [ERROR]: Error Response - Status: 404, Message: User not found.
+2025-02-25T08:18:58.297Z [ERROR]: Error Response - Status: 500, Message: Wrong Password.
+2025-02-25T08:28:42.146Z [ERROR]: Error Response - Status: 500, Message: Wrong Password.
+2025-02-25T08:28:44.550Z [ERROR]: Error Response - Status: 500, Message: Wrong Password.

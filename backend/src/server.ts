@@ -8,6 +8,8 @@ import morgan from 'morgan';
 // Import routes
 import userRoute from './routes/userRoutes';
 import otpRoute from './routes/OtpRoutes';
+import doctorRoute from './routes/doctorRoutes';
+import adminRoute from './routes/adminRoutes';
 
 const app: Express = express();
 
@@ -34,6 +36,12 @@ console.log('Server is starting...');
 // Routes
 app.use('/api/users', userRoute);
 app.use('/api/users/otp', otpRoute);
+app.use('/api/doctor', doctorRoute);
+app.use('/api/admin' , adminRoute)
+
+app.use('*', (req, res) => {
+    res.status(404).json({ message: 'Endpoint not found' });
+});
 
 // Start server
 const PORT: number | string = process.env.PORT || 5000;

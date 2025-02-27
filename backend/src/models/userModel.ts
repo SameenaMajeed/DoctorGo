@@ -2,6 +2,7 @@ import mongoose, { Document, ObjectId, Schema } from "mongoose";
 
 
 interface IUser extends Document {
+    isBlocked: boolean;
     _id : ObjectId;
     name : string;
     email : string;
@@ -14,7 +15,7 @@ interface IUser extends Document {
     url : string;
     address : string;
     is_verified : boolean;
-    is_blocked : boolean;
+    isblocked : boolean;
     is_deleted : boolean;
 }
 

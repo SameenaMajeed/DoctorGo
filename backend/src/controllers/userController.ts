@@ -95,7 +95,6 @@ export class Usercontroller {
 
   async refreshAccessToken(req: Request, res: Response): Promise<void> {
     try {
-      console.log("Cookies received in refreshAccessToken:", req.cookies);
 
       const refreshToken = req.cookies.refreshToken;
 

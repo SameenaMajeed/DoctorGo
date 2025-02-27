@@ -9,6 +9,8 @@ import { setError, setLoading } from "../../slice/user/userSlice";
 import { assets } from "../../assets/assets";
 import sendOtp from "../../Utils/sentOtp";
 import OtpModal from "../../components/CommonComponents/OtpModal";
+import Navbar from "../CommonComponents/Navbar";
+import Footer from "../CommonComponents/Footer";
 
 interface SignupFormInputs {
   name: string;
@@ -25,20 +27,29 @@ const validationSchema = yup.object({
     .matches(/^[A-Za-z ]+$/, "Only alphabets and spaces are allowed")
     .min(3, "Name must be at least 3 characters")
     .required("Name is required"),
-  email: yup.string().email("Invalid email format").required("Email is required"),
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
   password: yup
     .string()
     .min(8, "Password must be at least 8 characters")
     .matches(/[A-Z]/, "Must contain at least one uppercase letter")
     .matches(/[a-z]/, "Must contain at least one lowercase letter")
     .matches(/[0-9]/, "Must contain at least one number")
-    .matches(/[!@#$%^&*(),.?":{}|<>]/, "Must contain at least one special character")
+    .matches(
+      /[!@#$%^&*(),.?":{}|<>]/,
+      "Must contain at least one special character"
+    )
     .required("Password is required"),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref("password")], "Passwords do not match")
     .required("Confirm Password is required"),
-  mobileNo: yup.string().matches(/^\d{10}$/, "Mobile number must be 10 digits").required("Mobile number is required"),
+  mobileNo: yup
+    .string()
+    .matches(/^\d{10}$/, "Mobile number must be 10 digits")
+    .required("Mobile number is required"),
   gender: yup.string().required("Gender is required"),
 });
 
@@ -60,7 +71,10 @@ const SignupForm: React.FC = () => {
   const onSubmit = async (data: SignupFormInputs) => {
     setMessage("");
     try {
-      const { success, message: otpMessage } = await sendOtp(data.email, dispatch);
+      const { success, message: otpMessage } = await sendOtp(
+        data.email,
+        dispatch
+      );
       setMessage(otpMessage);
       if (success) setShowOtpModal(true);
     } catch (error) {
@@ -93,26 +107,49 @@ const SignupForm: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100 items-center justify-center p-6">
-      <div className="bg-white shadow-2xl rounded-2xl flex overflow-hidden max-w-5xl w-full">
-        <div className="hidden md:block w-3/5">
-          <img src={assets.registration} alt="DoctorGo" className="w-full h-full object-cover" />
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+
+       {/* Main Content */}
+       <div className="flex flex-col md:flex-row items-center justify-center flex-grow p-6 mt-8">
+        {/* Illustration */}
+        <div className="hidden md:block w-1/2">
+          <img
+            src="/registration.jpg"
+            alt="Signup Illustration"
+            className="max-w-full"
+          />
         </div>
 
-        <div className="w-full md:w-2/5 p-10 flex flex-col justify-center">
-          <h1 className="text-3xl font-extrabold text-gray-800 mb-2">Create Account</h1>
-          <p className="text-gray-500 mb-6">Please sign up to book an appointment</p>
+        <div className="w-full md:w-1/3 bg-white shadow-lg rounded-lg p-8">
+          <h1 className="text-3xl font-extrabold text-gray-800 mb-2">
+            Create Account
+          </h1>
+          <p className="text-gray-500 mb-6">
+            Please sign up to book an appointment
+          </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <div>
-              <label className="block text-gray-700 font-medium">Full Name</label>
+            <div>
+              <label className="block text-gray-700 font-medium">
+                Full Name
+              </label>
               <Controller
                 name="name"
                 control={control}
                 defaultValue=""
-                render={({ field }) => <input {...field} type="text" placeholder="Enter your name" className="w-full px-3 py-2 border rounded" />}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="text"
+                    placeholder="Enter your name"
+                    className="w-full px-3 py-2 border rounded"
+                  />
+                )}
               />
-              {errors.name && <p className="text-red-600 text-sm">{errors.name.message}</p>}
+              {errors.name && (
+                <p className="text-red-600 text-sm">{errors.name.message}</p>
+              )}
             </div>
 
             {/* Email */}
@@ -122,21 +159,43 @@ const SignupForm: React.FC = () => {
                 name="email"
                 control={control}
                 defaultValue=""
-                render={({ field }) => <input {...field} type="email" placeholder="Enter your email" className="w-full px-3 py-2 border rounded" />}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="email"
+                    placeholder="Enter your email"
+                    className="w-full px-3 py-2 border rounded"
+                  />
+                )}
               />
-              {errors.email && <p className="text-red-600 text-sm">{errors.email.message}</p>}
+              {errors.email && (
+                <p className="text-red-600 text-sm">{errors.email.message}</p>
+              )}
             </div>
 
             {/* Mobile No */}
             <div>
-              <label className="block text-gray-700 font-medium">Phone No</label>
+              <label className="block text-gray-700 font-medium">
+                Phone No
+              </label>
               <Controller
                 name="mobileNo"
                 control={control}
                 defaultValue=""
-                render={({ field }) => <input {...field} type="text" placeholder="Enter your mobile number" className="w-full px-3 py-2 border rounded" />}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="text"
+                    placeholder="Enter your mobile number"
+                    className="w-full px-3 py-2 border rounded"
+                  />
+                )}
               />
-              {errors.mobileNo && <p className="text-red-600 text-sm">{errors.mobileNo.message}</p>}
+              {errors.mobileNo && (
+                <p className="text-red-600 text-sm">
+                  {errors.mobileNo.message}
+                </p>
+              )}
             </div>
 
             {/* Gender */}
@@ -147,46 +206,87 @@ const SignupForm: React.FC = () => {
                 control={control}
                 defaultValue=""
                 render={({ field }) => (
-                  <select {...field} className="w-full px-3 py-2 border rounded">
+                  <select
+                    {...field}
+                    className="w-full px-3 py-2 border rounded"
+                  >
                     <option value="">Select</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                   </select>
                 )}
               />
-              {errors.gender && <p className="text-red-600 text-sm">{errors.gender.message}</p>}
+              {errors.gender && (
+                <p className="text-red-600 text-sm">{errors.gender.message}</p>
+              )}
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-gray-700 font-medium">Password</label>
+              <label className="block text-gray-700 font-medium">
+                Password
+              </label>
               <Controller
                 name="password"
                 control={control}
                 defaultValue=""
-                render={({ field }) => <input {...field} type="password" placeholder="Enter your password" className="w-full px-3 py-2 border rounded" />}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="password"
+                    placeholder="Enter your password"
+                    className="w-full px-3 py-2 border rounded"
+                  />
+                )}
               />
-              {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
+              {errors.password && (
+                <p className="text-red-600 text-sm">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-gray-700 font-medium">Confirm Password</label>
+              <label className="block text-gray-700 font-medium">
+                Confirm Password
+              </label>
               <Controller
                 name="confirmPassword"
                 control={control}
                 defaultValue=""
-                render={({ field }) => <input {...field} type="password" placeholder="Confirm your password" className="w-full px-3 py-2 border rounded" />}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="password"
+                    placeholder="Confirm your password"
+                    className="w-full px-3 py-2 border rounded"
+                  />
+                )}
               />
-              {errors.confirmPassword && <p className="text-red-600 text-sm">{errors.confirmPassword.message}</p>}
+              {errors.confirmPassword && (
+                <p className="text-red-600 text-sm">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
             </div>
 
-            <button type="submit" className="w-full bg-blue-600 text-white py-3 mt-5 rounded-lg text-lg font-semibold">Create Account</button>
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-3 mt-5 rounded-lg text-lg font-semibold"
+            >
+              Create Account
+            </button>
           </form>
-          {message && <p className="mt-4 text-center text-sm font-medium text-[#8b5d3b]">{message}</p>}
+          {message && (
+            <p className="mt-4 text-center text-sm font-medium text-[#8b5d3b]">
+              {message}
+            </p>
+          )}
         </div>
       </div>
 
+      <Footer/>
       {showOtpModal && (
         <OtpModal
           email={getValues("email")}

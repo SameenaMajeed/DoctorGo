@@ -46,6 +46,7 @@ export class UserRepository implements UserRepositoryInterface {
   async findByGoogleId(googleId: string): Promise<IUser | null> {
     return await User.findOne({ google_id: googleId });
   }
+
   async updatePassword(userId: string, hashedPassword: string): Promise<void> {
     try {
       const user = await User.findById(userId);
@@ -86,6 +87,10 @@ export class UserRepository implements UserRepositoryInterface {
   }
   async updateProfilePicture(userId: string, profilePicture: string) {
     return await User.findByIdAndUpdate(userId, { profilePicture }, { new: true });
+  }
+
+  async save(user:IUser):Promise<IUser>{
+    return await user.save()
   }
 }
 

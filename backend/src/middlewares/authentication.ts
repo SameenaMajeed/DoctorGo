@@ -5,8 +5,7 @@ export const authenticateToken = (requiredRole?: string) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     try {
       const token = req.cookies.accessToken || req.headers.authorization?.split(' ')[1];
-   console.log('body',req.cookies)
-      console.log('Received token from cookies or header:', token);
+      console.log('body',req.cookies)
 
       if (!token) {
         res.status(401).json({ message: 'Access token is missing or invalid' });
@@ -24,17 +23,23 @@ export const authenticateToken = (requiredRole?: string) => {
       // Populate req.data with decoded token info
       req.data = {
         id: decoded.id, 
-        role: decoded.role,  
-      };
-
-      // If it's a user, add userId to req.data
-      if (decoded.role === 'user') {
-        req.data.userId = decoded.id;
+        role: decoded.role,
+        email: decoded.email,
+      }as {
+        id: string;
+        role: string;
+        userId?: string;
+        email: string;
       }
+
+      // // If it's a user, add userId to req.data
+      // if (decoded.role === 'user') {
+      //   req.data.userId = decoded.id;
+      // }
 
       // Check if the required role matches the token's role
       if (requiredRole && decoded.role !== requiredRole) {
-        console.log('Forbidden access: insufficient permissions for role', decoded.role);
+        console.log(`Forbidden: Role mismatch. Required: ${requiredRole}, Found: ${decoded.role}`);        
         res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
         return;
       }

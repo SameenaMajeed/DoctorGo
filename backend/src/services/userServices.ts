@@ -67,8 +67,14 @@ export class UserService implements IUserService {
       throw new Error('Wrong Password');
     }
 
-    const accessToken = generateAccessToken(user._id.toString(), 'user');
-    const refreshToken = generateRefreshToken(user._id.toString(), 'user');
+    const payload = {
+      id : user._id.toString(),
+      role : 'user' , 
+      email : user.email
+    }
+
+    const accessToken = generateAccessToken(payload);
+    const refreshToken = generateRefreshToken(payload);
 
     return { user, accessToken, refreshToken };
   }
@@ -85,7 +91,7 @@ export class UserService implements IUserService {
 
       const { id: userId, role } = decoded;
       console.log('Generating new access token for user ID:', userId);
-      const newAccessToken = generateAccessToken(userId, role);
+      const newAccessToken = generateAccessToken({id : userId, role});
 
       return { accessToken: newAccessToken };
     } catch (error) {
