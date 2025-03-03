@@ -10,5 +10,5 @@ export interface IDoctorRepository {
     findAllPending(filter: any, skip: number, limit: number): Promise<any>;
      // Updated countAll method to accept optional search and filter parameters.
     countAll(filter: any): Promise<number>;
-    updateProfile(doctorId : string , updatedData : any) : Promise<any>
+    updateProfile(doctorId : string , updatedData : any) : Promise<any>;
 }

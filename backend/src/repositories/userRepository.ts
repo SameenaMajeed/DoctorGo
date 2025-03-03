@@ -92,6 +92,7 @@ export class UserRepository implements UserRepositoryInterface {
   async save(user:IUser):Promise<IUser>{
     return await user.save()
   }
+  
 }
 
  

@@ -19,9 +19,7 @@ class AdminService implements IAdminService {
     email: string,
     password: string
   ): Promise<{ admin: any; accessToken: string; refreshToken: string }> {
-    console.log("Hloo",email , password)
     const admin = await this.adminRepository.findByEmail(email);
-    console.log(admin)
 
     if (!admin) {
       throw new Error("Admin not found");
@@ -38,11 +36,6 @@ class AdminService implements IAdminService {
       id: admin._id.toString(),
       role: "admin",
     });
-
-    console.log(
-      "Tokens generated successfully for admin:",
-      admin._id.toString()
-    );
 
     return { admin, accessToken, refreshToken };
   }
@@ -168,12 +161,14 @@ class AdminService implements IAdminService {
   async userBlock(userId: string, isBlocked: boolean): Promise<any> {
     try {
       const user = await this.userRepository.findById(userId);
+      console.log("Before Update - isBlocked:", user?.isBlocked);
       if (!user) {
         throw new Error("User not found");
       }
       console.log('User is blocking boolean:', isBlocked);
       user.isBlocked = isBlocked;
       const updatedUser = await this.userRepository.save(user);
+      console.log("After Update - isBlocked:", updatedUser?.isBlocked);
       return updatedUser;
     } catch (error: any) {
       throw new Error(error.message);

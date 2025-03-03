@@ -1,3 +1,29 @@
+// import multer from "multer";
+// import cloudinary from "../config/cloudinary";
+
+// // Configure multer to use memory storage (files are stored in memory, not on disk)
+// const storage = multer.memoryStorage();
+// const upload = multer({ storage });
+
+// // Function to upload files to Cloudinary
+// const uploadToCloudinary = async (file: Express.Multer.File): Promise<string> => {
+//   return new Promise((resolve, reject) => {
+//     cloudinary.uploader
+//       .upload_stream({ resource_type: "auto" }, (error, result) => {
+//         if (error) {
+//           console.error("Cloudinary upload error:", error);
+//           reject(error);
+//         } else {
+//           resolve(result?.secure_url || ""); // Return the secure URL of the uploaded file
+//         }
+//       })
+//       .end(file.buffer); // Pass the file buffer to Cloudinary
+//   });
+// };
+
+// export { upload, uploadToCloudinary };
+
+
 import multer from "multer";
 import path from "path";
 import fs from "fs";

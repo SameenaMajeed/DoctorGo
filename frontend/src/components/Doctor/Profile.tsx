@@ -5,6 +5,27 @@ import { RootState } from "../../slice/Store/Store";
 import { setError, setLoading } from "../../slice/user/userSlice";
 import doctorApi from "../../axios/DoctorInstance";
 import { setProfile } from "../../slice/Doctor/doctorSlice";
+import { useForm, Controller } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+// Validation Schema
+const profileSchema = yup.object().shape({
+  name: yup
+    .string()
+    .required("Name is required")
+    .min(3, "Name must be at least 3 characters")
+    .matches(/^[A-Za-z ]+$/, "Only alphabets and spaces are allowed"),
+  email: yup.string().email("Invalid email format").required("Email is required"),
+  phone: yup
+    .string()
+    .matches(/^\d{10}$/, "Phone number must be 10 digits")
+    .required("Phone number is required"),
+  qualification: yup.string().required("Qualification is required"),
+  specialization: yup.string().required("Specialization is required"),
+});
+
+type FormData = yup.InferType<typeof profileSchema>;
 
 const Profile: React.FC = () => {
   const dispatch = useDispatch();
@@ -13,14 +34,25 @@ const Profile: React.FC = () => {
   );
 
   const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    qualification: "",
-    specialization: "",
+
+  // React Hook Form
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: yupResolver(profileSchema),
+    defaultValues: {
+      name: profile?.name || "",
+      email: profile?.email || "",
+      phone: profile?.phone || "",
+      qualification: profile?.qualification || "",
+      specialization: profile?.specialization || "",
+    },
   });
 
+  // Fetch profile data
   useEffect(() => {
     if (!doctor) {
       dispatch(setError("Doctor not logged in"));
@@ -32,24 +64,19 @@ const Profile: React.FC = () => {
         dispatch(setLoading());
         const response = await doctorApi.get(`/profile/${doctor._id}`);
         dispatch(setProfile(response.data.data));
-        setFormData(response.data.data); // Pre-fill form with current data
+        reset(response.data.data); // Pre-fill form with current data
       } catch (err) {
         dispatch(setError("Failed to fetch doctor profile."));
       }
     };
 
     fetchProfile();
-  }, [dispatch, doctor]);
-
-  // Handle input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  }, [dispatch, doctor, reset]);
 
   // Handle save profile update
-  const handleSave = async () => {
+  const handleSave = async (data: FormData) => {
     try {
-      const response = await doctorApi.put(`/updateProfile/${doctor?._id}`, formData);
+      const response = await doctorApi.put(`/updateProfile/${doctor?._id}`, data);
       dispatch(setProfile(response.data.updatedProfile)); // Update Redux state
       setEditMode(false); // Exit edit mode
     } catch (err) {
@@ -90,10 +117,10 @@ const Profile: React.FC = () => {
 
         {/* Doctor Details */}
         <h2 className="mt-4 text-xl font-semibold">
-          {formData?.name || "Dr. Name"}
+          {profile?.name || "Dr. Name"}
         </h2>
-        <p className="text-gray-500">{formData?.email || "email@doctor.com"}</p>
-        <p className="text-gray-500">{formData?.phone || "+XXX XXX XXX XXX"}</p>
+        <p className="text-gray-500">{profile?.email || "email@doctor.com"}</p>
+        <p className="text-gray-500">{profile?.phone || "+XXX XXX XXX XXX"}</p>
 
         {/* Buttons */}
         <div className="mt-4 space-y-3 w-full">
@@ -111,95 +138,131 @@ const Profile: React.FC = () => {
         </div>
       </div>
 
-      {/* Right Side - Profile Form (Always Visible but Read-Only) */}
+      {/* Right Side - Profile Form */}
       <div className="bg-white p-6 rounded-lg shadow-md w-full md:w-2/3 ml-0 md:ml-6 mt-6 md:mt-0">
         <h3 className="text-xl font-semibold mb-4">Profile Details</h3>
 
         {/* Form Inputs */}
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit(handleSave)} className="space-y-4">
           <div>
             <label className="text-gray-600">Full Name</label>
-            <input
-              type="text"
+            <Controller
               name="name"
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter your full name"
-              value={formData.name}
-              onChange={handleChange}
-              disabled={!editMode}
+              control={control}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  type="text"
+                  className="w-full p-2 border rounded-md"
+                  placeholder="Enter your full name"
+                  disabled={!editMode}
+                />
+              )}
             />
+            {errors.name && (
+              <p className="text-red-500 text-sm">{errors.name.message}</p>
+            )}
           </div>
 
           <div>
             <label className="text-gray-600">Phone Number</label>
-            <input
-              type="text"
+            <Controller
               name="phone"
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter your phone number"
-              value={formData.phone}
-              onChange={handleChange}
-              disabled={!editMode}
+              control={control}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  type="text"
+                  className="w-full p-2 border rounded-md"
+                  placeholder="Enter your phone number"
+                  disabled={!editMode}
+                />
+              )}
             />
+            {errors.phone && (
+              <p className="text-red-500 text-sm">{errors.phone.message}</p>
+            )}
           </div>
 
           <div>
             <label className="text-gray-600">Email</label>
-            <input
-              type="email"
+            <Controller
               name="email"
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-              disabled={!editMode}
+              control={control}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  type="email"
+                  className="w-full p-2 border rounded-md"
+                  placeholder="Enter your email"
+                  disabled={!editMode}
+                />
+              )}
             />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
+            )}
           </div>
 
           <div>
             <label className="text-gray-600">Qualification</label>
-            <input
-              type="text"
+            <Controller
               name="qualification"
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter your qualification"
-              value={formData.qualification}
-              onChange={handleChange}
-              disabled={!editMode}
+              control={control}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  type="text"
+                  className="w-full p-2 border rounded-md"
+                  placeholder="Enter your qualification"
+                  disabled={!editMode}
+                />
+              )}
             />
+            {errors.qualification && (
+              <p className="text-red-500 text-sm">{errors.qualification.message}</p>
+            )}
           </div>
 
           <div>
             <label className="text-gray-600">Specialization</label>
-            <input
-              type="text"
+            <Controller
               name="specialization"
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter your specialization"
-              value={formData.specialization}
-              onChange={handleChange}
-              disabled={!editMode}
+              control={control}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  type="text"
+                  className="w-full p-2 border rounded-md"
+                  placeholder="Enter your specialization"
+                  disabled={!editMode}
+                />
+              )}
             />
+            {errors.specialization && (
+              <p className="text-red-500 text-sm">{errors.specialization.message}</p>
+            )}
           </div>
-        </div>
 
-        {/* Action Buttons (Show Only in Edit Mode) */}
-        {editMode && (
-          <div className="mt-6 flex justify-between">
-            <button
-              className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-md"
-              onClick={handleSave}
-            >
-              <CheckCircle size={16} /> Save Changes
-            </button>
-            <button
-              className="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-md"
-              onClick={() => setEditMode(false)}
-            >
-              Cancel
-            </button>
-          </div>
-        )}
+          {/* Action Buttons (Show Only in Edit Mode) */}
+          {editMode && (
+            <div className="mt-6 flex justify-between">
+              <button
+                type="submit"
+                className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-md"
+              >
+                <CheckCircle size={16} /> Save Changes
+              </button>
+              <button
+                type="button"
+                className="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-md"
+                onClick={() => setEditMode(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+        </form>
       </div>
     </div>
   );

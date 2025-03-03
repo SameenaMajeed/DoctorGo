@@ -6,23 +6,13 @@ export interface IDoctor extends Document {
   email: string;
   password: string;
   phone: string;
-  image : string;
+  image: string;
   qualification: string;
   isBlocked: boolean;
-  bio: string;
-  ticketPrice: number;
-  role: string;
   specialization: string;
-  timeSlot: string;
-  extraCharged: string[];
-  onlineTimeSlot: string[];
-  experience: string;
-  reviews: mongoose.Types.ObjectId[];
-  appointments: mongoose.Types.ObjectId[];
-  ratings: number[];
-  activeStatus: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  // registrationNumber: string; 
+  // certificates: string[]; 
+  // isApproved: boolean; 
 }
 
 const DoctorSchema: Schema = new Schema<IDoctor>(
@@ -32,20 +22,12 @@ const DoctorSchema: Schema = new Schema<IDoctor>(
     password: { type: String, required: true },
     phone: { type: String, required: true },
     qualification: { type: String, required: true },
-    image: { type: String  },
+    image: { type: String },
     isBlocked: { type: Boolean, default: false },
-    bio: { type: String, default: "" },
-    ticketPrice: { type: Number,},
-    role: { type: String},
-    specialization: { type: String, required: true },
-    timeSlot: { type: String},
-    extraCharged: [{ type: String }],
-    onlineTimeSlot: [{ type: String }],
-    experience: { type: String},
-    reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
-    appointments: [{ type: Schema.Types.ObjectId, ref: "Booking" }],
-    ratings: [{ type: Number }],
-    activeStatus: { type: Boolean, default: true },
+    // specialization: { type: String, required: true },
+    // registrationNumber: { type: String, required: true, unique: true },
+    // certificates: [{ type: String, required: true }], 
+    // isApproved: { type: Boolean, default: false }, 
   },
   { timestamps: true }
 );

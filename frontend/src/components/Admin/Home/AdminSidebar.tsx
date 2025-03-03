@@ -13,24 +13,35 @@ import {
 import SidebarItem from "./SidebarItem";
 import { useNavigate } from "react-router-dom";
 import adminApi from "../../../axios/AdminInstance";
+import { useDispatch } from "react-redux";
+import { adminLogout } from "../../../slice/admin/adminSlice";
+import Swal from "sweetalert2";
 
 const AdminSidebar: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleLogout = async () => {
-    try {
-      const response = await adminApi.post("/logout", {
-        method: "POST",
-        credentials: "include", // Ensures cookies are included in the request
-      });
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, logout!",
+    });
 
-      if (response) {
-        navigate("/admin"); // Redirect to login after successful logout
-      } else {
-        console.error("Logout failed");
-      }
+    if (!result.isConfirmed) return;
+
+    try {
+      await adminApi.post("/logout");
+      dispatch(adminLogout());
+      Swal.fire("Logged Out!", "You have been successfully logged out.", "success");
+      navigate("/admin");
     } catch (error) {
-      console.error("Error during logout:", error);
+      Swal.fire("Error!", "Logout failed. Please try again.", "error");
+      console.error("Logout failed:", error);
     }
   };
 
@@ -43,46 +54,14 @@ const AdminSidebar: React.FC = () => {
 
       {/* Navigation Menu */}
       <nav className="flex-1 space-y-2">
-        <SidebarItem
-          href="/admin/dashboard"
-          icon={<Home size={20} />}
-          label="Dashboard"
-        />
-        <SidebarItem
-          href="/admin/users"
-          icon={<Users size={20} />}
-          label="Users"
-        />
-        <SidebarItem
-          href="/admin/doctors"
-          icon={<Stethoscope size={20} />}
-          label="Doctors"
-        />
-        <SidebarItem
-          href="/admin/appointments"
-          icon={<CalendarCheck size={20} />}
-          label="Appointments"
-        />
-        <SidebarItem
-          href="/admin/approvals"
-          icon={<CheckCircle size={20} />}
-          label="Approvals"
-        />
-        <SidebarItem
-          href="/admin/sales_report"
-          icon={<BarChart size={20} />}
-          label="Sales Report"
-        />
-        <SidebarItem
-          href="/admin/payments"
-          icon={<CreditCard size={20} />}
-          label="Payments"
-        />
-        <SidebarItem
-          href="/admin/reports"
-          icon={<FileText size={20} />}
-          label="Reports"
-        />
+        <SidebarItem href="/admin/dashboard" icon={<Home size={20} />} label="Dashboard" />
+        <SidebarItem href="/admin/users" icon={<Users size={20} />} label="Users" />
+        <SidebarItem href="/admin/doctors" icon={<Stethoscope size={20} />} label="Doctors" />
+        <SidebarItem href="/admin/appointments" icon={<CalendarCheck size={20} />} label="Appointments" />
+        <SidebarItem href="/admin/approvals" icon={<CheckCircle size={20} />} label="Approvals" />
+        <SidebarItem href="/admin/sales_report" icon={<BarChart size={20} />} label="Sales Report" />
+        <SidebarItem href="/admin/payments" icon={<CreditCard size={20} />} label="Payments" />
+        <SidebarItem href="/admin/reports" icon={<FileText size={20} />} label="Reports" />
       </nav>
 
       {/* Logout Button */}
@@ -100,3 +79,4 @@ const AdminSidebar: React.FC = () => {
 };
 
 export default AdminSidebar;
+

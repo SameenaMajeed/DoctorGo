@@ -14,10 +14,8 @@ class AdminController {
   async login(req: Request, res: Response): Promise<void> {
     const { email, password } = req.body;
     try {
-      console.log('hi')
       const { admin, accessToken, refreshToken } =
         await this.adminService.adminLogin(email, password);
-        console.log(admin)
       CookieManager.setAuthCookies(res, { accessToken, refreshToken });
       sendResponse(res, HttpStatus.OK, MessageConstants.LOGIN_SUCCESS, {
         admin,
@@ -219,6 +217,7 @@ class AdminController {
     const { userId, isBlocked } = req.body;
     try {
       const updatedUser = await this.adminService.userBlock(userId, isBlocked);
+      
       const message = isBlocked
         ? MessageConstants.USER_BLOCKED
         : MessageConstants.USER_UNBLOCKED;

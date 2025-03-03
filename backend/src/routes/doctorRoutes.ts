@@ -16,7 +16,7 @@ const doctorController = new DoctorController(doctorService);
 
 const doctorRoute: Router = express.Router();
 
-doctorRoute.post("/signup", (req, res) => {
+doctorRoute.post("/signup", upload.array("certificates"), (req, res) => {
   doctorController.registerDoctor(req, res);
 });
 
@@ -27,6 +27,8 @@ doctorRoute.post("/login", (req, res) => {
 doctorRoute.post("/refresh-token", (req, res) => {
   doctorController.refreshAccessToken(req, res);
 });
+
+// doctorRoute.post("/approve/:id", doctorController.approveDoctor.bind(doctorController)); 
 
 doctorRoute.get("/profile/:id", authenticateToken("doctor"), (req, res) =>
   doctorController.getProfile(req, res)

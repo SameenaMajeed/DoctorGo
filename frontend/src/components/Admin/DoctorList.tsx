@@ -6,6 +6,7 @@ import Pagination from "../../Pagination/Pagination";
 import TableActions from "./TableActions";
 import DataTable from "./DataTable";
 import AdminSidebar from "./Home/AdminSidebar";
+import Swal from "sweetalert2";
 
 const DoctorList: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -25,11 +26,36 @@ const DoctorList: React.FC = () => {
   const totalPages = Math.ceil(total / limit);
 
   const handleBlockedDoctors = async (doctorId: string, isBlocked: boolean) => {
-    try {
-      await blockDoctor(doctorId, isBlocked);
-      refetch();
-    } catch (err) {
-      console.error("Error blocking/unblocking doctor:", err);
+    const action = isBlocked ? "Block" : "Unblock";
+    const result = await Swal.fire({
+      title: `Are you sure?`,
+      text: `Do you really want to ${action.toLowerCase()} this user?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: `Yes, ${action}!`,
+      cancelButtonText: "Cancel",
+    });
+    if (result.isConfirmed) {
+      try {
+        await blockDoctor(doctorId, isBlocked);
+        Swal.fire({
+          title: "Success!",
+          text: `User has been ${action.toLowerCase()}ed successfully.`,
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        refetch();
+      } catch (err) {
+        console.error("Error blocking/unblocking doctor:", err);
+        Swal.fire({
+          title: "Error!",
+          text: "Something went wrong. Please try again.",
+          icon: "error",
+        });
+      }
     }
   };
 

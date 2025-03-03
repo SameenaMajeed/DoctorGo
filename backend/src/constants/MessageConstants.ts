@@ -25,5 +25,7 @@ export const MessageConstants = {
     USER_UNBLOCKED: "User unblocked successfully.",
     PROFILE_FETCHED_SUCCESS : "User profile fetched successfully.",
     DOCTOR_ID_NOT_FOUND : "Doctor ID not found",
-    PROFILE_UPDATED_SUCCESS:"Profile updated sucessfully"
+    PROFILE_UPDATED_SUCCESS:"Profile updated sucessfully",
+    DOCTOR_NOT_FOUND:'Doctor not found',
+    DOCTOR_APPROVED : 'Doctor approved successfully'
 }

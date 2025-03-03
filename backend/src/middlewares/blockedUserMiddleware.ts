@@ -9,10 +9,10 @@ const blockedUserMiddleware = async (
   try {
     const   email = req.body.email || req.query.email;
 
-    console.log('emial in blocked middleware',email)
+    console.log('email in blocked middleware',email)
     const user = await User.findOne({ email });
  
-    if (user && user.isblocked) {
+    if (user && user.isBlocked) {
      res.status(403).json({ message: "User is blocked by Admin." });
      return
     }

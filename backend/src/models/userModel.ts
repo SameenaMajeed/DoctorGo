@@ -15,7 +15,6 @@ interface IUser extends Document {
     url : string;
     address : string;
     is_verified : boolean;
-    isblocked : boolean;
     is_deleted : boolean;
 }
 
@@ -30,7 +29,7 @@ const userSchema : Schema = new Schema({
     medical_History : String,
     DOB : Date,
     url : String,
-    is_blocked: {
+    isBlocked: {  
         type: Boolean,
         default: false,
     },
