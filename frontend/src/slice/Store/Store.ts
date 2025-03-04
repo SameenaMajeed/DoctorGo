@@ -12,7 +12,7 @@ import { AnyAction } from 'redux';
 const persistConfig = {
     key : 'root',
     storage,
-    whitelist: ['user', 'admin','Doctor'],
+    whitelist: ['user', 'admin','doctor'],
 }
 
 // combine user reducer

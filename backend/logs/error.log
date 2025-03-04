@@ -93,3 +93,18 @@
 2025-02-27T12:03:41.596Z [ERROR]: Error Response - Status: 401, Message: Login failed. Please check your credentials.
 2025-02-27T12:33:37.653Z [ERROR]: Error Response - Status: 401, Message: Login failed. Please check your credentials.
 2025-02-27T13:11:05.329Z [ERROR]: Error Response - Status: 400, Message: Refresh token is required.
+2025-03-03T15:45:56.061Z [ERROR]: Error Response - Status: 500, Message: Wrong Password.
+2025-03-03T15:45:57.962Z [ERROR]: Error Response - Status: 500, Message: Wrong Password.
+2025-03-03T15:46:10.781Z [ERROR]: Error Response - Status: 500, Message: Wrong Password.
+2025-03-03T15:46:19.612Z [ERROR]: Error Response - Status: 500, Message: Wrong Password.
+2025-03-03T15:46:22.490Z [ERROR]: Error Response - Status: 500, Message: Wrong Password.
+2025-03-03T15:46:23.469Z [ERROR]: Error Response - Status: 500, Message: Wrong Password.
+2025-03-03T15:46:23.712Z [ERROR]: Error Response - Status: 500, Message: Wrong Password.
+2025-03-03T18:33:04.339Z [ERROR]: Error Response - Status: 500, Message: Login failed. Please check your credentials.
+2025-03-03T18:33:06.400Z [ERROR]: Error Response - Status: 500, Message: Login failed. Please check your credentials.
+2025-03-03T18:33:07.425Z [ERROR]: Error Response - Status: 500, Message: Login failed. Please check your credentials.
+2025-03-03T18:33:07.994Z [ERROR]: Error Response - Status: 500, Message: Login failed. Please check your credentials.
+2025-03-03T19:03:06.046Z [ERROR]: Error Response - Status: 500, Message: Login failed. Please check your credentials.
+2025-03-03T19:04:28.070Z [ERROR]: Error Response - Status: 500, Message: Login failed. Please check your credentials.
+2025-03-03T19:04:59.653Z [ERROR]: Error Response - Status: 500, Message: Login failed. Please check your credentials.
+2025-03-04T01:44:28.982Z [ERROR]: Error Response - Status: 400, Message: Refresh token is required.

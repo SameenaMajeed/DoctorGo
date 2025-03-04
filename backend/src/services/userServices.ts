@@ -108,6 +108,7 @@ export class UserService implements IUserService {
       }
 
       const otp = generateOtp();
+      console.log('Generated otp:' , otp)
       const mailSent = await sentMail(
         email,
         'Forgot Password Verification',

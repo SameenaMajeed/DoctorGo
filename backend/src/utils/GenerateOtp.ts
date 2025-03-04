@@ -12,7 +12,8 @@ export const generateOtp = (): string => {
 
 export async function hashOtp(otp: string): Promise<string> {
   try {
-    return await bcrypt.hash(otp, 10);
+    const hashedOtp = await bcrypt.hash(otp, 10);
+    return hashedOtp;
   } catch (error: any) {
     console.log(error.message);
     throw new Error();
@@ -24,7 +25,8 @@ export async function compareOtps(
   otpDb: string,
 ): Promise<boolean> {
   try {
-    return await bcrypt.compare(otp, otpDb);
+    const isMatch = await bcrypt.compare(otp, otpDb);
+    return isMatch;
   } catch (error: any) {
     console.log(error.any);
     throw new Error('wrong otp');

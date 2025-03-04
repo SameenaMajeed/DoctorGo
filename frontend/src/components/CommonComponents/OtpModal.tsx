@@ -105,7 +105,7 @@ const OtpModal: React.FC<OtpModalProps> = ({
         </form>
 
         <div className="mt-4 text-center">
-          <p className="text-sm font-medium text-gray-700">
+          <p className="text-sm font-medium text-red-700">
             OTP will expire in {countdown} seconds.
           </p>
 
@@ -121,7 +121,7 @@ const OtpModal: React.FC<OtpModalProps> = ({
         </div>
 
         {message && (
-          <p className="mt-4 text-center text-sm font-medium text-gray-700">
+          <p className="mt-4 text-center text-sm font-medium text-red-700">
             {message}
           </p>
         )}

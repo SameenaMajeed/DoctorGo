@@ -3,6 +3,8 @@ import { googleUserData } from "../types/google";
 
 
 import { IUserService } from "../interfaces/user/userServiceInterface";
+import { sendError } from "../utils/responseUtils";
+import { HttpStatus } from "../constants/Httpstatus";
 
 declare global {
   namespace Express {
@@ -20,7 +22,7 @@ declare global {
 export class Usercontroller {
  
 
-  constructor(    private userService:IUserService ) {
+  constructor( private userService:IUserService ) {
 
   }
 
@@ -125,7 +127,7 @@ export class Usercontroller {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 3000, // 15 minutes
+        maxAge: 10 * 60 * 1000, // default: 10 minutes
       });
 
       res.status(200).json({

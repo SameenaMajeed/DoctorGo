@@ -21,7 +21,7 @@ const corsOptions = {
     origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"], // Fixed spelling mistake
-    credentials: true, // ✅ Corrected typo (was `Credential`)
+    credentials: true, // Corrected typo (was `Credential`)
 };
 
 // Apply middleware

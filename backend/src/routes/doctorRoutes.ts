@@ -6,6 +6,7 @@ import { DoctorService } from "../services/doctorService";
 import { DoctorRepository } from "../repositories/doctorRepository";
 import { OtpRepository } from "../repositories/otpRepository";
 import { checkApproved } from "../middlewares/checkApproved";
+import { EmailVerificationController } from "../controllers/emailVerification";
 
 const otpRepository = new OtpRepository();
 const doctorRepository = new DoctorRepository();
@@ -16,7 +17,7 @@ const doctorController = new DoctorController(doctorService);
 
 const doctorRoute: Router = express.Router();
 
-doctorRoute.post("/signup", upload.array("certificates"), (req, res) => {
+doctorRoute.post("/signup", (req, res) => {
   doctorController.registerDoctor(req, res);
 });
 
@@ -40,6 +41,15 @@ doctorRoute.put("/updateProfile/:id", authenticateToken("doctor"), (req, res) =>
 
 doctorRoute.post("/logout", (req, res) => {
   doctorController.logout(req, res);
+});
+
+
+doctorRoute.post("/send-otp",(req, res) => {
+   EmailVerificationController.sendVerificationOTP(req, res);
+  });
+doctorRoute.post("/verify-otp",(req, res) => { 
+  console.log("Request Body:", req.body);
+  EmailVerificationController.verifyOTPAndChangeEmail(req, res);
 });
 
 export default doctorRoute;

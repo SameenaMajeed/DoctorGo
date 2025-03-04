@@ -1,9 +1,27 @@
 import React, { useState } from "react";
 import { Bell } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../../slice/Store/Store";
+import doctorApi from "../../../axios/DoctorInstance";
+import { logoutDoctor } from "../../../slice/Doctor/doctorSlice";
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const doctor = useSelector((state: RootState) => state.doctor.doctor);
+
+  const handleLogout = async () => {
+    try {
+      await doctorApi.post("/logout");
+      dispatch(logoutDoctor());
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <header className="flex items-center justify-between bg-white shadow px-6 py-4">
@@ -41,7 +59,7 @@ const Header: React.FC = () => {
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"> <Link to="/doctor/profile">My Profile</Link></li>
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">My Appointments</li>
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Messages</li>
-                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-500"><Link to="/doctor">Logout</Link></li>
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-500" onClick={handleLogout}>Logout</li>
               </ul>
             </div>
           )}

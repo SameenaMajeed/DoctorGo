@@ -11,7 +11,7 @@ const Main = () => {
           Manage your <span className="text-green-600 font-semibold">appointments</span>, <span className="text-green-600 font-semibold">patients</span>, and <span className="text-green-600 font-semibold">schedule</span> efficiently.
         </p>
 
-        {/* Quick Actions */}
+        {/* Quick Actions
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <button className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition">
             View Appointments
@@ -19,7 +19,7 @@ const Main = () => {
           <button className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition">
             Add New Patient
           </button>
-        </div>
+        </div> */}
       </main>
     </div>
   );

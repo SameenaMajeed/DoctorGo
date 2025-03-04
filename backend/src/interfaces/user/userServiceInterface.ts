@@ -1,6 +1,6 @@
 import { IUser } from '../../models/userModel';
 import { googleUserData } from '../../types/google';
- import { ForgotPasswordResponse } from '../../services/userServices'
+import { ForgotPasswordResponse } from '../../services/userServices'
 
 export interface IUserService {
  
