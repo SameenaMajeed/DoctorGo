@@ -7,21 +7,25 @@ import api from "../../axios/UserInstance";
 import { useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
 import { Appointment } from "../../Types";
+import Sidebar from "./SideBar";
+
 
 const AppointmentsList: React.FC = () => {
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const appointmentsPerPage = 3;
+
   const userId = useSelector((state: RootState) => state.user?.user?.id);
 
   useEffect(() => {
-    fetchAppointments();
+    if (userId) fetchAppointments();
   }, [userId]);
 
   const fetchAppointments = async () => {
     try {
       const response = await api.get(`/appointments/${userId}`);
-      console.log(response)
       if (Array.isArray(response.data.data)) {
         setAppointments(response.data.data);
       } else {
@@ -35,46 +39,95 @@ const AppointmentsList: React.FC = () => {
   };
 
   const handleCancelAppointment = (id: string) => {
-    setAppointments(appointments.filter((appt) => appt._id !== id));
+    setAppointments((prev) => prev.filter((appt) => appt._id !== id));
+  };
+
+  // Pagination logic
+  const indexOfLastAppointment = currentPage * appointmentsPerPage;
+  const indexOfFirstAppointment = indexOfLastAppointment - appointmentsPerPage;
+  const currentAppointments = appointments.slice(indexOfFirstAppointment, indexOfLastAppointment);
+  const totalPages = Math.ceil(appointments.length / appointmentsPerPage);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Navbar */}
       <div className="bg-white shadow-md fixed w-full top-0 z-50">
         <Navbar />
       </div>
 
-      {/* Back Button */}
-      <div className="py-6 mt-16 flex items-center px-6">
-        <button
-          onClick={() => navigate(-1)}
-          className="bg-blue-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-200"
-        >
-          ← Back
-        </button>
-      </div>
+      <div className="flex flex-1 pt-20">
+        <aside  className="hidden md:block w-64 border-r bg-white">
+          <Sidebar />
+        </aside >
 
-      {/* Content Section */}
-      <div className="flex-1 container mx-auto px-6 py-10">
-        <h2 className="text-3xl font-semibold text-gray-800 text-center mb-6">My Appointments</h2>
-        <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
-          {loading ? (
-            <p className="text-gray-500 text-center animate-pulse">Loading appointments...</p>
-          ) : appointments.length > 0 ? (
-            <div className="space-y-4">
-              {appointments.map((appointment) => (
-                <AppointmentCard key={appointment._id} appointment={appointment} onCancel={handleCancelAppointment} />
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-center">No appointments found.</p>
-          )}
+        <div className="flex-1 px-6 py-10">
+          <h2 className="text-3xl font-semibold text-gray-800 text-center mb-6">
+            My Appointments
+          </h2>
+
+          <div className="max-w-4xl mx-auto bg-white shadow-md rounded-xl p-6">
+            {loading ? (
+              <p className="text-center text-gray-500 animate-pulse">
+                Loading appointments...
+              </p>
+            ) : currentAppointments.length > 0 ? (
+              <>
+                <div className="space-y-4">
+                  {currentAppointments.map((appointment) => (
+                    <AppointmentCard
+                      key={appointment._id}
+                      appointment={appointment}
+                      onCancel={handleCancelAppointment}
+                    />
+                  ))}
+                </div>
+
+                {/* Pagination Controls */}
+                <div className="flex justify-center mt-6 space-x-2">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                  >
+                    Prev
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(i + 1)}
+                      className={`px-3 py-1 rounded ${
+                        currentPage === i + 1
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-100 hover:bg-gray-200"
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              </>
+            ) : (
+              <p className="text-center text-gray-500">
+                No appointments found.
+              </p>
+            )}
+          </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

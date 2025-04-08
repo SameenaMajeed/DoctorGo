@@ -12,7 +12,7 @@ const App: FC = () => {
           {routes}
         </Routes>
       </Router>
-      <ToastContainer position="bottom-right" />
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };

@@ -178,6 +178,26 @@ export class UserService implements IUserService {
   }
 
 
+  async getUserProfile(userId: string): Promise<{ id: string; name: string; email: string; mobile: string; age : string; profilePicture: string } | null> {
+    try {
+      const user = await this.userRepository.findById(userId);
+      if (!user) {
+        throw new AppError(HttpStatus.NotFound, MessageConstants.USER_NOT_FOUND);
+      }
+      return {
+        id: user._id.toString(),
+        name: user.name ?? "Unknown",
+        email: user.email ?? "No Email",
+        mobile: user.mobile_no ?? "No Mobile",
+        age : user.DOB??"",
+        profilePicture: user.profilePicture ?? "",
+      };
+    } catch (error: unknown) {
+      if (error instanceof AppError) throw error;
+      throw new AppError(HttpStatus.InternalServerError, MessageConstants.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   async getAllDoctors(): Promise<{doctors : IDoctor[] }>{
     try {
       const doctors = await this.doctorRepository.findAllDoctor()

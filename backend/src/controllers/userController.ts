@@ -261,6 +261,29 @@ export class Usercontroller {
     }
   }
 
+  // Profile session
+  async getProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.data?.id;
+      if (!userId) {
+        throw new AppError(HttpStatus.BadRequest, MessageConstants.USER_ID_NOT_FOUND);
+      }
+      const userProfile = await this.userService.getUserProfile(userId);
+      if (!userProfile) {
+        throw new AppError(HttpStatus.NotFound, MessageConstants.USER_NOT_FOUND);
+      }
+      sendResponse(res, HttpStatus.OK, MessageConstants.PROFILE_FETCHED_SUCCESS, userProfile);
+    } catch (error: unknown) {
+      if (error instanceof AppError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(res, HttpStatus.InternalServerError, MessageConstants.INTERNAL_SERVER_ERROR);
+      }
+    }
+  }
+
+
+// Doctors fetching 
   async getAllDoctors(req: Request, res: Response): Promise<void> {
     try {
       const result = await this.userService.getAllDoctors()

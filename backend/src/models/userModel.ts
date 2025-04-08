@@ -12,11 +12,12 @@ interface IUser extends Document {
     role : string;
     google_id?: string; 
     medical_History : string;
-    DOB : Date;
+    DOB : string;
     url : string;
     address : string;
     is_verified : boolean;
     is_deleted : boolean;
+    profilePicture : string;
 }
 
 
@@ -28,8 +29,9 @@ const userSchema : Schema = new Schema({
     gender : String,
     role : String,
     medical_History : String,
-    DOB : Date,
+    DOB : String,
     url : String,
+    profilePicture : String,
     google_id: { type: String }, 
     isBlocked: {  
         type: Boolean,

@@ -34,6 +34,10 @@ export interface IUserService {
     newPassword: string,
   ): Promise<{ success: boolean; message: string }>;
 
+
+  getUserProfile(userId: string): Promise<{ id: string; name: string; email: string; mobile: string; age : string; profilePicture: string } | null>
+
+
   getAllDoctors(doctorId?: string ): Promise<{ doctors: any[]}>
   getDoctorById(doctorId: string) : Promise<IDoctor>;
 

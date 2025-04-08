@@ -32,6 +32,7 @@ import TimeSlots from "../components/Doctor/Slot/TimeSlot.tsx";
 import AppointmentsList from "../components/User/AppointmentList.tsx";
 import Appointments from "../components/Doctor/Appointments.tsx";
 import EditSlot from "../components/Doctor/Slot/EditSlot.tsx";
+import UserProfile from "../components/User/UserProfile.tsx";
 
 export const routes = (
   <>
@@ -39,6 +40,7 @@ export const routes = (
       <Route path="/" Component={UserHomePage} />
       <Route path="/signup" element={<SignupForm />} />
       <Route path="/login" element={<LoginForm />} />
+      <Route path="/my-profile" element={<UserProfile/>}/>
       <Route path='/doctors/:doctorId' element={<AppointmentPage/>}/>
       <Route path='/appointment/verification' element={<AppointmentVerification/>}/>
       <Route path='/appointment/success' element={<PaymentSuccess/>}/>
