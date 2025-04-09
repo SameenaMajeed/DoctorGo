@@ -6,3 +6,11 @@ export interface ProfilePictureResponse {
       profilePicture: string;
     };
   }
+
+  export interface AxiosError {
+    response?: {
+      data?: {
+        message?: string;
+      };
+    };
+  }

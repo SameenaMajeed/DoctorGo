@@ -1,44 +1,73 @@
-import { IUser } from '../../models/userModel';
-import { googleUserData } from '../../types/google';
-import { ForgotPasswordResponse } from '../../services/userServices'
-import { IDoctor } from '../../models/DoctorModel';
+import { IUser } from "../../models/userModel";
+import { googleUserData } from "../../types/google";
+import { ForgotPasswordResponse } from "../../services/userServices";
+import { IDoctor } from "../../models/DoctorModel";
 
 export interface IUserService {
- 
   registerUser(
     name: string,
     email: string,
     password: string,
-    mobile_no: string,
+    mobile_no: string
   ): Promise<IUser>;
 
-   
   authenticateUser(
     email: string,
-    password: string,
+    password: string
   ): Promise<{ user: IUser; accessToken: string; refreshToken: string }>;
 
- 
   googleSignIn(
-    userData: googleUserData,
+    userData: googleUserData
   ): Promise<{ user: IUser; accessToken: string; refreshToken: string }>;
- 
+
   refreshAccessToken(refreshToken: string): Promise<{ accessToken: string }>;
 
- 
   forgotPasswordVerify(email: string): Promise<ForgotPasswordResponse>;
 
- 
   resetPassword(
     email: string,
-    newPassword: string,
+    newPassword: string
   ): Promise<{ success: boolean; message: string }>;
 
+  getUserProfile(
+    userId: string
+  ): Promise<{
+    id: string;
+    name: string;
+    email: string;
+    mobile_no: string;
+    age: string;
+    address: string;
+    DOB: string;
+    gender: string;
+    profilePicture: string;
+  } | null>;
 
-  getUserProfile(userId: string): Promise<{ id: string; name: string; email: string; mobile: string; age : string; profilePicture: string } | null>
+  uploadProfilePicture(userId: string, filePath: string): Promise<string>;
 
+  updateUserProfile(
+    userId: string,
+    updateData: {
+      name: string;
+      email: string;
+      mobile_no: string;  
+      address: string;
+      DOB: string;
+      gender: string;
+      age: string;
+    }
+  ): Promise<{
+    id: string;
+    name: string;
+    email: string;
+    mobile_no: string;
+    address: string;
+    DOB: string;
+    gender: string;
+    age: string;
+    profilePicture: string;
+  }>
 
-  getAllDoctors(doctorId?: string ): Promise<{ doctors: any[]}>
-  getDoctorById(doctorId: string) : Promise<IDoctor>;
-
+  getAllDoctors(doctorId?: string): Promise<{ doctors: any[] }>;
+  getDoctorById(doctorId: string): Promise<IDoctor>;
 }

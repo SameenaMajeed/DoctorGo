@@ -1,7 +1,7 @@
 // components/TextArea.tsx
 import React from "react";
 
-const TextArea = ({ label, value, onChange, id }: any) => (
+const TextArea =  React.forwardRef(({ label, value, onChange, id }: any , ref) => (
   <div>
     <label htmlFor={id} className="block text-sm font-medium text-gray-700">{label}</label>
     <textarea
@@ -13,6 +13,6 @@ const TextArea = ({ label, value, onChange, id }: any) => (
       aria-label={label}
     />
   </div>
-);
+))
 
 export default TextArea;

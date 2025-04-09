@@ -13,6 +13,7 @@ import { DoctorController } from "../controllers/doctorController";
 import { DoctorService } from "../services/doctorService";
 import { PaymentService } from "../services/PaymentService";
 import SlotRepository from "../repositories/SlotRepository";
+import upload from "../middlewares/multer";
 
 const userRoute: Router = express.Router();
 const userRepository = new UserRepository();
@@ -65,6 +66,28 @@ userRoute.post("/reset-password", (req: Request, res: Response) => {
 });
 
 userRoute.post("/logout", (req, res) => userController.logout(req, res));
+
+// User profile (using middleware for authentication)
+userRoute.get('/profile', authenticateToken('user'), blockedUserMiddleware, (req: Request, res: Response) => {
+  userController.getProfile(req, res);
+});
+
+userRoute.put('/updateProfile', authenticateToken('user'), (req, res) => userController.updateProfile(req, res));
+
+userRoute.put('/uploadProfilePicture', authenticateToken('user'), upload.single('profilePicture'), (req: Request, res: Response) => {
+  console.log('request hitting')
+  userController.uploadProfilePicture(req, res);
+});
+
+// password reset
+userRoute.post('/forgot-password', (req: Request, res: Response) => {
+  userController.forgotPassword(req, res);
+});
+
+userRoute.post('/reset-password', (req: Request, res: Response) => {
+  userController.resetPassword(req, res);
+});
+
 
 // Doctor related routes
 userRoute.get("/doctors", blockedUserMiddleware, (req: Request, res: Response) => {

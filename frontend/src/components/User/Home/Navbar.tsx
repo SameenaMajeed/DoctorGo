@@ -11,8 +11,6 @@ const Navbar: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.user.user);
-  console.log('User details :' , user)
-  console.log('User details :' , user?.email)
 
   const [showMenu, setShowMenu] = useState(false);
 

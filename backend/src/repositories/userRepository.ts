@@ -3,8 +3,12 @@ import { UserRepositoryInterface } from '../interfaces/user/UserRepositoryInterf
 import User, { IUser } from '../models/userModel';
 import { googleUserData } from '../types/google';
 import Doctor , {IDoctor} from '../models/DoctorModel';
+import { BaseRepository } from './BaseRepository';
 
-export class UserRepository implements UserRepositoryInterface {
+export class UserRepository extends BaseRepository<IUser> implements UserRepositoryInterface {
+  constructor() {
+    super(User);
+  }
   // Create a new user (standard or Google)
   async create(user: Partial<IUser> | googleUserData): Promise<IUser> {
     try {
@@ -62,9 +66,9 @@ export class UserRepository implements UserRepositoryInterface {
     }
   }
 
-  async findAll(skip:number,limit:number): Promise<any[]> {
-   return await User.find().skip(skip).limit(limit).exec()
-  }
+  // async findAll(skip:number,limit:number): Promise<any[]> {
+  //  return await User.find().skip(skip).limit(limit).exec()
+  // }
   async countAll(): Promise<number> {
     return await User.countDocuments();
   }
@@ -93,6 +97,28 @@ export class UserRepository implements UserRepositoryInterface {
   async save(user:IUser):Promise<IUser>{
     return await user.save()
   }
+
+
+  // async updateProfilePicture(userId: string, profilePicture: string): Promise<IUser | null> {
+  //   try {
+  //     const updatedUser = await User.findByIdAndUpdate(
+  //       userId,
+  //       { profilePicture },
+  //       { new: true }
+  //     ).exec();
+  //     if (!updatedUser) {
+  //       throw new AppError(HttpStatus.NotFound, MessageConstants.USER_NOT_FOUND);
+  //     }
+  //     return updatedUser;
+  //   } catch (error: unknown) {
+  //     console.error('Error in updateProfilePicture:', error);
+  //     if (error instanceof AppError) throw error;
+  //     const errorMessage = error instanceof Error 
+  //       ? `${MessageConstants.INTERNAL_SERVER_ERROR}: ${error.message}`
+  //       : MessageConstants.INTERNAL_SERVER_ERROR;
+  //     throw new AppError(HttpStatus.InternalServerError, errorMessage);
+  //   }
+  // }
   
 }
 

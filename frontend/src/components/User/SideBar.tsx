@@ -39,8 +39,8 @@ const Sidebar: React.FC = () => {
               <span>←</span>
               <span>Back</span>
             </button>
-            <button className="w-full bg-blue-600 text-white py-2 rounded-md font-semibold">
-              Dashboard
+            <button onClick={() => navigate('/')} className="w-full bg-blue-600 text-white py-2 rounded-md font-semibold">
+              Home Page
             </button>
           </div>
         </div>

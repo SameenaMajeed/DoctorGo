@@ -1,6 +1,6 @@
 import React from "react";
 
-const SelectInput = ({ label, value, onChange, options, id }: any) => (
+const SelectInput =  React.forwardRef(({ label, value, onChange, options, id }: any,ref) => (
   <div>
     <label htmlFor={id} className="block text-sm font-medium text-gray-700">{label}</label>
     <select
@@ -15,6 +15,6 @@ const SelectInput = ({ label, value, onChange, options, id }: any) => (
       ))}
     </select>
   </div>
-);
+))
 
 export default SelectInput;

@@ -4,17 +4,24 @@ interface User {
     id: string;
     name: string;
     email: string;
+    profilePicture: string;
+    mobile_no : string;
+    address:string;
+    gender:string;
+    DOB:string;
     accessToken?: string;
 }
 
 interface UserState {
   user: User | null;
+  profile: User | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: UserState = {
   user: null,
+  profile : null,
   loading: false,
   error: null,
 };
@@ -31,6 +38,11 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    setProfile: (state, action: PayloadAction<User>) => {
+          state.profile = action.payload;
+          state.loading = false;
+          state.error = null;
+    },
     setError: (state, action: PayloadAction<string>) => {
       state.error = action.payload;
       state.loading = false;
@@ -44,6 +56,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { setLoading, setUser, setError, logoutUser} = userSlice.actions;
+export const { setLoading, setUser, setError, logoutUser ,setProfile} = userSlice.actions;
 
 export default userSlice.reducer;

@@ -282,6 +282,86 @@ export class Usercontroller {
     }
   }
 
+  async uploadProfilePicture(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.data?.id;
+      if (!userId) {
+        throw new AppError(HttpStatus.BadRequest, MessageConstants.USER_ID_NOT_FOUND);
+      }
+      if (!req.file?.path) {
+        throw new AppError(HttpStatus.BadRequest, MessageConstants.FILE_NOT_UPLOADED);
+      }
+      const profilePicture = await this.userService.uploadProfilePicture(userId, req.file.path);
+      sendResponse(res, HttpStatus.OK, MessageConstants.PROFILE_PICTURE_UPLOADED, { profilePicture });
+    } catch (error: unknown) {
+      if (error instanceof AppError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(res, HttpStatus.InternalServerError, MessageConstants.INTERNAL_SERVER_ERROR);
+      }
+    }
+  }
+
+  async updateProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.data?.id;
+      if (!userId) {
+        throw new AppError(HttpStatus.BadRequest, MessageConstants.USER_ID_NOT_FOUND);
+      }
+      
+      // Use mobile_no instead of mobile
+      const { name, email, mobile_no, address, DOB, age, gender } = req.body;
+      console.log('Received update data:', req.body);
+
+      const updatedUser = await this.userService.updateUserProfile(userId, { 
+        name, 
+        email, 
+        mobile_no,  // Changed from mobile to mobile_no
+        address, 
+        DOB,
+        age,
+        gender
+      });
+      
+      if (!updatedUser) {
+        throw new AppError(HttpStatus.NotFound, MessageConstants.USER_NOT_FOUND);
+      }
+
+       // Verify address in the response
+    console.log("Updated user with address:", updatedUser.address);
+      sendResponse(res, HttpStatus.OK, MessageConstants.PROFILE_UPDATED_SUCCESS, updatedUser);
+    } catch (error: unknown) {
+      if (error instanceof AppError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(res, HttpStatus.InternalServerError, MessageConstants.INTERNAL_SERVER_ERROR);
+      }
+    }
+  }
+  
+  // async updateProfile(req: Request, res: Response): Promise<void> {
+  //   try {
+  //     const userId = req.data?.id;
+  //     if (!userId) {
+  //       throw new AppError(HttpStatus.BadRequest, MessageConstants.USER_ID_NOT_FOUND);
+  //     }
+  //     const { name, email, mobile, address, DOB, age, gender } = req.body;
+  //     console.log('data:' ,req.body)
+
+  //     const updatedUser = await this.userService.updateUserProfile(userId, { name, email, mobile , address , DOB });
+  //     if (!updatedUser) {
+  //       throw new AppError(HttpStatus.NotFound, MessageConstants.USER_NOT_FOUND);
+  //     }
+  //     sendResponse(res, HttpStatus.OK, MessageConstants.PROFILE_UPDATED_SUCCESS, updatedUser);
+  //   } catch (error: unknown) {
+  //     if (error instanceof AppError) {
+  //       sendError(res, error.status, error.message);
+  //     } else {
+  //       sendError(res, HttpStatus.InternalServerError, MessageConstants.INTERNAL_SERVER_ERROR);
+  //     }
+  //   }
+  // }
+
 
 // Doctors fetching 
   async getAllDoctors(req: Request, res: Response): Promise<void> {

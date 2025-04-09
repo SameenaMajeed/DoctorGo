@@ -1,6 +1,6 @@
 import React from "react";
 
-const TextInput = ({ label, value, onChange, type = "text", id }: any) => (
+const TextInput = React.forwardRef(({ label, value, onChange, type = "text", id }: any , ref)  => (
   <div>
     <label htmlFor={id} className="block text-sm font-medium text-gray-700">{label}</label>
     <input
@@ -12,6 +12,6 @@ const TextInput = ({ label, value, onChange, type = "text", id }: any) => (
       aria-label={label}
     />
   </div>
-);
+));
 
 export default TextInput;

@@ -18,6 +18,7 @@ interface IUser extends Document {
     is_verified : boolean;
     is_deleted : boolean;
     profilePicture : string;
+    age : string;
 }
 
 
@@ -31,7 +32,13 @@ const userSchema : Schema = new Schema({
     medical_History : String,
     DOB : String,
     url : String,
+    age : String,
     profilePicture : String,
+    address: { 
+        type: String,
+        default: "",
+        trim: true
+    },
     google_id: { type: String }, 
     isBlocked: {  
         type: Boolean,
