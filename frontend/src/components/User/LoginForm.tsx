@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FormEvent, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setError, setLoading, setUser } from "../../slice/user/userSlice";
@@ -10,16 +10,7 @@ import ForgotPasswordModel from "../CommonComponents/ForgotPasswordModel";
 import {getAuth , signInWithPopup , GoogleAuthProvider} from "firebase/auth"
 import App from "../../FirebaseAuthentication/config";
 import { toast } from "react-hot-toast";
-
-interface GoogleSignInResponse {
-  user: {
-    id: string
-    name: string
-    email: string
-    googleId: string
-  }
-  message: string
-}
+import { GoogleSignInResponse, LoginResponse } from "../../types/auth";
 
 const LoginForm: React.FC = () => {
   const dispatch = useDispatch();
@@ -56,7 +47,7 @@ const LoginForm: React.FC = () => {
     return valid;
   };
 
-  const handleLogin = async (e: any) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage("");
 
@@ -64,14 +55,23 @@ const LoginForm: React.FC = () => {
 
     dispatch(setLoading());
     try {
-      const response = await api.post(
+      const response = await api.post<LoginResponse>(
         "/login",
         { email, password },
         { withCredentials: true }
       );
-      const { user } = response.data;
-      dispatch(setUser({ name: user.name, email: user.email ,id : user._id}));
-      setMessage("Login successful!");
+      console.log('User : ',response.data)
+      const { user , accessToken , refreshToken } = response.data.data;
+      console.log('User : ',user)
+      dispatch(setUser({
+        id: user._id || "", // fallback to empty string
+        name: user.name || "",
+        email: user.email || "",
+        mobile_no: user.mobile_no || "",
+        accessToken, // Store accessToken
+        refreshToken,
+      }));
+      toast.success('Login successful!');
       navigate("/");
     } catch (error: any) {
       console.error(error);
@@ -93,16 +93,23 @@ const LoginForm: React.FC = () => {
       const result = await signInWithPopup(auth, provider);
       const idToken = await result.user.getIdToken();
   
-      const response : any = await api.post('/google', { idToken }, { withCredentials: true });
+      const response : any = await api.post<GoogleSignInResponse>('/google', { idToken }, { withCredentials: true });
   
       console.log('Full API response:', response.data);
   
       // Extract user correctly
-      const user = response.data?.data?.user; 
+      const {user , accessToken, refreshToken } = response.data?.data; 
       console.log('Extracted user:', user);
   
       if (user) {
-        dispatch(setUser(user)); 
+        dispatch(setUser({
+          id: user._id || "", // fallback to empty string
+          name: user.name || "",
+          email: user.email || "",
+          mobile_no: user.mobile_no || "",
+          accessToken, // Store accessToken
+          refreshToken,
+        })); 
         toast.success('Google Sign-In successful!');
         navigate("/");
       } else {

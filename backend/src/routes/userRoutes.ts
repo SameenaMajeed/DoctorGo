@@ -75,7 +75,6 @@ userRoute.get('/profile', authenticateToken('user'), blockedUserMiddleware, (req
 userRoute.put('/updateProfile', authenticateToken('user'), (req, res) => userController.updateProfile(req, res));
 
 userRoute.put('/uploadProfilePicture', authenticateToken('user'), upload.single('profilePicture'), (req: Request, res: Response) => {
-  console.log('request hitting')
   userController.uploadProfilePicture(req, res);
 });
 
@@ -90,7 +89,7 @@ userRoute.post('/reset-password', (req: Request, res: Response) => {
 
 
 // Doctor related routes
-userRoute.get("/doctors", blockedUserMiddleware, (req: Request, res: Response) => {
+userRoute.get("/doctors", (req: Request, res: Response) => {
   userController.getAllDoctors(req, res);
 });
 

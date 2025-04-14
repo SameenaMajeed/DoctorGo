@@ -17,6 +17,7 @@ declare global {
         id: string;
         role: string;
         userId?: string;
+        email?:string
       };
     }
   }
@@ -58,33 +59,18 @@ export class Usercontroller {
     try {
       const { email, password } = req.body;
       if (!email || !password) {
-        res.status(400).json({ message: "Email and password are required" });
-        return;
+        throw new AppError(HttpStatus.BadRequest, MessageConstants.REQUIRED_FIELDS_MISSING);
       }
 
       const { user, accessToken, refreshToken } =
         await this.userService.authenticateUser(email, password);
 
-      // Set cookies securely
-      res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        secure: true,
-        maxAge: 10 * 60 * 1000,
-      });
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: true,
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
+      CookieManager.setAuthCookies(res, { accessToken, refreshToken });
 
-      res.status(200).json({
-        message: "Login successful",
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          mobile_no: user.mobile_no,
-        },
+      sendResponse(res, HttpStatus.OK, MessageConstants.LOGIN_SUCCESS, {
+        user: { id: user._id, name: user.name, email: user.email, mobile_no: user.mobile_no },
+        accessToken,
+        refreshToken
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });

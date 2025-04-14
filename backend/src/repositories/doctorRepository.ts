@@ -4,6 +4,7 @@ import DoctorModel from "../models/DoctorModel";
 import { AppError } from "../utils/AppError";
 import { HttpStatus } from "../constants/Httpstatus";
 import { MessageConstants } from "../constants/MessageConstants";
+import mongoose from "mongoose";
 
 export class DoctorRepository implements IDoctorRepository {
   // Find doctor by email
@@ -122,6 +123,19 @@ export class DoctorRepository implements IDoctorRepository {
       throw new AppError(HttpStatus.InternalServerError, MessageConstants.INTERNAL_SERVER_ERROR);
     }
   }
+
+   //get doctor data with id
+   async getDoctorDataWithId(id: string): Promise<IDoctor | null> {
+    try {
+        const _id = new mongoose.Types.ObjectId(id);
+        const data = await DoctorModel.findOne({ _id: _id });
+
+        return data;
+    } catch (error: any) {
+        console.log(error.message);
+        return null;
+    }
+}
 }
 
 

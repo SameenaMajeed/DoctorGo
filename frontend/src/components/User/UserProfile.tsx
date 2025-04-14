@@ -12,12 +12,11 @@ import { RootState } from "../../slice/Store/Store";
 import {
   setError,
   setLoading,
-  setProfile,
   setUser,
 } from "../../slice/user/userSlice";
 import api from "../../axios/UserInstance";
 import toast from "react-hot-toast";
-import { AxiosError } from "../../types/auth";
+import { AxiosError, ProfileResponse } from "../../types/auth";
 
 // Validation Schema
 const profileSchema = yup.object().shape({
@@ -45,7 +44,7 @@ type FormData = yup.InferType<typeof profileSchema>;
 const UserProfile: React.FC = () => {
   const dispatch = useDispatch();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const { user, profile, loading, error } = useSelector(
+  const { user, loading, error } = useSelector(
     (state: RootState) => state.user
   );
 
@@ -88,7 +87,7 @@ const UserProfile: React.FC = () => {
     const fetchProfile = async () => {
       try {
         dispatch(setLoading());
-        const response = await api.get(`/profile`);
+        const response = await api.get<ProfileResponse>(`/profile`);
         const profileData = response.data.data;
         console.log("profileData :", profileData);
 
@@ -96,9 +95,10 @@ const UserProfile: React.FC = () => {
         const formattedData = {
           ...profileData,
           DOB: formatDateForInput(profileData.DOB),
+          profilePicture: profileData.profilePicture ?? undefined,
         };
 
-        dispatch(setProfile(formattedData));
+        dispatch(setUser(formattedData));
         reset(formattedData);
       } catch (err) {
         dispatch(setError("Failed to fetch user profile."));
@@ -107,7 +107,7 @@ const UserProfile: React.FC = () => {
     };
 
     fetchProfile();
-  }, [dispatch, user, reset, updateTrigger]);
+  }, [dispatch]);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -211,7 +211,7 @@ const UserProfile: React.FC = () => {
                   <img
                     src={
                       imagePreview ||
-                      profile?.profilePicture ||
+                      user?.profilePicture ||
                       "https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff"
                     }
                     alt="Profile"

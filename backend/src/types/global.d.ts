@@ -6,7 +6,7 @@ declare global {
       data?: {
         id: string;
         role: string;
-        email: string;
+        email?: string;
         userId?: string;
       };
     }

@@ -11,7 +11,6 @@ import { BookingRepository } from "../repositories/BookingRepository";
 import { BookingService } from "../services/BookingService";
 import { UserRepository } from "../repositories/userRepository";
 import { BookingController } from "../controllers/BookingController";
-import blockedDoctorMiddleware from "../middlewares/blockedDoctorMiddleware";
 import { PaymentService } from "../services/PaymentService";
 import blockedUserMiddleware from "../middlewares/blockedUserMiddleware";
 import SlotRepository from "../repositories/SlotRepository";
@@ -44,7 +43,7 @@ doctorRoute.post("/signup", upload.single("certificationFile"), (req, res) => {
   doctorController.registerDoctor(req, res);
 });
 
-doctorRoute.post("/login",blockedDoctorMiddleware, (req, res) => {
+doctorRoute.post("/login",blockedUserMiddleware, (req, res) => {
   doctorController.loginDoctor(req, res);
 });
 
@@ -52,7 +51,7 @@ doctorRoute.post("/refresh-token", (req, res) => {
   doctorController.refreshAccessToken(req, res);
 });
 
-doctorRoute.get("/profile/:id",blockedDoctorMiddleware,
+doctorRoute.get("/profile/:id",blockedUserMiddleware,
   authenticateToken("doctor"), (req, res) =>
   doctorController.getProfile(req, res)
 );
@@ -78,7 +77,7 @@ doctorRoute.post("/verify-otp", (req, res) => {
 
 doctorRoute.get(
   "/:doctorId/appointments",
-  blockedDoctorMiddleware,
+  blockedUserMiddleware,
   authenticateToken("doctor"),
   (req, res) => bookingController.getDoctorBooking(req, res)
 );

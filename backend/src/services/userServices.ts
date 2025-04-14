@@ -55,7 +55,7 @@ export class UserService implements IUserService {
       email,
       password: hashedPassword,
       mobile_no,
-      is_verified: false,
+      is_verified: true,
       is_blocked: false,
     };
 
@@ -63,32 +63,56 @@ export class UserService implements IUserService {
     return await this.userRepository.create(userData);
   }
 
-  async authenticateUser(email: string, password: string) {
-    const user = await this.userRepository.findByEmail(email);
-    if (!user) {
-      console.log("Login: User not found for email:", email);
-      throw new Error("User not found");
+  async authenticateUser(email: string, password: string): Promise<{ user: IUser; accessToken: string; refreshToken: string }> {
+    try {
+      const user = await this.userRepository.findByEmail(email);
+      if (!user) {
+        throw new AppError(HttpStatus.NotFound, MessageConstants.USER_NOT_FOUND);
+      }
+      const isPasswordValid = user.password ? await bcrypt.compare(password, user.password) : false;
+      if (!isPasswordValid) {
+        throw new AppError(HttpStatus.Unauthorized, MessageConstants.INVALID_PASSWORD);
+      }
+      const accessToken = generateAccessToken({ id: user._id.toString(), role: 'user', email: user.email });
+      const refreshToken = generateRefreshToken({ id: user._id.toString(), role: 'user' });
+      return { user, accessToken, refreshToken };
+    } catch (error: unknown) {
+      if (error instanceof AppError) throw error;
+      throw new AppError(HttpStatus.InternalServerError, MessageConstants.INTERNAL_SERVER_ERROR);
     }
-
-    const isPasswordValid = user.password
-      ? await bcrypt.compare(password, user.password)
-      : false;
-    if (!isPasswordValid) {
-      console.log("Login: Invalid password for email:", email);
-      throw new Error("Wrong Password");
-    }
-
-    const payload = {
-      id: user._id.toString(),
-      role: "user",
-      email: user.email,
-    };
-
-    const accessToken = generateAccessToken(payload);
-    const refreshToken = generateRefreshToken(payload);
-
-    return { user, accessToken, refreshToken };
   }
+
+  // async authenticateUser(email: string, password: string) {
+  //   const user = await this.userRepository.findByEmail(email);
+
+  //   if (!user) {
+  //     console.log("Login: User not found for email:", email);
+  //     throw new Error("User not found");
+  //   }
+
+  //   const isPasswordValid = user.password
+  //     ? await bcrypt.compare(password, user.password)
+  //     : false;
+  //   if (!isPasswordValid) {
+  //     console.log("Login: Invalid password for email:", email);
+  //     throw new Error("Wrong Password");
+  //   }
+
+  //   console.log(user.email)
+
+  //   const payload = {
+  //     id: user._id.toString(),
+  //     role: "user",
+  //     email: user.email,
+  //   };
+
+  //   console.log(payload)
+
+  //   const accessToken = generateAccessToken(payload);
+  //   const refreshToken = generateRefreshToken(payload);
+
+  //   return { user, accessToken, refreshToken };
+  // }
 
   async googleSignIn(
     userData: googleUserData
@@ -127,26 +151,41 @@ export class UserService implements IUserService {
     return { user: newUser, accessToken, refreshToken };
   }
 
-  async refreshAccessToken(refreshToken: string) {
+  async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string }> {
     try {
-      console.log("Verifying refresh token:", refreshToken);
       const decoded = verifyToken(refreshToken);
-
-      if (!decoded || typeof decoded !== "object" || !("id" in decoded)) {
-        console.warn("Invalid or malformed token:", decoded);
-        throw new Error("Invalid token");
+      if (!decoded || typeof decoded !== 'object' || !('id' in decoded)) {
+        throw new AppError(HttpStatus.BadRequest, MessageConstants.INVALID_REFRESH_TOKEN);
       }
-
-      const { id: userId, role } = decoded;
-      console.log("Generating new access token for user ID:", userId);
-      const newAccessToken = generateAccessToken({ id: userId, role });
-
+      const newAccessToken = generateAccessToken({ id: (decoded as { id: string }).id, role: 'user' });
+      console.log("Generating new access token for user ID:", newAccessToken);
       return { accessToken: newAccessToken };
-    } catch (error) {
-      console.error("Error verifying refresh token:", error);
-      throw new Error("Failed to refresh tokens");
+    } catch (error: unknown) {
+      if (error instanceof AppError) throw error;
+      throw new AppError(HttpStatus.InternalServerError, MessageConstants.INTERNAL_SERVER_ERROR);
     }
   }
+
+  // async refreshAccessToken(refreshToken: string) {
+  //   try {
+  //     console.log("Verifying refresh token:", refreshToken);
+  //     const decoded = verifyToken(refreshToken);
+
+  //     if (!decoded || typeof decoded !== "object" || !("id" in decoded)) {
+  //       console.warn("Invalid or malformed token:", decoded);
+  //       throw new Error("Invalid token");
+  //     }
+
+  //     const { id: userId, role } = decoded;
+  //     console.log("Generating new access token for user ID:", userId);
+  //     const newAccessToken = generateAccessToken({ id: userId, role });
+
+  //     return { accessToken: newAccessToken };
+  //   } catch (error) {
+  //     console.error("Error verifying refresh token:", error);
+  //     throw new Error("Failed to refresh tokens");
+  //   }
+  // }
 
   async forgotPasswordVerify(email: string): Promise<ForgotPasswordResponse> {
     try {

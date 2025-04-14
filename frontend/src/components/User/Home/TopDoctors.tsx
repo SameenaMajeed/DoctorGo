@@ -20,7 +20,12 @@ const TopDoctors = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await api.get<{ data: Doctor[], message: string, success: boolean }>("/doctors");
+        const response = await api.get<{ data: Doctor[], message: string, success: boolean }>("/doctors"//,{
+        //   headers: {
+        //     Authorization: `Bearer ${accessToken}` // Add your access token here
+        //   }
+        // }
+      );
         console.log("response:", response);
 
         if (response.data.success) {

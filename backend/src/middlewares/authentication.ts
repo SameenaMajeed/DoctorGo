@@ -32,9 +32,11 @@ export const authenticateToken = (requiredRole?: string) => {
         email: string;
       };
 
-      if (requiredRole && req.data.role !== requiredRole.toLowerCase()) {
-        console.error(`Forbidden: Role mismatch. Required: ${requiredRole}, Found: ${req.data.role}`);
-        res.status(403).json({ message: `Forbidden: Required role is ${requiredRole}, but found ${req.data.role}` });
+      console.log('User attached to request:', req.data);
+
+      if (requiredRole && decoded.role !== requiredRole) {
+        console.error(`Forbidden: Role mismatch. Required: ${requiredRole}, Found: ${decoded.role}`);
+        res.status(403).json({ message: `Forbidden: Required role is ${requiredRole}, but found ${decoded.role}` });
         return;
       }
 

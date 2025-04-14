@@ -4,6 +4,7 @@ import User, { IUser } from '../models/userModel';
 import { googleUserData } from '../types/google';
 import Doctor , {IDoctor} from '../models/DoctorModel';
 import { BaseRepository } from './BaseRepository';
+import mongoose from 'mongoose';
 
 export class UserRepository extends BaseRepository<IUser> implements UserRepositoryInterface {
   constructor() {
@@ -97,6 +98,20 @@ export class UserRepository extends BaseRepository<IUser> implements UserReposit
   async save(user:IUser):Promise<IUser>{
     return await user.save()
   }
+
+  //get user data with id
+  async getUserDataWithId(id: string): Promise<Partial<IUser> | null> {
+    try {
+        const _id = new mongoose.Types.ObjectId(id);
+
+        const data = await User.findOne({ _id: _id });
+
+        return data;
+    } catch (error: any) {
+        console.log(error.message);
+        return null;
+    }
+}
 
 
   // async updateProfilePicture(userId: string, profilePicture: string): Promise<IUser | null> {
