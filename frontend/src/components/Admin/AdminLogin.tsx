@@ -10,6 +10,7 @@ import { AiFillLock } from "react-icons/ai";
 const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
@@ -28,7 +29,17 @@ const AdminLogin: React.FC = () => {
       const response: any = await adminApi.post("/login", { email, password });
       console.log("Admin response received successfully:", response);
 
-      dispatch(adminLogin({ email: response.data.data.email })); // Dispatch the login action
+      const { admin, accessToken } = response.data.data;
+      console.log('Login Response Data:', { admin, accessToken });
+
+      const payload = {
+        _id: admin._id,
+        email: admin.email,
+        accessToken,
+      };
+
+      console.log('Dispatching adminLogin with:', payload);
+      dispatch(adminLogin(payload));
       navigate("/admin/dashboard");
       toast.success("Login success");
     } catch (error: any) {
@@ -36,7 +47,8 @@ const AdminLogin: React.FC = () => {
 
       // Extract the error response message from the backend
       const errorMessage =
-        error.response?.data?.message || "Invalid email or password. Please try again.";
+        error.response?.data?.message ||
+        "Invalid email or password. Please try again.";
 
       setLocalError(errorMessage);
     }
@@ -53,11 +65,18 @@ const AdminLogin: React.FC = () => {
           </div>
         </div>
         {/* Show error messages */}
-        {localError && <p className="mb-4 text-center text-red-500">{localError}</p>}
-        {error && !localError && <p className="mb-4 text-center text-red-500">{error}</p>}
+        {localError && (
+          <p className="mb-4 text-center text-red-500">{localError}</p>
+        )}
+        {error && !localError && (
+          <p className="mb-4 text-center text-red-500">{error}</p>
+        )}
 
         <form onSubmit={handleLogin}>
-          <label htmlFor="email" className="block mb-2 text-sm font-medium text-white">
+          <label
+            htmlFor="email"
+            className="block mb-2 text-sm font-medium text-white"
+          >
             Email
           </label>
           <input
@@ -70,7 +89,10 @@ const AdminLogin: React.FC = () => {
             required
           />
 
-          <label htmlFor="password" className="block mb-2 text-sm font-medium text-white">
+          <label
+            htmlFor="password"
+            className="block mb-2 text-sm font-medium text-white"
+          >
             Password
           </label>
           <input
@@ -87,7 +109,9 @@ const AdminLogin: React.FC = () => {
             type="submit"
             disabled={loading}
             className={`w-full py-2 text-white rounded-lg transition duration-200 shadow-md ${
-              loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-700 hover:bg-blue-800"
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-700 hover:bg-blue-800"
             }`}
           >
             {loading ? "Logging in..." : "LOGIN"}

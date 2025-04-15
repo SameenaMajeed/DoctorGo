@@ -4,6 +4,7 @@ import SlotService from "../services/SlotService";
 import SlotController from "../controllers/SlotController";
 import { authenticateToken } from "../middlewares/authentication";
 import blockedUserMiddleware from "../middlewares/blockedUserMiddleware";
+import blockedDoctorMiddleware from "../middlewares/blockedDoctorMiddleware";
 
 const slotRoute: Router = express.Router();
 
@@ -15,21 +16,21 @@ const slotController = new SlotController(slotService);
 slotRoute.post(
   '/time-slots/create',
   authenticateToken('doctor'),
-  blockedUserMiddleware,
+  blockedDoctorMiddleware,
   (req, res) => slotController.createSlot(req, res)
 );
 
 slotRoute.get(
   '/time-slots/:doctorId',
   authenticateToken('doctor'),
-  blockedUserMiddleware,
+  blockedDoctorMiddleware,
   (req, res) => slotController.getAvailableSlots(req, res)
 );
 
 slotRoute.get(
   "/time-slots/edit/:slotId",
   authenticateToken('doctor'),
-  blockedUserMiddleware,
+  blockedDoctorMiddleware,
   (req, res) => {
     slotController.getSlot(req, res)}
 );
@@ -37,14 +38,14 @@ slotRoute.get(
 slotRoute.put(
   "/time-slots/:slotId",
   authenticateToken('doctor'),
-  blockedUserMiddleware,
+  blockedDoctorMiddleware,
   (req, res) => slotController.updateSlot(req, res)
 );
 
 slotRoute.delete(
   '/time-slots/:slotId',
   authenticateToken('doctor'),
-  blockedUserMiddleware,
+  blockedDoctorMiddleware,
   (req, res) => slotController.deleteSlot(req, res)
 );
 
@@ -52,6 +53,7 @@ slotRoute.delete(
 slotRoute.get(
   '/time-slots/:doctorId/available',
   authenticateToken('user'),
+  blockedUserMiddleware,
   (req, res) => slotController.getAvailableSlots(req, res)
 );
 
@@ -64,6 +66,7 @@ slotRoute.put(
 slotRoute.get(
   '/time-slots/:slotId/availability',
   authenticateToken('user'),
+  blockedUserMiddleware,
   (req, res) => slotController.checkSlotAvailability(req, res)
 );
 

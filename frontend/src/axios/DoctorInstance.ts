@@ -31,7 +31,7 @@ const logout = (): void => {
 
   setTimeout(() => {
     window.location.href = "/doctor/login";
-  }, 5000);
+  }, 1000);
 };
 
 // Add a response interceptor to handle token expiration and auto-refresh
@@ -47,6 +47,13 @@ doctorApi.interceptors.response.use(
 
     if (error.response) {
       const { status } = error.response;
+
+      if (status === 403) {
+        // Handle 403 Forbidden - User might be blocked
+        toast.error("You have been blocked by the admin." ,{});
+        setTimeout(() => logout() , 5000) // Redirect after 5 seconds
+        return Promise.reject(error);
+      }
 
       // Handle token expiration
       if (status === 401 && !originalRequest._retry) {

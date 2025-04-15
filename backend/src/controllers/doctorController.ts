@@ -8,7 +8,6 @@ import { IDoctorService } from "../interfaces/doctor/doctorServiceInterface";
 import DoctorModel from "../models/DoctorModel";
 import { AppError } from "../utils/AppError";
 
-
 // Extend the Request type to include files
 interface MulterRequest extends Request {
   files: Express.Multer.File[];
@@ -17,45 +16,58 @@ interface MulterRequest extends Request {
 export class DoctorController {
   constructor(private doctorService: IDoctorService) {}
 
-    async registerDoctor(req: Request, res: Response): Promise<void> {
+  async registerDoctor(req: Request, res: Response): Promise<void> {
     try {
-      const { name, email, password, phone, qualification, specialization, registrationNumber , certificate } = req.body;
-      console.log('req.body : ', req.body);
+      const {
+        name,
+        email,
+        password,
+        phone,
+        qualification,
+        specialization,
+        registrationNumber,
+        certificate,
+      } = req.body;
+      console.log("req.body : ", req.body);
 
       if (!req.file) {
-        sendError(res, HttpStatus.BadRequest, MessageConstants.FILE_NOT_UPLOADED);
+        sendError(
+          res,
+          HttpStatus.BadRequest,
+          MessageConstants.FILE_NOT_UPLOADED
+        );
         return;
       }
 
       const certificatePath = await CloudinaryService.uploadFile(
         req.file.path,
-        'doctor_certificates',
+        "doctor_certificates",
         `doctor_${email}`
       );
 
-      console.log('certificatePath :' ,certificatePath)
-      
-
+      console.log("certificatePath :", certificatePath);
 
       // Register doctor with certification files
-      const doctor = await this.doctorService.registerDoctor(
-        {
-          name,
-          email,
-          password,
-          phone,
-          qualification,
-          specialization,
-          registrationNumber,
-          certificate: certificatePath,
-          // ticketPrice,
-          // extraCharge,
-          // bio,
-        },
+      const doctor = await this.doctorService.registerDoctor({
+        name,
+        email,
+        password,
+        phone,
+        qualification,
+        specialization,
+        registrationNumber,
+        certificate: certificatePath,
+        // ticketPrice,
+        // extraCharge,
+        // bio,
+      });
+
+      sendResponse(
+        res,
+        HttpStatus.Created,
+        MessageConstants.DOCTOR_REGISTER_SUCCESS,
+        doctor
       );
-
-      sendResponse(res, HttpStatus.Created, MessageConstants.DOCTOR_REGISTER_SUCCESS, doctor);
-
     } catch (error: any) {
       if (error.message === MessageConstants.USER_ALREADY_EXISTS) {
         sendError(
@@ -84,11 +96,24 @@ export class DoctorController {
   public async loginDoctor(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
+
+      if (!email || !password) {
+        throw new AppError(
+          HttpStatus.BadRequest,
+          MessageConstants.REQUIRED_FIELDS_MISSING
+        );
+      }
+
       const result = await this.doctorService.loginDoctor(email, password);
-      CookieManager.setAuthCookies(res, result);
+      CookieManager.setAuthCookies(res, {
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+      });
       sendResponse(res, HttpStatus.OK, MessageConstants.LOGIN_SUCCESS, {
         ...result.doctor,
         role: result.role,
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
       });
     } catch (error: any) {
       // Handle blocked account error
@@ -178,7 +203,8 @@ export class DoctorController {
         return;
       }
 
-      const { name, email, phone, qualification, specialization , ticketPrice  } = req.body;
+      const { name, email, phone, qualification, specialization, ticketPrice } =
+        req.body;
 
       const updateDoctor = await this.doctorService.updatedDoctorProfile(
         doctorId,
@@ -203,7 +229,7 @@ export class DoctorController {
   async uploadProfilePicture(req: Request, res: Response): Promise<void> {
     try {
       const doctorId = req.data?.id;
-      console.log(doctorId)
+      console.log(doctorId);
       if (!doctorId) {
         sendError(
           res,
@@ -214,17 +240,31 @@ export class DoctorController {
       }
 
       if (!req.file) {
-        sendError(res, HttpStatus.BadRequest, MessageConstants.FILE_NOT_UPLOADED);
+        sendError(
+          res,
+          HttpStatus.BadRequest,
+          MessageConstants.FILE_NOT_UPLOADED
+        );
         return;
       }
 
-      const profilePicture = await this.doctorService.uploadProfilePicture(doctorId, req.file.path);
-      sendResponse(res, HttpStatus.OK, MessageConstants.PROFILE_PICTURE_UPLOADED, { profilePicture });
-      
+      const profilePicture = await this.doctorService.uploadProfilePicture(
+        doctorId,
+        req.file.path
+      );
+      sendResponse(
+        res,
+        HttpStatus.OK,
+        MessageConstants.PROFILE_PICTURE_UPLOADED,
+        { profilePicture }
+      );
     } catch (error: unknown) {
-        sendError(res, HttpStatus.InternalServerError, MessageConstants.INTERNAL_SERVER_ERROR);
+      sendError(
+        res,
+        HttpStatus.InternalServerError,
+        MessageConstants.INTERNAL_SERVER_ERROR
+      );
     }
-      
   }
 
   async logout(req: Request, res: Response): Promise<void> {
@@ -244,18 +284,18 @@ export class DoctorController {
   // async fetchDoctor(req : Request ,res: Response):Promise<void>{
   //   try {
   //     const { doctorId } = req.params;
-  
+
   //     // Find doctor by ID
   //     const doctor = await DoctorModel.findById(doctorId);
-      
+
   //     if (!doctor) {
   //       throw new AppError(HttpStatus.NotFound, "Doctor not found");
   //     }
-  
+
   //     res.status(HttpStatus.OK).json(doctor);
   //   } catch (error) {
   //     console.error("Error fetching doctor:", error);
-  
+
   //     res.status(HttpStatus.InternalServerError).json({ message: "Internal server error" });
   //   }
   // }

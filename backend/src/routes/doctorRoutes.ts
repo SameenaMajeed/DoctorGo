@@ -14,6 +14,7 @@ import { BookingController } from "../controllers/BookingController";
 import { PaymentService } from "../services/PaymentService";
 import blockedUserMiddleware from "../middlewares/blockedUserMiddleware";
 import SlotRepository from "../repositories/SlotRepository";
+import blockedDoctorMiddleware from "../middlewares/blockedDoctorMiddleware";
 // import { uploadCertifications } from '../middlewares/fileUpload';
 
 const otpRepository = new OtpRepository();
@@ -43,7 +44,7 @@ doctorRoute.post("/signup", upload.single("certificationFile"), (req, res) => {
   doctorController.registerDoctor(req, res);
 });
 
-doctorRoute.post("/login",blockedUserMiddleware, (req, res) => {
+doctorRoute.post("/login",blockedDoctorMiddleware, (req, res) => {
   doctorController.loginDoctor(req, res);
 });
 
@@ -51,9 +52,10 @@ doctorRoute.post("/refresh-token", (req, res) => {
   doctorController.refreshAccessToken(req, res);
 });
 
-doctorRoute.get("/profile/:id",blockedUserMiddleware,
-  authenticateToken("doctor"), (req, res) =>
-  doctorController.getProfile(req, res)
+doctorRoute.get("/profile/:id",
+  authenticateToken("doctor"),
+  blockedDoctorMiddleware, 
+  (req, res) => doctorController.getProfile(req, res)
 );
 doctorRoute.put("/updateProfile/:id",
   authenticateToken("doctor"), (req, res) =>
@@ -77,14 +79,14 @@ doctorRoute.post("/verify-otp", (req, res) => {
 
 doctorRoute.get(
   "/:doctorId/appointments",
-  blockedUserMiddleware,
   authenticateToken("doctor"),
+  blockedDoctorMiddleware,
   (req, res) => bookingController.getDoctorBooking(req, res)
 );
 doctorRoute.put(
   "/appointments/:appointmentId/status",
-  blockedUserMiddleware,
   authenticateToken("doctor"),
+  blockedDoctorMiddleware,
   (req, res) => bookingController.updateDoctorAppointmentStatus(req, res)
 );
 

@@ -7,19 +7,25 @@ import { MessageConstants } from "../constants/MessageConstants";
 
 import { sendResponse, sendError } from "../utils/responseUtils";
 import { CookieManager } from "../utils/cookieManager";
+import { AppError } from "../utils/AppError";
 
 class AdminController {
   constructor(private adminService: IAdminService) {}
 
   async login(req: Request, res: Response): Promise<void> {
-    const { email, password } = req.body;
     try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        throw new AppError(HttpStatus.BadRequest, MessageConstants.REQUIRED_FIELDS_MISSING);
+      }
+
       const { admin, accessToken, refreshToken } =
         await this.adminService.adminLogin(email, password);
       CookieManager.setAuthCookies(res, { accessToken, refreshToken });
       sendResponse(res, HttpStatus.OK, MessageConstants.LOGIN_SUCCESS, {
         admin,
         email,
+        accessToken
       });
     } catch (error: any) {
       sendError(
@@ -226,8 +232,12 @@ class AdminController {
   }
 
   async blockDoctor(req: Request, res: Response): Promise<void> {
-    const { doctorId, isBlocked } = req.body;
     try {
+      const { doctorId, isBlocked } = req.body;
+      if (!doctorId) {
+        throw new AppError(HttpStatus.BadRequest, 'Doctor ID is required');
+      }
+      
       const updatedDoctor = await this.adminService.doctorBlock(
         doctorId,
         isBlocked
@@ -242,8 +252,12 @@ class AdminController {
   }
 
   async blockUser(req: Request, res: Response): Promise<void> {
-    const { userId, isBlocked } = req.body;
     try {
+      const { userId, isBlocked } = req.body;
+      if (!userId) {
+        throw new AppError(HttpStatus.BadRequest, 'User ID is required');
+      }
+
       const updatedUser = await this.adminService.userBlock(userId, isBlocked);
       
       const message = isBlocked

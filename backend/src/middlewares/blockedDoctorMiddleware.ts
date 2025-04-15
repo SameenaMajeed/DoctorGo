@@ -8,17 +8,19 @@ const blockedDoctorMiddleware = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Get doctorId from authenticated user data
-    const doctorId = req.data?.id;
-    
-    if (!doctorId) {
-      next();
-      return;
+    const email = req.data?.email || req.body.email;
+
+    console.log('email : ' ,email)
+
+    if (!email) {
+      res.status(400).json({ message: 'Email is required to check block status' });
+      return
     }
 
-    const doctor = await DoctorModel.findById(doctorId);
+    const doctor = await DoctorModel.findOne({ email: email });
+    console.log('fetching email:' ,doctor)
 
-    if (doctor?.isBlocked) {
+    if (doctor && doctor?.isBlocked) {
       res.status(HttpStatus.Forbidden).json({ 
         message: "Your account has been blocked by Admin",
         reason: doctor.blockReason || "Contact admin for more information"

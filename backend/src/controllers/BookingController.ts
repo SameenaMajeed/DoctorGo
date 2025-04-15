@@ -142,6 +142,7 @@ export class BookingController {
 
 // doctor Booking details:
   async getDoctorBooking(req: Request, res: Response): Promise<void> {
+    console.log('Request hitting...')
     try {
       const { doctorId } = req.params;
       const authenticatedDoctorId = req.data?.id;

@@ -10,7 +10,7 @@ import {
   CalendarDays,
   Clock,
   Users,
-  Utensils,
+  Stethoscope,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -21,7 +21,7 @@ const Appointments: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [page, setPage] = useState(1);
-  const [limit] = useState(5);
+  const [limit] = useState(6);
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string | undefined>(
     undefined
@@ -76,6 +76,8 @@ const Appointments: React.FC = () => {
       toast.error(error.response?.data?.message || "Failed to update status");
     }
   };
+
+  console.log(appointments);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -175,11 +177,19 @@ const Appointments: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4 text-gray-400" />
-                      {appointment.slot_id.startTime} - {appointment.slot_id.endTime}
+                      {appointment.appointmentTime}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-gray-400" />
+                      {appointment.patientDetails.patientName}
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-sm font-medium shadow-sm">
+                    <Stethoscope className="w-4 h-4 text-blue-600" />
+                      {appointment.modeOfAppointment}
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
                   {/* Action Buttons */}
                   <div className="mt-6 flex gap-2">
                     {appointment.status === "pending" && (

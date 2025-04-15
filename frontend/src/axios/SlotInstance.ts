@@ -46,6 +46,13 @@ slotApi.interceptors.response.use(
       return Promise.resolve(error.response);
     }
 
+    if (error.response.status === 403) {
+      // Handle 403 Forbidden - User might be blocked
+      toast.error("You have been blocked by the admin." ,{});
+      setTimeout(() => logout() , 5000) // Redirect after 5 seconds
+      return Promise.reject(error);
+    }
+
     // Handle 401 Unauthorized errors
     if (error.response && error.response.status === 401) {
       // Skip refresh if credentials are invalid

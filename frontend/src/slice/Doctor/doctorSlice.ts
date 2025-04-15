@@ -1,21 +1,26 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+
+
 // Define the Doctor interface
 interface Doctor {
+  role: string | null;
   _id?: string;
   name: string;
   email: string;
   phone?: string;
   qualification?: string;
-  role?: "doctor";
+  // role?: "doctor";
   profilePicture?: string | null;
   specialization?: string;
   accessToken?: string;
+  refreshToken?: string;
   isApproved?: boolean;
   approvalStatus?: string;
   ticketPrice?: number,
   extraCharge ?: number,
   bio ?: string,
+  [key: string]: any;
 }
 
 // Define the state interface
@@ -23,6 +28,7 @@ interface DoctorState {
   doctor: Doctor | null;
   profile: Doctor | null;
   isAuthenticated: boolean;
+  role: string | null;
   loading: boolean;
   error: string | null;
 }
@@ -31,6 +37,7 @@ interface DoctorState {
 const initialState: DoctorState = {
   doctor: null,
   profile: null,
+  role: null,
   isAuthenticated: false,
   loading: false,
   error: null,
@@ -45,8 +52,20 @@ const doctorSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
-    setDoctor: (state, action: PayloadAction<Doctor>) => {
-      state.doctor = action.payload;
+    setDoctor: (state, action: PayloadAction<{
+      doctor: Doctor;  // This should contain all doctor fields
+      accessToken: string;
+      refreshToken: string;
+      role: string;
+    }>) => {
+      console.log('setDoctor payload:', action.payload);
+      
+      state.doctor = {
+        ...action.payload.doctor,
+        accessToken: action.payload.accessToken,
+        refreshToken: action.payload.refreshToken,
+      }
+      state.role = action.payload.role;
       state.isAuthenticated = true;
       state.loading = false;
       state.error = null;
@@ -68,7 +87,7 @@ const doctorSlice = createSlice({
     },
     updateProfilePicture: (state, action: PayloadAction<string>) => {
       if (state.doctor) {
-        state.doctor.profilePicture = action.payload 
+        state.doctor.profilePicture = action.payload
       }
     },
     updateDoctorApproval: (
@@ -76,12 +95,20 @@ const doctorSlice = createSlice({
       action: PayloadAction<{ isApproved: boolean; approvalStatus: string }>
     ) => {
       if (state.doctor) {
-        state.doctor = {
-          ...state.doctor, // Ensures that doctor is treated as an object
-          isApproved: action.payload.isApproved,
-          approvalStatus: action.payload.approvalStatus,
-        };
+        state.doctor.isApproved = action.payload.isApproved;
+        state.doctor.approvalStatus = action.payload.approvalStatus;
       }
+      if (state.profile) {
+        state.profile.isApproved = action.payload.isApproved;
+        state.profile.approvalStatus = action.payload.approvalStatus;
+      }
+      // if (state.doctor) {
+      //   state.doctor = {
+      //     ...state.doctor, // Ensures that doctor is treated as an object
+      //     isApproved: action.payload.isApproved,
+      //     approvalStatus: action.payload.approvalStatus,
+      //   };
+      // }
     },
   },
 });
@@ -97,66 +124,3 @@ export const {
   updateProfilePicture
 } = doctorSlice.actions;
 export default doctorSlice.reducer;
-
-// import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-// interface Doctor {
-//   _id?: string;
-//   name: string;
-//   email: string;
-//   phone?: string;
-//   qualification?: string;
-//   role?: "doctor";
-//   image?: string;
-//   specialization?: string;
-//   accessToken?: string;
-// }
-
-// interface DoctorState {
-//   doctor: Doctor | null;
-//   profile: Doctor | null;
-//   loading: boolean;
-//   error: string | null;
-// }
-
-// const initialState: DoctorState = {
-//   doctor: null,
-//   profile: null,
-//   loading: false,
-//   error: null,
-// };
-
-// const doctorSlice = createSlice({
-//   name: "doctor",
-//   initialState,
-//   reducers: {
-//     setLoading: (state) => {
-//       state.loading = true;
-//     },
-//     setDoctor: (state, action: PayloadAction<Doctor>) => {
-//       state.doctor = action.payload;
-//       state.loading = false;
-//       state.error = null;
-//     },
-//     setProfile: (state, action: PayloadAction<Doctor>) => {
-//       state.profile = action.payload;
-//       state.loading = false;
-//       state.error = null;
-//     },
-//     setError: (state, action: PayloadAction<string>) => {
-//       state.error = action.payload;
-//       state.loading = false;
-//     },
-//     logoutDoctor: (state) => {
-//       state.doctor = null;
-//       state.profile = null;
-//       state.loading = false;
-//       state.error = null;
-//     },
-//   },
-// });
-
-// export const { setLoading, setDoctor, setProfile, setError, logoutDoctor } =
-//   doctorSlice.actions;
-
-// export default doctorSlice.reducer;

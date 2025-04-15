@@ -7,8 +7,6 @@ const blockedUserMiddleware = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    console.log('Request body is :', req.data?.email);
-
     const email = req.data?.email || req.body.email;
 
     console.log('email : ' ,email)
