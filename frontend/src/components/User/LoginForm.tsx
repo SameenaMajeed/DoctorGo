@@ -11,6 +11,7 @@ import {getAuth , signInWithPopup , GoogleAuthProvider} from "firebase/auth"
 import App from "../../FirebaseAuthentication/config";
 import { toast } from "react-hot-toast";
 import { GoogleSignInResponse, LoginResponse } from "../../types/auth";
+import { loginUser } from "../../Api/UserApis";
 
 const LoginForm: React.FC = () => {
   const dispatch = useDispatch();
@@ -53,33 +54,13 @@ const LoginForm: React.FC = () => {
 
     if (!validateForm()) return;
 
-    dispatch(setLoading());
-    try {
-      const response = await api.post<LoginResponse>(
-        "/login",
-        { email, password },
-        { withCredentials: true }
-      );
-      console.log('User : ',response.data)
-      const { user , accessToken , refreshToken } = response.data.data;
-      console.log('User : ',user)
-      dispatch(setUser({
-        id: user._id || "", // fallback to empty string
-        name: user.name || "",
-        email: user.email || "",
-        mobile_no: user.mobile_no || "",
-        accessToken, // Store accessToken
-        refreshToken,
-      }));
+    const { success, message } = await loginUser(email, password, dispatch);
+    
+    if (success) {
       toast.success('Login successful!');
       navigate("/");
-    } catch (error: any) {
-      console.error(error);
-      const errorMessage =
-        error.response?.data?.message ||
-        "An unexpected error occurred. Please try again.";
-      setMessage(errorMessage);
-      dispatch(setError("Login failed."));
+    } else if (message) {
+      setMessage(message);
     }
   };
 
@@ -124,38 +105,6 @@ const LoginForm: React.FC = () => {
     }
   };
   
-
-  // const handleGoogleSignIn = async () => {
-  //   const auth = getAuth(App)
-  //   const provider = new GoogleAuthProvider()
-
-  //   try {
-
-  //     dispatch(setLoading())
-  //     const result = await signInWithPopup(auth , provider)
-  //     const idToken = await result.user.getIdToken()
-
-  //     const response : any = await api.post<GoogleSignInResponse>('/google' , {idToken} , {withCredentials : true})
-  //     console.log('Full API response:', response.data); // Debug API response
-
-  //     // Ensure correct data extraction
-  //     const user = response.data?.data || response.data; 
-  //     console.log('Extracted user:', user);
-  //     // const user  = response.data.data
-  //     // console.log('user' ,user)
-
-  //     dispatch(setUser(user))
-  //     toast.success('Google Sign-In successful!')
-     
-  //     navigate("/")
-
-  //   } catch (error: any) {
-  //     console.error(error)
-  //     const errorMessage = error.response?.data?.message || "Google Sign-In failed. Please try again."
-  //     dispatch(setError(errorMessage))
-  //   }
-
-  // }
 
   return (
     <div>

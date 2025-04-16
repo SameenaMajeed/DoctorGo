@@ -89,7 +89,7 @@ userRoute.post('/reset-password', (req: Request, res: Response) => {
 
 
 // Doctor related routes
-userRoute.get("/doctors", (req: Request, res: Response) => {
+userRoute.get("/doctors", authenticateToken("user"),blockedUserMiddleware, (req: Request, res: Response) => {
   userController.getAllDoctors(req, res);
 });
 

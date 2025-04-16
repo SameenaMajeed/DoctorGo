@@ -16,6 +16,7 @@ const NewPasswordModal: React.FC<NewPasswordModalProps> = ({
   onClose,
   role,
 }) => {
+  console.log(email , role)
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
 
@@ -47,6 +48,8 @@ const NewPasswordModal: React.FC<NewPasswordModalProps> = ({
           password: newPassword,
         }
       );
+
+      console.log(response.data)
 
       if (response.data.success) {
         toast.success("Password reset successfully! You can now log in.");

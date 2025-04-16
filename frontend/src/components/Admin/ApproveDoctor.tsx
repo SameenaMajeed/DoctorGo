@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import adminApi from '../../axios/AdminInstance';
 import Pagination from '../../Pagination/Pagination';
 import toast from 'react-hot-toast';
+import { fetchPendingDoctors, updateDoctorStatus } from '../../Api/AdminApis';
 
 interface Doctor {
   _id: string;
@@ -12,19 +13,10 @@ interface Doctor {
   isBlocked: boolean;
 }
 
-interface PendingDoctorsResponse {
-  success: boolean;
-  message: string;
-  data: {
-    doctors: Doctor[];
-    total: number;
-    page: number;
-    limit: number;
-  };
-}
 
 const ApproveDoctors: React.FC = () => {
   const [pendingDoctors, setPendingDoctors] = useState<Doctor[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState<string | null>(null);
@@ -34,21 +26,30 @@ const ApproveDoctors: React.FC = () => {
   const [total, setTotal] = useState<number>(0);
   const limit = 5;
 
-  useEffect(() => {
-    fetchPendingDoctors();
-  }, [page, searchTerm]);
-
-  const fetchPendingDoctors = async () => {
-    try {
-      const response = await adminApi.get<PendingDoctorsResponse>('/doctors/pending', {
-        params: { page, limit, searchTerm }
-      });
-      setPendingDoctors(response.data.data.doctors || []);
-      setTotal(response.data.data.total || 0);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch pending doctors.');
+  const loadPendingDoctors = async () => {
+    setIsLoading(true);
+    
+    const { success, message, doctors, total } = await fetchPendingDoctors(
+      page, 
+      limit, 
+      searchTerm
+    );
+  
+    if (success) {
+      setPendingDoctors(doctors || []);
+      setTotal(total || 0);
+    } else {
+      setError(message);
     }
+  
+    setIsLoading(false);
   };
+  
+  // Call this in useEffect or when needed
+  useEffect(() => {
+    loadPendingDoctors();
+  }, [page, limit, searchTerm]);
+
 
   const totalPages = Math.ceil(total / limit);
 
@@ -71,18 +72,24 @@ const ApproveDoctors: React.FC = () => {
 
   const handleUpdateStatus = async (doctorId: string, isBlocked: boolean) => {
     try {
-      await adminApi.post('/doctors/update-status', {
+      const { success, message, shouldRemove } = await updateDoctorStatus({
         doctorId,
         isBlocked,
         blockReason: isBlocked ? blockReason : undefined,
       });
-
-      toast.success(`Doctor ${isBlocked ? 'blocked' : 'approved'} successfully!`);
-      setPendingDoctors((prev) => prev.filter((doctor) => doctor._id !== doctorId));
-      setShowBlockModal(false);
-      setBlockReason('');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update doctor status.');
+  
+      if (success) {
+        toast.success(message);
+        if (shouldRemove) {
+          setPendingDoctors((prev) => prev.filter((doctor) => doctor._id !== doctorId));
+        }
+        setShowBlockModal(false);
+        setBlockReason('');
+      } else {
+        setError(message);
+      }
+    } catch (err) {
+      setError('An unexpected error occurred');
     }
   };
 

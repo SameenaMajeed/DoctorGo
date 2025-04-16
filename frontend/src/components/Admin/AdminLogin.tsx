@@ -6,6 +6,7 @@ import { adminLogin } from "../../slice/admin/adminSlice";
 import adminApi from "../../axios/AdminInstance";
 import toast from "react-hot-toast";
 import { AiFillLock } from "react-icons/ai";
+import { adminLoginService } from "../../Api/AdminApis";
 
 const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -22,37 +23,66 @@ const AdminLogin: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Logging in with:", { email, password });
-
-    setLocalError(null); // Reset error before new request
-
-    try {
-      const response: any = await adminApi.post("/login", { email, password });
-      console.log("Admin response received successfully:", response);
-
-      const { admin, accessToken } = response.data.data;
+  
+    setLocalError(null);
+  
+    const { success, message, admin, accessToken, error } = await adminLoginService({
+      email,
+      password
+    });
+  
+    if (success && admin && accessToken) {
       console.log('Login Response Data:', { admin, accessToken });
-
+      
       const payload = {
         _id: admin._id,
         email: admin.email,
         accessToken,
       };
-
+  
       console.log('Dispatching adminLogin with:', payload);
       dispatch(adminLogin(payload));
       navigate("/admin/dashboard");
-      toast.success("Login success");
-    } catch (error: any) {
+      toast.success(message);
+    } else {
       console.error("Login error:", error);
-
-      // Extract the error response message from the backend
-      const errorMessage =
-        error.response?.data?.message ||
-        "Invalid email or password. Please try again.";
-
-      setLocalError(errorMessage);
+      setLocalError(message);
     }
   };
+  // const handleLogin = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   console.log("Logging in with:", { email, password });
+
+  //   setLocalError(null); // Reset error before new request
+
+  //   try {
+  //     const response: any = await adminApi.post("/login", { email, password });
+  //     console.log("Admin response received successfully:", response);
+
+  //     const { admin, accessToken } = response.data.data;
+  //     console.log('Login Response Data:', { admin, accessToken });
+
+  //     const payload = {
+  //       _id: admin._id,
+  //       email: admin.email,
+  //       accessToken,
+  //     };
+
+  //     console.log('Dispatching adminLogin with:', payload);
+  //     dispatch(adminLogin(payload));
+  //     navigate("/admin/dashboard");
+  //     toast.success("Login success");
+  //   } catch (error: any) {
+  //     console.error("Login error:", error);
+
+  //     // Extract the error response message from the backend
+  //     const errorMessage =
+  //       error.response?.data?.message ||
+  //       "Invalid email or password. Please try again.";
+
+  //     setLocalError(errorMessage);
+  //   }
+  // };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 to-indigo-500">

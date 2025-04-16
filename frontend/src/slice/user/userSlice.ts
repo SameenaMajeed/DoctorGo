@@ -4,14 +4,16 @@ interface User {
     id: string;
     name: string;
     email: string;
-    profilePicture?: string;
+    profilePicture?: string | null; 
+    // profilePicture?: string;
     mobile_no : string;
     address?:string;
     gender?:string;
     DOB?:string;
     accessToken?: string;
-    // role?: string;
+    role?: string;
     refreshToken?: string; 
+    isBlocked ?:boolean,
 }
 
 interface UserState {

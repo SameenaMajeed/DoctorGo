@@ -65,10 +65,12 @@ export class Usercontroller {
       const { user, accessToken, refreshToken } =
         await this.userService.authenticateUser(email, password);
 
+        console.log('user:' , user)
+
       CookieManager.setAuthCookies(res, { accessToken, refreshToken });
 
       sendResponse(res, HttpStatus.OK, MessageConstants.LOGIN_SUCCESS, {
-        user: { id: user._id, name: user.name, email: user.email, mobile_no: user.mobile_no },
+        user: { id: user._id, name: user.name, email: user.email, mobile_no: user.mobile_no, isBlocked : user.isBlocked,},
         accessToken,
         refreshToken
       });
@@ -324,30 +326,6 @@ export class Usercontroller {
       }
     }
   }
-  
-  // async updateProfile(req: Request, res: Response): Promise<void> {
-  //   try {
-  //     const userId = req.data?.id;
-  //     if (!userId) {
-  //       throw new AppError(HttpStatus.BadRequest, MessageConstants.USER_ID_NOT_FOUND);
-  //     }
-  //     const { name, email, mobile, address, DOB, age, gender } = req.body;
-  //     console.log('data:' ,req.body)
-
-  //     const updatedUser = await this.userService.updateUserProfile(userId, { name, email, mobile , address , DOB });
-  //     if (!updatedUser) {
-  //       throw new AppError(HttpStatus.NotFound, MessageConstants.USER_NOT_FOUND);
-  //     }
-  //     sendResponse(res, HttpStatus.OK, MessageConstants.PROFILE_UPDATED_SUCCESS, updatedUser);
-  //   } catch (error: unknown) {
-  //     if (error instanceof AppError) {
-  //       sendError(res, error.status, error.message);
-  //     } else {
-  //       sendError(res, HttpStatus.InternalServerError, MessageConstants.INTERNAL_SERVER_ERROR);
-  //     }
-  //   }
-  // }
-
 
 // Doctors fetching 
   async getAllDoctors(req: Request, res: Response): Promise<void> {
@@ -379,5 +357,7 @@ export class Usercontroller {
     
         res.status(HttpStatus.InternalServerError).json({ message: "Internal server error" });
       }
-    }
+  }
+
+  
 }

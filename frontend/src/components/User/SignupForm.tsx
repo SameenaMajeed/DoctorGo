@@ -4,13 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import api from "../../axios/UserInstance";
-import { setError, setLoading } from "../../slice/user/userSlice";
-import { assets } from "../../assets/assets";
-import sendOtp from "../../Utils/sentOtp";
+// import api from "../../axios/UserInstance";
+// import { setError, setLoading } from "../../slice/user/userSlice";
+// import { assets } from "../../assets/assets";
+// import sendOtp from "../../Utils/sentOtp";
 import OtpModal from "../../components/CommonComponents/OtpModal";
 import Navbar from "../CommonComponents/Navbar";
 import Footer from "../CommonComponents/Footer";
+import { registerUser } from "../../Api/UserApis";
+import { sendOtp } from "../../Api/OtpApis";
 
 interface SignupFormInputs {
   name: string;
@@ -71,10 +73,7 @@ const SignupForm: React.FC = () => {
   const onSubmit = async (data: SignupFormInputs) => {
     setMessage("");
     try {
-      const { success, message: otpMessage } = await sendOtp(
-        data.email,
-        dispatch
-      );
+      const { success, message: otpMessage } = await sendOtp(data.email, dispatch);
       setMessage(otpMessage);
       if (success) setShowOtpModal(true);
     } catch (error) {
@@ -89,22 +88,59 @@ const SignupForm: React.FC = () => {
     const data = getValues();
 
     try {
-      dispatch(setLoading());
-      await api.post("/register", {
+      await registerUser({
         name: data.name,
         email: data.email,
         password: data.password,
         mobile_no: data.mobileNo,
-        gender: data.gender,
-      });
+        gender: data.gender
+      }, dispatch);
+      
       setMessage("User registered successfully!");
       navigate("/login");
     } catch (error) {
       console.error("Error registering user:", error);
-      dispatch(setError("Error registering user."));
       setMessage("Error registering user. Please try again.");
     }
   };
+
+  // const onSubmit = async (data: SignupFormInputs) => {
+  //   setMessage("");
+  //   try {
+  //     const { success, message: otpMessage } = await sendOtp(
+  //       data.email,
+  //       dispatch
+  //     );
+  //     setMessage(otpMessage);
+  //     if (success) setShowOtpModal(true);
+  //   } catch (error) {
+  //     console.error("Error sending OTP:", error);
+  //     setMessage("Failed to send OTP. Please try again.");
+  //   }
+  // };
+
+  // const handleOtpSuccess = async (successMessage: string) => {
+  //   setMessage(successMessage);
+  //   setShowOtpModal(false);
+  //   const data = getValues();
+
+  //   try {
+  //     dispatch(setLoading());
+  //     await api.post("/register", {
+  //       name: data.name,
+  //       email: data.email,
+  //       password: data.password,
+  //       mobile_no: data.mobileNo,
+  //       gender: data.gender,
+  //     });
+  //     setMessage("User registered successfully!");
+  //     navigate("/login");
+  //   } catch (error) {
+  //     console.error("Error registering user:", error);
+  //     dispatch(setError("Error registering user."));
+  //     setMessage("Error registering user. Please try again.");
+  //   }
+  // };
 
   return (
     <div className="min-h-screen flex flex-col">

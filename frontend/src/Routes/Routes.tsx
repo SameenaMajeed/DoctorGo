@@ -33,43 +33,62 @@ import AppointmentsList from "../components/User/AppointmentList.tsx";
 import Appointments from "../components/Doctor/Appointments.tsx";
 import EditSlot from "../components/Doctor/Slot/EditSlot.tsx";
 import UserProfile from "../components/User/UserProfile.tsx";
+import ProtectedLogin from "../components/User/LoginProtected.tsx";
+import UserLayout from "../components/User/Home/UserLayout.tsx";
 
 export const routes = (
   <>
-    <Route element={<UserProtected />}>
-      <Route path="/" Component={UserHomePage} />
-      <Route path="/signup" element={<SignupForm />} />
-      <Route path="/login" element={<LoginForm />} />
-      <Route path="/my-profile" element={<UserProfile/>}/>
-      <Route path='/doctors/:doctorId' element={<AppointmentPage/>}/>
-      <Route path='/appointment/verification' element={<AppointmentVerification/>}/>
-      <Route path='/appointment/success' element={<PaymentSuccess/>}/>
-      <Route path="/my-aappointments" element={<AppointmentsList/>}/>
-    </Route>
+    {/* Public Routes */}
+    <Route path="/signup" element={<SignupForm />} />
+    <Route path="/login" element={<ProtectedLogin />} />
 
-    {/* Doctor route */}
-    <Route path="/doctor" element={<DoctorLanding />} />
     <Route path="/doctor/login" element={<DoctorLogin />} />
     <Route path="/doctor/signup" element={<DoctorSignupForm />} />
     <Route path="/doctor/pending-approval" element={<PendingApprovel />} />
+
+    <Route path="/admin" element={<AdminLanding />} />
+    <Route path="/admin/login" element={<AdminLogin />} />
+    <Route path="/doctor" element={<DoctorLanding />} />
+
+    {/* User Routes */}
+
+    <Route element={<UserProtected />}>
+      <Route path="/" element={<UserHomePage />} />
+      <Route path="/doctors/:doctorId" element={<AppointmentPage />} />
+      <Route
+        path="/appointment/verification"
+        element={<AppointmentVerification />}
+      />
+      <Route path="/appointment/success" element={<PaymentSuccess />} />
+      <Route element={<UserLayout />}>
+        <Route path="/my-profile" element={<UserProfile />}/>
+        <Route path="/my-aappointments" element={<AppointmentsList />} />
+      </Route>
+    </Route>
+
+    {/* Doctor route */}
     <Route element={<DoctorProtected />}>
       <Route path="/doctor/home" element={<DoctorDashboard />} />
-      <Route element={<Layout/>}>
-        <Route path="/doctor/profile" element={<Profile/>}/>
-        <Route path="/doctor/viewBookings" element={<ViewBookings/>}/>
+      <Route element={<Layout />}>
+        <Route path="/doctor/profile" element={<Profile />} />
+        <Route path="/doctor/viewBookings" element={<ViewBookings />} />
         <Route path="/doctor/time-slots" element={<TimeSlots />} />
         <Route path="/doctor/slots" element={<ManageSlots />} />
         <Route path="/doctor/slots/create" element={<CreateSlot />} />
-        <Route path="/doctor/time-slots/:slotId" element={< EditSlot/>} />
+        <Route path="/doctor/time-slots/:slotId" element={<EditSlot />} />
         <Route path="/doctor/slots/calendar" element={<SlotCalendar />} />
-        <Route path="/doctor/slots/emergency-block" element={<EmergencyBlock />} />
-        <Route path="/doctor/:doctorId/appointments" element={<Appointments />} />
+        <Route
+          path="/doctor/slots/emergency-block"
+          element={<EmergencyBlock />}
+        />
+        <Route
+          path="/doctor/:doctorId/appointments"
+          element={<Appointments />}
+        />
       </Route>
     </Route>
 
     {/* Admin Route */}
-    <Route path="/admin" element={<AdminLanding />} />
-    <Route path="/admin/login" element={<AdminLogin />} />
     <Route element={<AdminProtected />}>
       <Route path="/admin/dashboard" element={<AdminDashBoard />} />
       <Route path="/admin/approvals" element={<ApproveDoctor />} />

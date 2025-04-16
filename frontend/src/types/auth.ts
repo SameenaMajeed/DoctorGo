@@ -1,17 +1,21 @@
 
 export interface ProfilePictureResponse {
-    status: number;
+    status?: number;
     message: string;
-    data: {
+    success : boolean
+    data?: {
       profilePicture: string;
     };
   }
 
   export interface AxiosError {
     response?: {
+      status: any;
       data?: {
         message?: string;
+        error?:any
       };
+
     };
   }
 
@@ -83,3 +87,11 @@ export interface UpdateProfileResponse {
   message: string;
   data: User;
 }
+
+
+type BookingResponse = {
+  success: boolean;
+  message: string;
+  razorpayOrder?: any; // Replace with proper Razorpay order type
+  redirect?: boolean;
+};

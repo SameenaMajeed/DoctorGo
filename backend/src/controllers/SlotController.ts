@@ -74,6 +74,8 @@ export default class SlotController {
         limit,
         searchTerm
       );
+
+      console.log('Slots :',slots)
       sendResponse(
         res,
         HttpStatus.OK,

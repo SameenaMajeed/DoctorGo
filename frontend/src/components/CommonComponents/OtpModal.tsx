@@ -8,6 +8,8 @@ import {
   setOtpVerified,
   setOtpExpired,
 } from '../../slice/Otp/otpSlice';
+import { resendOtp, verifyOtp } from '../../Api/OtpApis';
+
 
 interface OtpModalProps {
   show: boolean;
@@ -27,6 +29,7 @@ const OtpModal: React.FC<OtpModalProps> = ({
 
   const [otp, setOtp] = useState('');
   const [message, setMessage] = useState('');
+  // const { countdown2, startCountdown } = useOtpCountdown(60);
   const [countdown, setCountdown] = useState<number>(60);  
 
   // Countdown timer effect
@@ -41,40 +44,47 @@ const OtpModal: React.FC<OtpModalProps> = ({
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(setLoading());
 
-    try {
-      await api.post('/otp/verify', { email, otp });
-      dispatch(setOtpVerified());
-      onSuccess('OTP verified successfully!');
+      const { success, message, expired } = await verifyOtp(email, otp, dispatch);
+    
+    if (success) {
+      onSuccess(message);
       onClose();
-    } catch (error: any) {
-      console.error(error);
-      if (error.response?.data?.message === 'OTP expired') {
-        dispatch(setOtpExpired());
-        setMessage('Your OTP has expired. Please resend the OTP.');
-      } else {
-        dispatch(setError('Error verifying OTP.'));
-        setMessage('Error verifying OTP. Please try again.');
-      }
+    } else {
+      setMessage(message);
     }
+
   };
 
   const handleResendOtp = async () => {
     setMessage('');
-    dispatch(setLoading());
-    setCountdown(60);  
-
-    try {
-      await api.post('/otp/send', { email });
-      dispatch(setOtpSent(email));
-      setMessage('A new OTP has been sent to your email.');
-    } catch (error: any) {
-      console.error(error);
-      dispatch(setError('Error resending OTP.'));
-      setMessage('Error resending OTP. Please try again.');
+    setCountdown(60); // Start the countdown
+    
+    const { success, message } = await resendOtp(email, dispatch);
+    
+    setMessage(message);
+    
+    if (!success) {
+      // Reset countdown if failed
+      setCountdown(0);
     }
   };
+
+  // const handleResendOtp = async () => {
+  //   setMessage('');
+  //   dispatch(setLoading());
+  //   setCountdown(60);  
+
+  //   try {
+  //     await api.post('/otp/send', { email });
+  //     dispatch(setOtpSent(email));
+  //     setMessage('A new OTP has been sent to your email.');
+  //   } catch (error: any) {
+  //     console.error(error);
+  //     dispatch(setError('Error resending OTP.'));
+  //     setMessage('Error resending OTP. Please try again.');
+  //   }
+  // };
 
   // If the modal should not be shown, return null
   if (!show) return null;

@@ -13,6 +13,7 @@ import {
   Stethoscope,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { fetchDoctorAppointments, updateAppointmentStatus } from "../../Api/DoctorApis";
 
 const Appointments: React.FC = () => {
   const { doctorId } = useParams<{ doctorId: string }>();
@@ -37,43 +38,58 @@ const Appointments: React.FC = () => {
     cancelled: "bg-rose-100 text-rose-800",
   };
 
-  const fetchAppointments = async () => {
+  const loadAppointments = async () => {
     if (!doctorId) {
       toast.error("Doctor ID is missing");
       return;
     }
-
+  
     setLoading(true);
-    try {
-      const response = await doctorApi.get(`/${doctorId}/appointments`, {
-        params: { page, limit, status: statusFilter },
-      });
-
-      console.log("API Response:", response.data.data.bookings); // Debugging line
-
-      setAppointments(response.data.data.bookings || []);
-      setTotalPages(response.data.data.totalPages || 1);
-    } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || "Failed to fetch appointments"
-      );
-    } finally {
-      setLoading(false);
+    
+    const { 
+      success, 
+      message, 
+      appointments, 
+      totalPages 
+    } = await fetchDoctorAppointments({
+      doctorId,
+      page,
+      limit,
+      statusFilter
+    });
+  
+    if (success) {
+      console.log("Fetched appointments:", appointments); // Debugging line
+      setAppointments(appointments || []);
+      setTotalPages(totalPages || 1);
+    } else {
+      toast.error(message);
     }
+  
+    setLoading(false);
   };
-
+  
+  // Call this in useEffect or when needed
   useEffect(() => {
-    fetchAppointments();
-  }, [doctorId, page, statusFilter]);
+    loadAppointments();
+  }, [doctorId, page, limit, statusFilter]);
+  
 
   const handleStatusUpdate = async (appointmentId: string, status: string) => {
-    try {
-      console.log("Appointment ID:", appointmentId);
-      await doctorApi.put(`/appointments/${appointmentId}/status`, { status });
-      toast.success(`Appointment marked as ${status}`);
-      fetchAppointments();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to update status");
+    console.log("Updating appointment:", appointmentId);
+    
+    const { success, message, shouldRefresh } = await updateAppointmentStatus({
+      appointmentId,
+      status
+    });
+  
+    if (success) {
+      toast.success(message);
+      if (shouldRefresh) {
+        loadAppointments(); // Refresh the appointments list
+      }
+    } else {
+      toast.error(message);
     }
   };
 
