@@ -33,7 +33,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onRestrictedAction }) => {
     }
   };
   const doctorId = doctor?._id;
-  console.log('doctorId from sideBar :',doctorId)
+  console.log("doctorId from sideBar :", doctorId);
 
   const appointmentsPath = doctorId ? `/doctor/${doctorId}/appointments` : "#";
 
@@ -124,6 +124,24 @@ const Sidebar: React.FC<SidebarProps> = ({ onRestrictedAction }) => {
             active={location.pathname === "/doctor/slots/emergency"}
             onClick={(e) => handleRestrictedNavigation(e, "/doctor/slots/emergency")}
           /> */}
+        </div>
+
+        <div className="py-2">
+          <p
+            className={`px-3 text-xs text-gray-500 mb-2 ${
+              collapsed ? "hidden" : "block"
+            }`}
+          >
+            Medical Records
+          </p>
+          <SidebarItem
+            href="/doctor/medicalRecords"
+            icon={<Clock size={20} />}
+            label="View Medical Records"
+            collapsed={collapsed}
+            active={location.pathname === "/doctor/medicalRecords"}
+            onClick={(e) => handleRestrictedNavigation(e, "/doctor/medicalRecords")}
+          />
         </div>
 
         <SidebarItem

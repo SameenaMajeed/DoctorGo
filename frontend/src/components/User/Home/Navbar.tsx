@@ -6,6 +6,7 @@ import { RootState } from "../../../slice/Store/Store";
 import { logoutUser } from "../../../slice/user/userSlice";
 import api from "../../../axios/UserInstance";
 import { useDispatch, useSelector } from "react-redux";
+import { User } from "lucide-react";
 
 const Navbar: React.FC = () => {
   const dispatch = useDispatch();
@@ -30,7 +31,7 @@ const Navbar: React.FC = () => {
         {/* Logo */}
         <NavLink to="/" className="flex items-center">
           <img
-            src='logo.png'
+            src="logo.png"
             alt="Logo"
             className="w-24 transition-transform duration-300 hover:scale-105"
           />
@@ -61,7 +62,9 @@ const Navbar: React.FC = () => {
               to={link.path}
               className={({ isActive }) =>
                 `block py-2 px-6 md:px-3 transition-all duration-300 rounded-lg hover:bg-gray-100 md:hover:bg-transparent ${
-                  isActive ? "text-primary font-bold md:bg-gray-200" : "hover:text-primary"
+                  isActive
+                    ? "text-primary font-bold md:bg-gray-200"
+                    : "hover:text-primary"
                 }`
               }
               onClick={() => setShowMenu(false)} // Close menu on click (mobile)
@@ -75,9 +78,22 @@ const Navbar: React.FC = () => {
         <div className="hidden md:block">
           {user ? (
             <div className="flex items-center gap-2 cursor-pointer group relative">
-              <img className="w-8 rounded-full" src={assets.profile_pic} alt="Profile" />
+              {user.profilePicture ? (
+                <img
+                  src={user.profilePicture}
+                  alt={user.name}
+                  className="w-8 rounded-full"
+                />
+              ) : (
+                <User size={16} className="text-blue-600" />
+              )}
+              {/* <img className="w-8 rounded-full" src={user.profilePicture} alt={user.name} /> */}
               <span className="text-sm">Hello, {user.name}</span>
-              <img className="w-2.5" src={assets.dropdown_icon} alt="Dropdown" />
+              <img
+                className="w-2.5"
+                src={assets.dropdown_icon}
+                alt="Dropdown"
+              />
 
               {/* Dropdown Menu */}
               <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
@@ -89,18 +105,21 @@ const Navbar: React.FC = () => {
                     My Profile
                   </p>
                   <p
-                    onClick={() => navigate("/my-aappointments")}
+                    onClick={() => navigate("/my-appointments")}
                     className="hover:text-black cursor-pointer"
                   >
                     My Appointments
                   </p>
                   <p
-                    onClick={() => navigate("/my-conversation")}
+                    onClick={() => navigate("/my-chats")}
                     className="hover:text-black cursor-pointer"
                   >
                     Conversation
                   </p>
-                  <p onClick={handleLogout} className="hover:text-black cursor-pointer">
+                  <p
+                    onClick={handleLogout}
+                    className="hover:text-black cursor-pointer"
+                  >
                     Logout
                   </p>
                 </div>

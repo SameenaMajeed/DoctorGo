@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import AppointmentCard from "./AppointmentCard";
-import Navbar from "../User/Home/Navbar";
-import Footer from "../CommonComponents/Footer";
 import { useNavigate } from "react-router-dom";
 import api from "../../axios/UserInstance";
 import { useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
 import { Appointment } from "../../Types";
-import Sidebar from "./SideBar";
+
 
 const AppointmentsList: React.FC = () => {
   const navigate = useNavigate();

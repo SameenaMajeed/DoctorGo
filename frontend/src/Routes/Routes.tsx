@@ -23,7 +23,6 @@ import Profile from "../components/Doctor/Profile";
 import AppointmentPage from "../components/User/AppointmentPage";
 import AppointmentVerification from "../components/User/AppointmentVerification";
 import PaymentSuccess from "../components/User/PaymentSuccess.tsx";
-import ViewBookings from "../components/Doctor/ViewBookings.tsx";
 import CreateSlot from "../components/Doctor/Slot/CreateSlot.tsx";
 import ManageSlots from "../components/Doctor/Slot/ManageSlots.tsx";
 import SlotCalendar from "../components/Doctor/Slot/SlotCalendar.tsx";
@@ -35,6 +34,9 @@ import EditSlot from "../components/Doctor/Slot/EditSlot.tsx";
 import UserProfile from "../components/User/UserProfile.tsx";
 import ProtectedLogin from "../components/User/LoginProtected.tsx";
 import UserLayout from "../components/User/Home/UserLayout.tsx";
+import Chat from "../components/User/Chat.tsx";
+import PrecipitationDownload from "../components/User/PrecipitationDownload.tsx";
+import PatientRecords from "../components/Doctor/PatientRecords.tsx";
 
 export const routes = (
   <>
@@ -62,7 +64,9 @@ export const routes = (
       <Route path="/appointment/success" element={<PaymentSuccess />} />
       <Route element={<UserLayout />}>
         <Route path="/my-profile" element={<UserProfile />}/>
-        <Route path="/my-aappointments" element={<AppointmentsList />} />
+        <Route path="/my-appointments" element={<AppointmentsList />} />
+        <Route path="/my-chats" element={<Chat />} />
+        <Route path="/prescriptionDownload" element={<PrecipitationDownload />} />
       </Route>
     </Route>
 
@@ -71,12 +75,12 @@ export const routes = (
       <Route path="/doctor/home" element={<DoctorDashboard />} />
       <Route element={<Layout />}>
         <Route path="/doctor/profile" element={<Profile />} />
-        <Route path="/doctor/viewBookings" element={<ViewBookings />} />
         <Route path="/doctor/time-slots" element={<TimeSlots />} />
         <Route path="/doctor/slots" element={<ManageSlots />} />
         <Route path="/doctor/slots/create" element={<CreateSlot />} />
         <Route path="/doctor/time-slots/:slotId" element={<EditSlot />} />
         <Route path="/doctor/slots/calendar" element={<SlotCalendar />} />
+        <Route path="/doctor/medicalRecords" element={<PatientRecords />} />
         <Route
           path="/doctor/slots/emergency-block"
           element={<EmergencyBlock />}
