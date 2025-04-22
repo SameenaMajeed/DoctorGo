@@ -111,6 +111,7 @@ export class Usercontroller {
   async refreshAccessToken(req: Request, res: Response): Promise<void> {
     try {
       const refreshToken = req.cookies.refreshToken;
+      console.log('refreshToken :' ,refreshToken)
 
       if (!refreshToken) {
         console.warn("No refresh token found in cookies");
