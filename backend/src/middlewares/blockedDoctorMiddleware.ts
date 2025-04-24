@@ -18,7 +18,7 @@ const blockedDoctorMiddleware = async (
     }
 
     const doctor = await DoctorModel.findOne({ email: email });
-    console.log('fetching email:' ,doctor)
+    // console.log('fetching email:' ,doctor)
 
     if (doctor && doctor?.isBlocked) {
       res.status(HttpStatus.Forbidden).json({ 

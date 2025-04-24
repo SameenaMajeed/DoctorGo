@@ -14,7 +14,7 @@ const Layout = () => {
         <Header />
 
         {/* Page Content */}
-        <div className="p-6 flex-1">
+        <div className="p-6 flex-1 ">
           <Outlet /> {/* This will load Profile Page inside Main Content */}
         </div>
       </div>

@@ -21,6 +21,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ onRestrictedAction }) => {
   const [collapsed, setCollapsed] = useState(false);
   const { doctor } = useSelector((state: RootState) => state.doctor);
+  const { user } = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -35,14 +36,24 @@ const Sidebar: React.FC<SidebarProps> = ({ onRestrictedAction }) => {
   const doctorId = doctor?._id;
   console.log("doctorId from sideBar :", doctorId);
 
+  const userId = user?.id
+
   const appointmentsPath = doctorId ? `/doctor/${doctorId}/appointments` : "#";
+  const patientPath = doctorId ? `/doctor/${doctorId}/patients` : "#";
+  // const patient = userId ? `/doctor/patient-records/${userId}` : "#";
+
 
   return (
     <div
-      className={`h-screen bg-white shadow-md border-r transition-all duration-300 ${
+      className={`h-full bg-white text-white transition-all duration-300 ${
         collapsed ? "w-20" : "w-64"
       }`}
     >
+      {/* // <div 
+    //   className={`min-h-screen bg-black text-white transition-all duration-300 ${
+    //     collapsed ? "w-20" : "w-64"
+    //   }`}
+    // >
       {/* Logo Section */}
       <div className="flex items-center justify-between p-3">
         <Link to="/doctor/home">
@@ -126,7 +137,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onRestrictedAction }) => {
           /> */}
         </div>
 
-        <div className="py-2">
+        {/* <div className="py-2">
           <p
             className={`px-3 text-xs text-gray-500 mb-2 ${
               collapsed ? "hidden" : "block"
@@ -135,14 +146,16 @@ const Sidebar: React.FC<SidebarProps> = ({ onRestrictedAction }) => {
             Medical Records
           </p>
           <SidebarItem
-            href="/doctor/medicalRecords"
+            href={patient}
             icon={<Clock size={20} />}
             label="View Medical Records"
             collapsed={collapsed}
-            active={location.pathname === "/doctor/medicalRecords"}
-            onClick={(e) => handleRestrictedNavigation(e, "/doctor/medicalRecords")}
+            active={location.pathname === patient }
+            onClick={(e) =>
+              handleRestrictedNavigation(e, patient)
+            }
           />
-        </div>
+        </div> */}
 
         <SidebarItem
           href={appointmentsPath}
@@ -155,12 +168,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onRestrictedAction }) => {
 
         {/* Restricted Pages */}
         <SidebarItem
-          href="/doctor/patients"
+          href={patientPath}
           icon={<Users size={20} />}
           label="Patients"
           collapsed={collapsed}
-          active={location.pathname === "/doctor/patients"}
-          onClick={(e) => handleRestrictedNavigation(e, "/doctor/patients")}
+          active={location.pathname === patientPath}
+          onClick={(e) => handleRestrictedNavigation(e, patientPath)}
         />
         <SidebarItem
           href="/time-fees"

@@ -1,15 +1,17 @@
-import React from 'react';
+import React from "react";
 // import { Button } from '@/components/ui/button';
-import { Eye, Trash2 } from 'lucide-react';
+import { Eye, Trash2 } from "lucide-react";
 
 interface CardProps {
   children: React.ReactNode;
   className?: string;
 }
 
-export const Card: React.FC<CardProps> = ({ children, className = '' }) => {
+export const Card: React.FC<CardProps> = ({ children, className = "" }) => {
   return (
-    <div className={`bg-white rounded-lg shadow-sm p-6 ${className}`}>
+    <div
+      className={`bg-white rounded-2xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300 ${className}`}
+    >
       {children}
     </div>
   );
@@ -20,12 +22,11 @@ interface CardContentProps {
   className?: string;
 }
 
-export const CardContent: React.FC<CardContentProps> = ({ children, className = '' }) => {
-  return (
-    <div className={`p-4 ${className}`}>
-      {children}
-    </div>
-  );
+export const CardContent: React.FC<CardContentProps> = ({
+  children,
+  className = "",
+}) => {
+  return <div className={`p-4 ${className}`}>{children}</div>;
 };
 
 interface CardHeaderProps {
@@ -34,11 +35,19 @@ interface CardHeaderProps {
   className?: string;
 }
 
-export const CardHeader: React.FC<CardHeaderProps> = ({ title, subtitle, className = '' }) => {
+export const CardHeader: React.FC<CardHeaderProps> = ({
+  title,
+  subtitle,
+  className = "",
+}) => {
   return (
     <div className={`mb-6 ${className}`}>
-      <h1 className="text-3xl font-bold text-gray-800 border-b pb-2">{title}</h1>
-      {subtitle && <div className="mt-4 space-y-1 text-gray-600">{subtitle}</div>}
+      <h1 className="text-3xl font-bold text-gray-800 border-b pb-2">
+        {title}
+      </h1>
+      {subtitle && (
+        <div className="mt-4 space-y-1 text-gray-600">{subtitle}</div>
+      )}
     </div>
   );
 };
@@ -64,17 +73,25 @@ export const RecordCard: React.FC<RecordCardProps> = ({
   prescription,
   onView,
   onDelete,
-  className = '',
+  className = "",
 }) => {
   return (
     <Card className={`mb-4 ${className}`}>
       <CardContent className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <p className="text-sm text-gray-500">{date}</p>
-          <p><strong>Complaint:</strong> {complaint}</p>
-          <p><strong>Diagnosis:</strong> {diagnosis}</p>
-          <p><strong>Treatment:</strong> {treatment}</p>
-          <p><strong>Prescription:</strong> {prescription}</p>
+          <p>
+            <strong>Complaint:</strong> {complaint}
+          </p>
+          <p>
+            <strong>Diagnosis:</strong> {diagnosis}
+          </p>
+          <p>
+            <strong>Treatment:</strong> {treatment}
+          </p>
+          <p>
+            <strong>Prescription:</strong> {prescription}
+          </p>
         </div>
         <div className="flex flex-col items-end gap-2">
           <span className="text-green-600 font-semibold">{cost}</span>

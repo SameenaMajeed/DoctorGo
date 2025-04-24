@@ -196,7 +196,7 @@ const Appointments: React.FC = () => {
 
                     <div className="flex items-center gap-2">
                       <Users className="w-4 h-4 text-gray-400" />
-                      {appointment.patientDetails.patientName}
+                      {appointment.patientDetails.name}
                     </div>
                     <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-sm font-medium shadow-sm">
                     <Stethoscope className="w-4 h-4 text-blue-600" />

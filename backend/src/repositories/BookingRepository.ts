@@ -123,11 +123,15 @@ export class BookingRepository
       );
     }
   }
+
   async findByUserId(id: string): Promise<IBooking[]> {
     try {
       return await Booking.find({ user_id: id })
-        .populate("doctor_id", "name specialization profilePicture qualification")
-        .populate("slot_id",'startTime endTime')
+        .populate(
+          "doctor_id",
+          "name specialization profilePicture qualification"
+        )
+        .populate("slot_id", "startTime endTime")
         .exec();
     } catch (error) {
       console.error("Error in findByUserId:", error);
@@ -222,28 +226,44 @@ export class BookingRepository
     }
   }
 
-
-public async findByUserSlotId(userId: Types.ObjectId, doctorId?: Types.ObjectId): Promise<IBooking[]> {
-  const query: any = { 
+  public async findByUserSlotId(
+    userId: Types.ObjectId,
+    doctorId?: Types.ObjectId
+  ): Promise<IBooking[]> {
+    const query: any = {
       user_id: userId,
-      status: { $ne: 'cancelled' }
-  };
-  
-  if (doctorId) {
-      query.doctor_id = doctorId;
-  }
-  
-  return await Booking.find(query)
-      .populate('doctor_id', 'name profilePicture specialization')
-      .populate('slot_id', 'startTime endTime date')
-      .exec();
-}
+      status: { $ne: "cancelled" },
+    };
 
-public async findOneByUserAndSlot(userId: Types.ObjectId, slotId: Types.ObjectId): Promise<IBooking | null> {
-  return await Booking.findOne({
+    if (doctorId) {
+      query.doctor_id = doctorId;
+    }
+
+    return await Booking.find(query)
+      .populate("doctor_id", "name profilePicture specialization")
+      .populate("slot_id", "startTime endTime date")
+      .exec();
+  }
+
+  public async findOneByUserAndSlot(
+    userId: Types.ObjectId,
+    slotId: Types.ObjectId
+  ): Promise<IBooking | null> {
+    return await Booking.findOne({
       user_id: userId,
       slot_id: slotId,
-      status: { $ne: 'cancelled' }
-  }).exec();
-}
+      status: { $ne: "cancelled" },
+    }).exec();
+  }
+
+  // get User data for the perticular doctor
+  async getPatientsForDoctor(doctorId: string): Promise<IBooking[]> {
+    console.log('from repo',doctorId)
+    const patients = await Booking.find({ doctor_id : doctorId })
+      .populate("user_id", "name email mobile_no gender age profilePicture")
+      .exec();
+
+      console.log('patient from repository',patients)
+    return patients
+  }
 }

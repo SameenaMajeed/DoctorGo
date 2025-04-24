@@ -15,6 +15,9 @@ import { PaymentService } from "../services/PaymentService";
 import blockedUserMiddleware from "../middlewares/blockedUserMiddleware";
 import SlotRepository from "../repositories/SlotRepository";
 import blockedDoctorMiddleware from "../middlewares/blockedDoctorMiddleware";
+import prescriptionRepository from "../repositories/prescriptionRepository";
+import PrescriptionService from "../services/prescriptionService";
+import PrescriptionController from "../controllers/prescriptionController";
 // import { uploadCertifications } from '../middlewares/fileUpload';
 
 const otpRepository = new OtpRepository();
@@ -22,6 +25,7 @@ const doctorRepository = new DoctorRepository();
 const bookingRepository = new BookingRepository();
 const userRepository = new UserRepository();
 const slotRepository = new SlotRepository();
+const PrescriptionRepository = new prescriptionRepository()
 
 const bookingService = new BookingService(
   bookingRepository,
@@ -30,6 +34,8 @@ const bookingService = new BookingService(
   slotRepository
 );
 
+const prescriptionService = new PrescriptionService(PrescriptionRepository)
+
 const paymentService = new PaymentService();
 
 const bookingController = new BookingController(bookingService, paymentService);
@@ -37,6 +43,8 @@ const bookingController = new BookingController(bookingService, paymentService);
 const doctorService = new DoctorService(doctorRepository, otpRepository);
 
 const doctorController = new DoctorController(doctorService);
+
+const prescriptionController = new PrescriptionController(prescriptionService)
 
 const doctorRoute: Router = express.Router();
 
@@ -89,5 +97,16 @@ doctorRoute.put(
   blockedDoctorMiddleware,
   (req, res) => bookingController.updateDoctorAppointmentStatus(req, res)
 );
+
+// get Booked Users
+doctorRoute.get(
+  "/:doctorId/patients",
+  authenticateToken("doctor"),
+  blockedDoctorMiddleware,
+  (req, res) => bookingController.getPatients(req, res)
+);
+
+// Prescription 
+doctorRoute.post('/createPrescription',(req , res)=> prescriptionController.createPrescription(req , res))
 
 export default doctorRoute;

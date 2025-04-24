@@ -174,7 +174,7 @@ const CreateSlot: React.FC = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto my-10 p-6 bg-white rounded-xl shadow-md">
+    <div className="max-w-lg mx-auto my-10 p-6 bg-gray-100 rounded-xl shadow-md">
       <h2 className="text-2xl font-semibold text-teal-700 text-center mb-6">
         Create Appointment Slot
       </h2>

@@ -1,3 +1,4 @@
+import { User } from "./types/auth";
 import { SlotData } from "./types/Slot";
 
 export interface Doctor {
@@ -20,7 +21,7 @@ export interface Doctor {
 export interface Appointment {
     _id: string;
     doctor_id: Doctor; // Ensure doctor_id is an object, not a string
-    user_id: { _id: string; name: string; email: string } | string;
+    user_id: User | string;
     slot_id: SlotData;
     appointmentDate: string;
     appointmentTime: string;

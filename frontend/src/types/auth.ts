@@ -33,6 +33,7 @@ export interface User {
   address : string;
   gender : string;
   DOB : string;
+  age : string;
 }
 
 

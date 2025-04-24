@@ -504,4 +504,12 @@ export class BookingService implements IBookingService {
       );
     }
   }
+
+  // get user data for a perticular doctor:
+  async getPatientsForDoctor(doctorId: string) :Promise<IBooking[]> {
+    console.log('from service',doctorId)
+    const patients = await this._bookingRepo.getPatientsForDoctor(doctorId);
+    console.log('patient from service',patients)
+    return patients
+}
 }

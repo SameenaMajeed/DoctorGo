@@ -1,6 +1,5 @@
 import { HttpStatus } from "../constants/Httpstatus";
 import { ISlotRepository } from "../interfaces/Slot/SlotRepositoryInterface";
-import Slot from "../models/SlotModel";
 import SlotModel, { ISlot } from "../models/SlotModel";
 import { AppError } from "../utils/AppError";
 import { BaseRepository } from "./BaseRepository";

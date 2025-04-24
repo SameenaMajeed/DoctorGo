@@ -31,21 +31,21 @@ const DashboardLayout = () => {
 
   console.log("DashboardLayout is rendering");
 
-
   return (
     <div>
       {/* Show Approval Status Banner if not approved */}
       {!doctor?.isApproved && <ApprovalBanner />}
 
-      <div className="flex h-screen bg-gray-50">
+      <div className="flex h-screen">
         {/* Sidebar */}
-        <Sidebar onRestrictedAction={handleRestrictedAction} />
+        <div className="h-full">
+          <Sidebar onRestrictedAction={handleRestrictedAction} />
+        </div>
 
         {/* Main Content */}
         <div className="flex flex-col flex-1 overflow-hidden">
           <Header />
-          <main className="flex-1 p-6 overflow-auto">
-            {/* Pass handleRestrictedAction to Main */}
+          <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
             <Main onRestrictedAction={handleRestrictedAction} />
           </main>
         </div>
@@ -54,8 +54,19 @@ const DashboardLayout = () => {
   );
 };
 
-export default DashboardLayout;
+{
+  /* <div className="flex min-h-screen bg-black text-white">
+        <Sidebar onRestrictedAction={handleRestrictedAction} />
+        <div className="flex flex-col flex-1 overflow-hidden">
+          <Header />
+          <main className="flex-1 overflow-auto bg-gray-50 text-black p-6">
+            <Main onRestrictedAction={handleRestrictedAction} />
+          </main>
+        </div>
+      </div> */
+}
 
+export default DashboardLayout;
 
 // import React from "react";
 // import Sidebar from "../../components/Doctor/Home/Sidebar";
@@ -96,4 +107,3 @@ export default DashboardLayout;
 // };
 
 // export default DashboardLayout;
-

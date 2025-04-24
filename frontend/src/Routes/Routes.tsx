@@ -36,7 +36,10 @@ import ProtectedLogin from "../components/User/LoginProtected.tsx";
 import UserLayout from "../components/User/Home/UserLayout.tsx";
 import Chat from "../components/User/Chat.tsx";
 import PrecipitationDownload from "../components/User/PrecipitationDownload.tsx";
-import PatientRecords from "../components/Doctor/PatientRecords.tsx";
+import MedicalRecord from "../components/Doctor/PatientRecords.tsx";
+import PatientDashboard from "../components/Doctor/PatientDashboard.tsx";
+import Page404 from "../pages/Page404.tsx";
+import NewRecord from "../components/Doctor/NewRecord.tsx";
 
 export const routes = (
   <>
@@ -80,7 +83,9 @@ export const routes = (
         <Route path="/doctor/slots/create" element={<CreateSlot />} />
         <Route path="/doctor/time-slots/:slotId" element={<EditSlot />} />
         <Route path="/doctor/slots/calendar" element={<SlotCalendar />} />
-        <Route path="/doctor/medicalRecords" element={<PatientRecords />} />
+        <Route path="/doctor/patient-records/:userId" element={<MedicalRecord />} />
+        <Route path="/doctor/newRecords" element={< NewRecord/>} />
+        <Route path="/doctor/:doctorId/patients" element={<PatientDashboard />} />
         <Route
           path="/doctor/slots/emergency-block"
           element={<EmergencyBlock />}
@@ -99,5 +104,7 @@ export const routes = (
       <Route path="/admin/Doctors" element={<DoctorList />} />
       <Route path="/admin/users" element={<UserList />} />
     </Route>
+
+    <Route path='*' element={<Page404 />} />
   </>
 );

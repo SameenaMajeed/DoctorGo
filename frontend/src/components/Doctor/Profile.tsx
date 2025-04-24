@@ -179,7 +179,7 @@ const Profile: React.FC = () => {
         }
       );
 
-      console.log(response);
+      console.log('hi',response);
 
       const uploadedImageUrl = response.data.data.profilePicture;
       toast.success("Profile picture uploaded successfully");
