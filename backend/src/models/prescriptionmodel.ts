@@ -2,13 +2,16 @@ import mongoose, { Schema , Document} from "mongoose";
 
 interface Medicine {
   name: string;
+  dosage: string;
   quantity: number;
   time_gap: string;
+  amount:number;
 }
 
 interface TestReport {
   img: string;
 }
+
 
 export interface IPrescription extends Document {
   userId: mongoose.Types.ObjectId;
@@ -18,6 +21,9 @@ export interface IPrescription extends Document {
   disease: string;
   testReports: TestReport[];
   vitalSigns?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  followUpDate?: Date;
 }
 
 const PrescriptionSchema : Schema = new Schema<IPrescription>(
@@ -32,11 +38,14 @@ const PrescriptionSchema : Schema = new Schema<IPrescription>(
         ref: "Doctor",
         required: true,
       },
+      vitalSigns: { type: String },
       medicines: [
         {
           name: { type: String, required: true },
+          dosage: { type: String, required: true },
           quantity: { type: Number, required: true },
           time_gap: { type: String, required: true },
+          amount: { type: Number, required: true },
         },
       ],
       symptoms: {

@@ -11,7 +11,7 @@ import {
   ClipboardList,
 } from "lucide-react";
 import MenuItem from "./MenuItem";
-import { useNavigate, useLocation} from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "../../axios/UserInstance";
 import { logoutUser } from "../../slice/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -75,12 +75,11 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-
     <div>
       <aside
         className={`${
           isCollapsed ? "w-20" : "w-72"
-        } h-screen bg-white border-r border-gray-200 flex flex-col transition-all duration-300`}
+        } h-screen bg-white border-r border-gray-200 flex flex-col transition-all duration-300 `}
       >
         {/* Collapse Toggle */}
         {/* <div className="flex justify-end px-2"> */}
@@ -166,36 +165,36 @@ const Sidebar: React.FC = () => {
             <LogOut size={18} className={isCollapsed ? "" : "mr-3"} />
             {!isCollapsed && <span className="font-medium">Logout</span>}
           </button>
+            {/* User Info */}
+      <div className="flex-1 fixed bottom-1 ">
+        {user && (
+          <div className="hidden md:block px-4 py-3 bg-gray-50 border-t border-gray-200">
+            <div className="flex items-center">
+              <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden mr-3 ">
+                {user.profilePicture ? (
+                  <img
+                    src={user.profilePicture}
+                    alt={user.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User size={16} className="text-blue-600" />
+                )}
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 truncate max-w-[180px] ">
+                  {user.name}
+                </p>
+                <p className="text-xs text-gray-500 truncate max-w-[180px]">
+                  {user.email}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
         </div>
       </aside>
-      {/* User Info */}
-      <div className="flex-1 fixed bottom-0 ">
-            {user && (
-              <div className="hidden md:block px-4 py-3 bg-gray-50 border-t border-gray-200">
-                <div className="flex items-center">
-                  <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden mr-3">
-                    {user.profilePicture ? (
-                      <img
-                        src={user.profilePicture}
-                        alt={user.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <User size={16} className="text-blue-600" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 truncate max-w-[180px]">
-                      {user.name}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate max-w-[180px]">
-                      {user.email}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
     </div>
   );
 };

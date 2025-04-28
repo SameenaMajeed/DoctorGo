@@ -21,6 +21,11 @@ const PatientDashboard: React.FC = () => {
   const [patients, setPatients] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [gender, setGender] = useState("");
+  const [sortBy, setSortBy] = useState("");
+  const [date, setDate] = useState(new Date());
+
   const { doctorId } = useParams<{ doctorId: string }>();
 
   useEffect(() => {
@@ -38,6 +43,28 @@ const PatientDashboard: React.FC = () => {
 
     fetchPatients();
   }, [doctorId]);
+
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "Invalid Date";
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Invalid Date";
+    }
+  };
+
+  // const handleFilter = patients.filter((patient)=>{
+  //   const appointmentDate = formatDate(patient.appointmentDate); 
+  //   const name = formatDate(patient.); 
+  //   const appointmentDate = formatDate(patient.appointmentDate); 
+  //   const appointmentDate = formatDate(patient.appointmentDate); 
+  // })
 
   if (loading) return <div>Loading...</div>;
 
@@ -64,7 +91,46 @@ const PatientDashboard: React.FC = () => {
         </Card>
       </div>
 
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-4 items-center flex-wrap">
+      <TextInput
+        placeholder="Search Patients"
+        className="w-1/3 min-w-[200px]"
+        value={searchTerm}
+        onChange={(e : any) => setSearchTerm(e.target.value)}
+      />
+
+      <select
+        className="border rounded px-3 py-2 text-sm"
+        value={sortBy}
+        onChange={(e) => setSortBy(e.target.value)}
+      >
+        <option value="">Sort by...</option>
+        <option value="date">Date</option>
+        <option value="name">Name</option>
+      </select>
+
+      <select
+        className="border rounded px-3 py-2 text-sm"
+        value={gender}
+        onChange={(e) => setGender(e.target.value)}
+      >
+        <option value="">Gender...</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <div className="flex items-center gap-2 border rounded px-3 py-2">
+        <CalendarIcon className="h-4 w-4" />
+        <span className="text-sm">{format(date, "MM/dd/yyyy")}</span>
+      </div>
+
+      {/* <Button className="ml-auto" onClick={handleFilter}>
+        Filter
+      </Button> */}
+    </div>
+
+      {/* <div className="flex gap-4 items-center">
         <TextInput placeholder="Search Patients" className="w-1/3" />
         <select className="border rounded px-3 py-2">
           <option>Sort by...</option>
@@ -80,14 +146,14 @@ const PatientDashboard: React.FC = () => {
           <span>{format(new Date(), "MM/dd/yyyy")}</span>
         </div>
         <Button className="ml-auto">Filter</Button>
-      </div>
+      </div> */}
 
       <div className="bg-white rounded-xl shadow">
         <table className="min-w-full text-sm text-left">
           <thead className="bg-gray-100 text-gray-600">
             <tr>
               <th className="p-3">Patient</th>
-              <th className="p-3">Created At</th>
+              <th className="p-3">Appointment Time and Date</th>
               <th className="p-3">Gender</th>
               <th className="p-3">Phone Number</th>
               <th className="p-3">Age</th>
@@ -100,6 +166,10 @@ const PatientDashboard: React.FC = () => {
               const createdAt = (booking as any)?.createdAt || "";
               const age = (user as any)?.age || "N/A";
               const mobile_no = (user as any)?.mobile_no || "N/A";
+              const appoDate = booking.appointmentDate;
+              const appointmentDate = new Date(appoDate)
+                .toISOString()
+                .split("T")[0];
 
               return (
                 <tr key={booking._id} className="border-t">
@@ -117,7 +187,14 @@ const PatientDashboard: React.FC = () => {
                     </div>
                   </td>
                   <td className="p-3">
-                    {format(new Date(createdAt), "dd/MM/yyyy")}
+                    <div>
+                      <div className="text-sm font-light">
+                        Date : {appointmentDate}
+                      </div>
+                      <div className="text-sm font-light">
+                        Time : {booking.appointmentTime}
+                      </div>
+                    </div>
                   </td>
                   <td className="p-3">
                     <span

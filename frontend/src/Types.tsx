@@ -34,13 +34,16 @@ export interface Appointment {
     patientDetails : Patient;
 }
 
-interface MedicalRecord {
+
+// Interface for frontend display (adjusted to match backend)
+export interface MedicalRecord {
+  _id: string;
   date: string;
-  complaint: string;
-  cost: string;
-  diagnosis: string;
-  treatment: string;
-  prescription: string;
+  complaint: string; 
+  diagnosis: string; 
+  treatment: string; 
+  prescription: string; 
+  cost: string; 
 }
 
 export interface Patient {
@@ -50,35 +53,66 @@ export interface Patient {
   records: MedicalRecord[];
 }
 
-export interface Medication {
-  id: number;
+export interface TestReport {
+  img: string;
+}
+
+export interface Medicine {
   name: string;
-  dosage: string;
-  duration: string;
-  composition?: string;
+  quantity: number;
+  time_gap: string;
 }
 
 export interface Prescription {
-  doctorName: string;
-  qualification: string;
-  regNo: string;
-  hospital: string;
-  address: string;
-  contact: string;
-  patientId: string;
-  patientDetails: string;
-  patientMobile: string;
-  patientAddress: string;
-  vitals: string;
-  date: string;
-  complaints: string[];
-  findings: string[];
-  diagnosis: string[];
-  medications: Medication[];
-  advice: string[];
-  followUp: string;
-  note?: string;
+  _id: string;
+  userId: string;
+  doctorId: string;
+  medicines: Medicine[];
+  symptoms: string;
+  disease: string;
+  testReports: TestReport[];
+  vitalSigns?: string;
+  createdAt: string;
 }
+
+// interface MedicalRecord {
+//   date: string;
+//   complaint: string;
+//   cost: string;
+//   diagnosis: string;
+//   treatment: string;
+//   prescription: string;
+// }
+
+// export interface Medication {
+//   id: number;
+//   name: string;
+//   dosage: string;
+//   duration: string;
+//   composition?: string;
+// }
+
+// export interface Prescription {
+//   doctorName: string;
+//   qualification: string;
+//   regNo: string;
+//   hospital: string;
+//   address: string;
+//   contact: string;
+//   patientId: string;
+//   patientDetails: string;
+//   patientMobile: string;
+//   patientAddress: string;
+//   vitals: string;
+//   date: string;
+//   complaints: string[];
+//   findings: string[];
+//   diagnosis: string[];
+//   medications: Medication[];
+//   advice: string[];
+//   followUp: string;
+//   note?: string;
+// }
 
 // export interface Medication {
 //   name: string;

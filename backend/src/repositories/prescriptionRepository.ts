@@ -1,5 +1,6 @@
+import mongoose, { Types } from "mongoose";
 import IPrescriptionRepository from "../interfaces/prescription/IPrescriptionRepository";
-import PrescriptionModel, { IPrescription } from "../models/prescriptionmodel";
+import PrescriptionModel, { IPrescription} from "../models/prescriptionmodel";
 import { BaseRepository } from "./BaseRepository";
 
 export default class prescriptionRepository
@@ -22,5 +23,77 @@ export default class prescriptionRepository
       .populate('userId')
       .exec(); 
   }
+
+  // async findById(id: string): Promise<IPrescription | null> {
+  //   console.log(`Searching for doctor with id: ${id}`);
+  //   if (!mongoose.Types.ObjectId.isValid(id)) {
+  //     return null;
+  //   }
+  //   const uid =  await PrescriptionModel.findById(id).lean();
+  //   console.log('getted id :' , uid)
+  //   return uid
+  // }
+  // async findById(id: string): Promise<IPrescription | null> {
+  //   // Use the base method and pass the fields to populate
+  //   return this.findById(id);
+  // }
+
+  async findPrescriptions(
+    doctorId: string,
+    userId: string,
+    date: string | undefined,
+    page: number = 1,
+    limit: number = 10,
+    searchTerm: string = ""
+  ): Promise<{ prescriptions: IPrescription[]; total: number }> {
+    const filter: any = {};
+  
+    if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+      filter.userId = userId;
+    }
+    if (doctorId && mongoose.Types.ObjectId.isValid(doctorId)) {
+      filter.doctorId = doctorId;
+    }
+    if (date) {
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+      filter.createdAt = { $gte: startOfDay, $lte: endOfDay };
+    }
+  
+    const [prescriptions, total] = await Promise.all([
+      PrescriptionModel.find(filter)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+      PrescriptionModel.countDocuments(filter)
+    ]);
+  
+    return { prescriptions, total };
+  }
+  
+  // userside:
+  // Fetch all prescriptions for a user
+  async getPrescriptionsByUserId(userId: Types.ObjectId): Promise<IPrescription[]> {
+    return PrescriptionModel.find({ userId })
+      .populate("doctorId", "name") // Populate doctor name
+      .lean(); // Convert to plain JavaScript objects
+  }
+
+  // Fetch a single prescription by ID
+  async getPrescriptionById(prescriptionId: Types.ObjectId): Promise<IPrescription | null> {
+    return await this.model
+      .findById(prescriptionId)
+      .populate("userId", "name email age gender address mobile_no DOB address") 
+      .populate("doctorId", "name email phone qualification specialization registrationNumber ")
+      .exec();
+  }
+  // async getPrescriptionById(prescriptionId: Types.ObjectId): Promise<IPrescription | null> {
+  //   return PrescriptionModel.findById(prescriptionId)
+  //     .populate("doctorId", "name")
+  //     .lean();
+  // }
   
 }

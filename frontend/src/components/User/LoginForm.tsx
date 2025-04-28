@@ -80,11 +80,11 @@ const LoginForm: React.FC = () => {
   
       // Extract user correctly
       const {user , accessToken, refreshToken } = response.data?.data; 
-      console.log('Extracted user:', user);
+      console.log('Extracted user:', user ,accessToken, );
   
       if (user) {
         dispatch(setUser({
-          id: user._id || "", // fallback to empty string
+          id: user.id || "", // fallback to empty string
           name: user.name || "",
           email: user.email || "",
           mobile_no: user.mobile_no || "",

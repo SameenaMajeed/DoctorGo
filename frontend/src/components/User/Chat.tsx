@@ -1,209 +1,414 @@
-import React, { ReactNode, useState } from "react";
-import { FaSearch, FaPhone, FaPaperPlane, FaImage, FaPaperclip, FaEllipsisH, FaVideo } from "react-icons/fa";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  FaSearch,
+  FaPhone,
+  FaPaperPlane,
+  FaImage,
+  FaPaperclip,
+  FaEllipsisH,
+  FaVideo,
+  FaSpinner,
+} from "react-icons/fa";
 import { cn } from "../../Utils/Utils";
+import io from "socket.io-client";
+import { useSelector } from "react-redux";
+import { RootState } from "../../slice/Store/Store";
+import userApi from "../../axios/UserInstance";
+import { BaseUrl } from "../../constants";
 
-type User = {
-  time: ReactNode;
-  lastMessage: ReactNode;
-  online: any;
+interface Message {
+  userId: string;
+  doctorId: string;
+  senderId: string;
+  senderRole: "user" | "doctor";
+  message: string;
+  timestamp: string | Date;
+}
+
+interface Doctor {
+  _id: string;
   name: string;
-  phone: string;
-  avatar: string;
-  unread: number;
-};
+  email: string;
+  profilePicture?: string;
+  lastMessage?: string;
+  lastMessageTime?: string;
+  online?: boolean;
+  specialization?: string;
+  qualification?: string;
+}
 
-type Message = {
-  sender: "self" | "other";
-  text: string;
-};
-
-const users: User[] = [
-  {
-      name: "Aria Joseph",
-      phone: "+91-9874286294",
-      avatar: "https://i.pravatar.cc/150?img=32",
-      unread: 1,
-      online: undefined,
-      time: undefined,
-      lastMessage: undefined
-  },
-  {
-      name: "George Gregory",
-      phone: "+91-9874286295",
-      avatar: "https://i.pravatar.cc/150?img=33",
-      unread: 2,
-      online: undefined,
-      time: undefined,
-      lastMessage: undefined
-  },
-];
-
-const initialMessages: Message[] = [
-  { sender: "other", text: "Hello!" },
-  { sender: "self", text: "Hi there!" },
-  { sender: "self", text: "How are you?" },
-  { sender: "other", text: "I'm good, thanks!" },
-];
+const SOCKET_URL = BaseUrl;
 
 const Chat: React.FC = () => {
-  const [selectedUser, setSelectedUser] = useState<User>(users[0]);
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [input, setInput] = useState("");
+  const [socket, setSocket] = useState<ReturnType<typeof io> | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState<string>("");
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const userId = useSelector((state: RootState) => state.user.user?.id);
+  console.log('userId:',userId)
+  const token = useSelector((state: RootState) => state.user.user?.accessToken);
+  console.log('token:',token)
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  useEffect(() => {
+    if (!userId || !token) {
+      setError("Please log in to access chat");
+      return;
+    }
+
+    const fetchDoctors = async () => {
+      setIsLoading(true);
+      try {
+        const response = await userApi.get(`/chats/doctors/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const fetchedDoctors = response.data.data?.doctors || [];
+        const formattedDoctors = fetchedDoctors.map((doctor: any) => ({
+          _id: doctor._id || doctor.id,
+          name: doctor.name,
+          email: doctor.email,
+          profilePicture: doctor.profilePicture,
+          specialization: doctor.specialization,
+          qualification: doctor.qualification,
+          lastMessage: doctor.lastMessage,
+          lastMessageTime: doctor.lastMessageTime,
+          online: doctor.online,
+        }));
+        setDoctors(
+          formattedDoctors.sort((a: Doctor, b: Doctor) => {
+            const timeA = a.lastMessageTime
+              ? new Date(a.lastMessageTime).getTime()
+              : 0;
+            const timeB = b.lastMessageTime
+              ? new Date(b.lastMessageTime).getTime()
+              : 0;
+            return timeB - timeA;
+          })
+        );
+        setError(null);
+      } catch (err: any) {
+        setError(err.response?.data?.message || "Failed to fetch doctors");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDoctors();
+
+    const newSocket = io(SOCKET_URL, {
+      auth: { token },
+    });
+
+    setSocket(newSocket);
+
+    newSocket.on("connect", () => {
+      setIsConnected(true);
+      setError(null);
+    });
+
+    newSocket.on("connect_error", (err: any) => {
+      setIsConnected(false);
+      setError("Socket connection failed: " + err.message);
+    });
+
+    newSocket.on("error", (error: string) => {
+      setError(`Socket error: ${error}`);
+    });
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [userId, token]);
+
+  useEffect(() => {
+    if (!socket || !selectedDoctor || !isConnected) return;
+
+    socket.emit("joinChat", { userId, doctorId: selectedDoctor._id });
+
+    socket.on("previousMessages", (previousMessages: Message[]) => {
+      setMessages(previousMessages || []);
+    });
+
+    socket.on("receiveMessage", (message: Message) => {
+      if (message.userId === userId && message.doctorId === selectedDoctor._id) {
+        setMessages((prev) => [...prev, message]);
+      }
+      setDoctors((prev: any) => {
+        const updated = prev.map((doctor: any) =>
+          doctor.id === message.doctorId
+            ? {
+                ...doctor,
+                lastMessage: message.message,
+                lastMessageTime: message.timestamp,
+              }
+            : doctor
+        );
+        return updated.sort((a: any, b: any) => {
+          const timeA = a.lastMessageTime
+            ? new Date(a.lastMessageTime).getTime()
+            : 0;
+          const timeB = b.lastMessageTime
+            ? new Date(b.lastMessageTime).getTime()
+            : 0;
+          return timeB - timeA;
+        });
+      });
+    });
+
+
+
+    return () => {
+      socket.off("previousMessages");
+      socket.off("receiveMessage");
+    };
+  }, [socket, selectedDoctor, isConnected, userId]);
 
   const sendMessage = () => {
-    if (!input.trim()) return;
-    setMessages([...messages, { sender: "self", text: input.trim() }]);
+    if (!input.trim() || !socket || !isConnected || !selectedDoctor) return;
+
+    const messageData = {
+      userId,
+      doctorId: selectedDoctor._id,
+      message: input,
+    };
+
+    socket.emit("sendMessage", messageData);
+
+    setMessages((prev: any) => [...prev, messageData]);
+
+    setDoctors((prev) =>
+      prev
+        .map((doctor) =>
+          doctor._id === selectedDoctor._id
+            ? {
+                ...doctor,
+                lastMessage: input,
+                lastMessageTime: new Date().toISOString(),
+              }
+            : doctor
+        )
+        .sort((a, b) => {
+          const timeA = a.lastMessageTime
+            ? new Date(a.lastMessageTime).getTime()
+            : 0;
+          const timeB = b.lastMessageTime
+            ? new Date(b.lastMessageTime).getTime()
+            : 0;
+          return timeB - timeA;
+        })
+    );
     setInput("");
   };
 
+  const selectDoctor = (doctor: Doctor) => {
+    setSelectedDoctor(doctor);
+    setMessages([]);
+  };
+
+  const filteredDoctors = doctors.filter((doctor) =>
+    doctor.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex bg-gray-50 font-sans">
       {/* Sidebar */}
-      <aside className="w-1/4 max-w-xs border-r border-gray-200 bg-white p-4">
-        <h2 className="text-lg font-bold mb-4 text-gray-800">Chats</h2>
-        <div className="flex items-center bg-gray-100 px-3 py-2 rounded-lg mb-4">
-          <FaSearch className="text-gray-400 mr-2 text-sm" />
-          <input
-            type="text"
-            placeholder="Search conversations"
-            className="outline-none bg-transparent w-full text-sm placeholder-gray-500"
-          />
+      <aside className="w-1/4 max-w-xs border-r border-gray-200 bg-white shadow-sm flex flex-col">
+        <div className="p-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-800">Chats</h2>
+          <div className="mt-2 flex items-center bg-gray-100 rounded-lg p-2">
+            <FaSearch className="text-gray-500 mr-2" />
+            <input
+              type="text"
+              placeholder="Search or start a new chat"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-transparent text-sm placeholder-gray-500 outline-none"
+            />
+          </div>
         </div>
-        <ul className="space-y-1.5">
-          {users.map((user) => (
-            <li
-              key={user.name}
-              onClick={() => setSelectedUser(user)}
-              className={cn(
-                "flex items-center p-2.5 cursor-pointer rounded-lg transition-colors",
-                selectedUser.name === user.name
-                  ? "bg-blue-50"
-                  : "hover:bg-gray-100"
-              )}
-            >
-              <div className="relative">
-                <img
-                  src={user.avatar}
-                  alt={user.name}
-                  className="w-10 h-10 rounded-full mr-3 object-cover"
-                />
-                {user.online && (
-                  <span className="absolute bottom-0 right-3 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></span>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm truncate">{user.name}</p>
-                <p className="text-xs text-gray-500 truncate">
-                  {user.lastMessage}
-                </p>
-              </div>
-              <div className="flex flex-col items-end">
-                <span className="text-xs text-gray-400 mb-1">{user.time}</span>
-                {user.unread > 0 && (
-                  <span className="text-xs bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center">
-                    {user.unread}
-                  </span>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div className="flex-1 overflow-y-auto">
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <FaSpinner className="animate-spin text-blue-500 text-2xl" />
+            </div>
+          ) : error ? (
+            <p className="text-red-500 text-sm p-4">{error}</p>
+          ) : filteredDoctors.length === 0 ? (
+            <p className="text-gray-500 text-sm text-center p-4">No chats available.</p>
+          ) : (
+            <ul className="divide-y divide-gray-200 max-h-[600px] overflow-y-auto">
+              {filteredDoctors.map((doctor) => (
+                <li
+                  key={doctor._id}
+                  onClick={() => selectDoctor(doctor)}
+                  className={cn(
+                    "flex items-center p-3 cursor-pointer hover:bg-gray-50 transition-colors",
+                    selectedDoctor?._id === doctor._id && "bg-gray-100"
+                  )}
+                >
+                  <div className="relative mr-3">
+                    <img
+                      src={doctor.profilePicture}
+                      alt={doctor.name}
+                      className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                    />
+                    {doctor.online && (
+                      <span className="absolute bottom-0 right-0 w-3 h-3 bg-blue-500 rounded-full border-2 border-white"></span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between">
+                      <p className="text-sm font-medium text-gray-800 truncate">
+                        {doctor.name}
+                      </p>
+                      <span className="text-xs text-gray-500">
+                        {doctor.lastMessageTime
+                          ? new Date(doctor.lastMessageTime).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })
+                          : ""}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 truncate">
+                      {doctor.lastMessage || "No messages yet"}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </aside>
 
       {/* Chat Window */}
-      <main className="flex-1 flex flex-col">
-        {/* Chat header */}
-        <div className="border-b border-gray-200 bg-white p-4 flex items-center">
-          <div className="relative">
-            <img
-              src={selectedUser.avatar}
-              alt={selectedUser.name}
-              className="w-12 h-12 rounded-full mr-4 object-cover"
-            />
-            {selectedUser.online && (
-              <span className="absolute bottom-0 right-4 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
-            )}
-          </div>
-          <div className="flex flex-col">
-            <span className="font-semibold text-gray-800">
-              {selectedUser.name}
-            </span>
-            <span className="text-xs text-gray-500">
-              {selectedUser.online ? "Online" : "Last seen recently"}
-            </span>
-          </div>
-          <div className="ml-auto flex space-x-3">
-            <button className="text-gray-500 hover:text-blue-600 p-1.5 rounded-full hover:bg-gray-100">
-              <FaPhone className="text-sm" />
-            </button>
-            <button className="text-gray-500 hover:text-blue-600 p-1.5 rounded-full hover:bg-gray-100">
-              <FaVideo className="text-sm" />
-            </button>
-            <button className="text-gray-500 hover:text-blue-600 p-1.5 rounded-full hover:bg-gray-100">
-              <FaEllipsisH className="text-sm" />
-            </button>
-          </div>
-        </div>
+      <main className="flex-1 flex flex-col bg-gray-100">
+        {selectedDoctor ? (
+          <>
+            {/* Chat Header */}
+            <div className="bg-white p-4 flex items-center border-b border-gray-200 shadow-sm">
+              <div className="relative mr-4">
+                <img
+                  src={selectedDoctor.profilePicture}
+                  alt={selectedDoctor.name}
+                  className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                />
+                {selectedDoctor.online && (
+                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-blue-500 rounded-full border-2 border-white"></span>
+                )}
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {selectedDoctor.name}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {selectedDoctor.online ? "online" : "last seen recently"}
+                </p>
+              </div>
+              <div className="ml-auto flex space-x-3">
+                <button className="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100">
+                  <FaPhone className="text-lg" />
+                </button>
+                <button className="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100">
+                  <FaVideo className="text-lg" />
+                </button>
+                <button className="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100">
+                  <FaEllipsisH className="text-lg" />
+                </button>
+              </div>
+            </div>
 
-        {/* Messages area */}
-        <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
-          <div className="space-y-3 max-w-3xl mx-auto">
-            {messages.map((msg, index) => (
-              <div
-                key={index}
+            {/* Messages Area */}
+            <div className="flex-1 p-4">
+              {isConnected ? (
+                <div className="space-y-2 max-w-3xl mx-auto">
+                  {messages.map((msg, idx) => (
+                    <div
+                      key={`${msg.timestamp}-${msg.message}-${idx}`}
+                      className={cn(
+                        "flex",
+                        msg.senderRole === "user"
+                          ? "justify-end"
+                          : "justify-start"
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "max-w-xs lg:max-w-md px-3 py-2 rounded-lg text-sm shadow-sm",
+                          msg.senderRole === "user"
+                            ? "bg-blue-500 text-white rounded-br-none"
+                            : "bg-gray-200 text-gray-800 rounded-bl-none"
+                        )}
+                      >
+                        <p className="break-words">{msg.message}</p>
+                        <div className="text-right mt-1">
+                          <span className="text-xs text-gray-800">
+                            {new Date(msg.timestamp).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
+              ) : (
+                <p className="text-center text-gray-500 flex items-center justify-center h-full">
+                  <FaSpinner className="animate-spin mr-2" /> Connecting...
+                </p>
+              )}
+            </div>
+
+            {/* Message Input */}
+            <div className="bg-white p-2 flex items-center border-t border-gray-200">
+              <button className="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100">
+                <FaPaperclip className="text-lg" />
+              </button>
+              <button className="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100">
+                <FaImage className="text-lg" />
+              </button>
+              <input
+                type="text"
+                placeholder="Type a message..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                className="flex-1 bg-gray-100 rounded-full text-sm placeholder-gray-500 outline-none p-2 focus:ring-2 focus:ring-blue-200"
+                onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+              />
+              <button
+                onClick={sendMessage}
+                disabled={!input.trim()}
                 className={cn(
-                  "flex",
-                  msg.sender === "self" ? "justify-end" : "justify-start"
+                  "p-2 rounded-full transition-colors",
+                  input.trim()
+                    ? "text-white bg-blue-500 hover:bg-blue-600"
+                    : "text-gray-400 bg-gray-200 cursor-not-allowed"
                 )}
               >
-                <div
-                  className={cn(
-                    "max-w-xs lg:max-w-md px-4 py-2 rounded-xl text-sm",
-                    msg.sender === "self"
-                      ? "bg-blue-600 text-white rounded-br-none"
-                      : "bg-white text-gray-800 rounded-bl-none shadow-sm"
-                  )}
-                >
-                  {msg.text}
-                  <div className="text-right mt-1">
-                    <span className="text-xs opacity-80">
-                      {new Date().toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+                <FaPaperPlane className="text-lg" />
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center bg-gray-100">
+            <p className="text-gray-500 text-lg font-medium">
+              Select a chat to start messaging
+            </p>
           </div>
-        </div>
-
-        {/* Message input */}
-        <div className="border-t border-gray-200 bg-white p-4">
-          <div className="flex items-center space-x-3">
-            <button className="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100">
-              <FaPaperclip className="text-lg" />
-            </button>
-            <button className="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100">
-              <FaImage className="text-lg" />
-            </button>
-            <input
-              type="text"
-              placeholder="Type a message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="flex-1 bg-gray-100 rounded-full px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200"
-              onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-            />
-            <button
-              onClick={sendMessage}
-              className="text-white bg-blue-600 hover:bg-blue-700 p-2.5 rounded-full transition-colors"
-            >
-              <FaPaperPlane className="text-sm" />
-            </button>
-          </div>
-        </div>
+        )}
       </main>
     </div>
   );

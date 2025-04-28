@@ -143,7 +143,7 @@ export class DoctorService implements IDoctorService {
     }
 
     // Pass a payload object with id and role
-    return { accessToken: generateAccessToken({ id: decoded.id, role: "Doctor" }) };
+    return { accessToken: generateAccessToken({ id: decoded.id, role: "Doctor" , email : decoded.email}) };
   }
 
   async getDoctorProfile(doctorId: string): Promise<IDoctor | null> {

@@ -137,25 +137,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onRestrictedAction }) => {
           /> */}
         </div>
 
-        {/* <div className="py-2">
-          <p
-            className={`px-3 text-xs text-gray-500 mb-2 ${
-              collapsed ? "hidden" : "block"
-            }`}
-          >
-            Medical Records
-          </p>
-          <SidebarItem
-            href={patient}
-            icon={<Clock size={20} />}
-            label="View Medical Records"
-            collapsed={collapsed}
-            active={location.pathname === patient }
-            onClick={(e) =>
-              handleRestrictedNavigation(e, patient)
-            }
-          />
-        </div> */}
 
         <SidebarItem
           href={appointmentsPath}
@@ -176,12 +157,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onRestrictedAction }) => {
           onClick={(e) => handleRestrictedNavigation(e, patientPath)}
         />
         <SidebarItem
-          href="/time-fees"
+          href="/myChats"
           icon={<Calendar size={20} />}
-          label="Time & Fees"
+          label="Conversation"
           collapsed={collapsed}
-          active={location.pathname === "/time-fees"}
-          onClick={(e) => handleRestrictedNavigation(e, "/time-fees")}
+          active={location.pathname === "/myChats"}
+          onClick={(e) => handleRestrictedNavigation(e, "/myChats")}
         />
       </nav>
     </div>

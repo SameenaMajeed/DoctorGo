@@ -100,6 +100,8 @@ export class Usercontroller {
       CookieManager.setAuthCookies(res, { accessToken, refreshToken });
       const responseData = {
         user: { id: user._id, name: user.name, email: user.email },
+        accessToken,
+        refreshToken
       };
       sendResponse(res, HttpStatus.OK, MessageConstants.GOOGLE_SIGNIN_SUCCESS, responseData);
       

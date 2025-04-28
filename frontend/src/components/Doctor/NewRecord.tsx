@@ -49,11 +49,13 @@ const NewRecord: React.FC = () => {
         userId: patient._id,
         symptoms: complaints,
         disease: diagnosis,
-        vitalSigns, // Add this if your model supports it
+        vitalSigns: vitalSigns,
         medicines: medicines.map((med) => ({
           name: med.name,
+          dosage : med.dosage,
           quantity: med.quantity,
-          time_gap: med.instruction, // Assuming instruction maps to time_gap
+          time_gap: med.instruction,
+          amount : med.amount
         })),
         testReports: attachments.map((img) => ({ img })),
         // You'll need to add userId and doctorId from your auth context
@@ -133,6 +135,7 @@ const NewRecord: React.FC = () => {
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Sidebar Card (unchanged) */}
+          
           <div>
             <Card className="items-center text-center p-6 shadow-md border border-gray-200">
               <img
@@ -148,6 +151,15 @@ const NewRecord: React.FC = () => {
               <span className="inline-block bg-green-100 text-green-800 rounded-full px-3 py-1 text-sm mt-3">
                 Age : {patient.age}
               </span>
+               <div>
+               <Button variant="outline"  
+                  className="w-full mt-4 bg-white hover:bg-gray-100 text-blue-600 border-blue-600 hover:border-blue-700 transition duration-200" onClick={()=>navigate(`/doctor/patient-records/${patient._id}`, {
+          state: {
+            patient,
+            appointment,
+          },
+        })}>Back</Button>
+               </div>
             </Card>
           </div>
 
@@ -211,11 +223,12 @@ const NewRecord: React.FC = () => {
                   <thead className="bg-gray-100 text-gray-600">
                     <tr>
                       <th className="p-3">Item</th>
-                      <th className="p-3">Price (tsh)</th>
+                      <th className="p-3">Price (INR)</th>
+                      <th className="p-3">Medicine Name</th>
+                      <th className="p-3">Duration</th>
                       <th className="p-3">Dosage</th>
-                      <th className="p-3">Instruction</th>
                       <th className="p-3">Quantity</th>
-                      <th className="p-3">Amount (tsh)</th>
+                      <th className="p-3">Amount (INR)</th>
                       <th className="p-3">Actions</th>
                     </tr>
                   </thead>
@@ -223,17 +236,7 @@ const NewRecord: React.FC = () => {
                     {medicines.length > 0 ? (
                       medicines.map((medicine, index) => (
                         <tr key={index} className="border-t hover:bg-gray-50">
-                          <td className="p-3">
-                            <input
-                              type="text"
-                              value={medicine.name}
-                              onChange={(e) =>
-                                updateMedicine(index, "name", e.target.value)
-                              }
-                              className="w-full border-b border-gray-300 focus:outline-none"
-                              required
-                            />
-                          </td>
+                          <td className="p-3">{index + 1}</td>
                           <td className="p-3">
                             <input
                               type="number"
@@ -252,9 +255,9 @@ const NewRecord: React.FC = () => {
                           <td className="p-3">
                             <input
                               type="text"
-                              value={medicine.dosage}
+                              value={medicine.name}
                               onChange={(e) =>
-                                updateMedicine(index, "dosage", e.target.value)
+                                updateMedicine(index, "name", e.target.value)
                               }
                               className="w-full border-b border-gray-300 focus:outline-none"
                               required
@@ -265,9 +268,20 @@ const NewRecord: React.FC = () => {
                               type="text"
                               value={medicine.instruction}
                               onChange={(e) =>
+                                updateMedicine(index, "instruction", e.target.value)
+                              }
+                              className="w-full border-b border-gray-300 focus:outline-none"
+                              required
+                            />
+                          </td>
+                          <td className="p-3">
+                            <input
+                              type="text"
+                              value={medicine.dosage}
+                              onChange={(e) =>
                                 updateMedicine(
                                   index,
-                                  "instruction",
+                                  "dosage",
                                   e.target.value
                                 )
                               }

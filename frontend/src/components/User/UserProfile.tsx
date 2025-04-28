@@ -182,9 +182,10 @@ const UserProfile: React.FC = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col overflow-x-hidden">
       <main className="flex-1 p-4 sm:p-6 md:p-10 bg-gray-50">
-        <h2 className="text-3xl font-extrabold text-blue-400 tracking-tight mb-6 flex items-center gap-2">
-          MY PROFILE
-        </h2>
+      <h2 className="text-3xl font-extrabold text-blue-400 mb-6 text-center">
+      MY PROFILE
+      </h2>
+        
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="bg-gradient-to-br from-white to-gray-100 rounded-2xl shadow-lg flex flex-col md:flex-row overflow-hidden">

@@ -12,12 +12,12 @@ import { BookingService } from "../services/BookingService";
 import { UserRepository } from "../repositories/userRepository";
 import { BookingController } from "../controllers/BookingController";
 import { PaymentService } from "../services/PaymentService";
-import blockedUserMiddleware from "../middlewares/blockedUserMiddleware";
 import SlotRepository from "../repositories/SlotRepository";
 import blockedDoctorMiddleware from "../middlewares/blockedDoctorMiddleware";
 import prescriptionRepository from "../repositories/prescriptionRepository";
 import PrescriptionService from "../services/prescriptionService";
 import PrescriptionController from "../controllers/prescriptionController";
+import { ChatController } from "../controllers/chatController";
 // import { uploadCertifications } from '../middlewares/fileUpload';
 
 const otpRepository = new OtpRepository();
@@ -25,7 +25,7 @@ const doctorRepository = new DoctorRepository();
 const bookingRepository = new BookingRepository();
 const userRepository = new UserRepository();
 const slotRepository = new SlotRepository();
-const PrescriptionRepository = new prescriptionRepository()
+const PrescriptionRepository = new prescriptionRepository();
 
 const bookingService = new BookingService(
   bookingRepository,
@@ -34,7 +34,11 @@ const bookingService = new BookingService(
   slotRepository
 );
 
-const prescriptionService = new PrescriptionService(PrescriptionRepository)
+const prescriptionService = new PrescriptionService(
+  PrescriptionRepository,
+  doctorRepository,
+  userRepository
+);
 
 const paymentService = new PaymentService();
 
@@ -44,7 +48,9 @@ const doctorService = new DoctorService(doctorRepository, otpRepository);
 
 const doctorController = new DoctorController(doctorService);
 
-const prescriptionController = new PrescriptionController(prescriptionService)
+const prescriptionController = new PrescriptionController(prescriptionService);
+
+const chatController = new ChatController();
 
 const doctorRoute: Router = express.Router();
 
@@ -52,7 +58,7 @@ doctorRoute.post("/signup", upload.single("certificationFile"), (req, res) => {
   doctorController.registerDoctor(req, res);
 });
 
-doctorRoute.post("/login",blockedDoctorMiddleware, (req, res) => {
+doctorRoute.post("/login", blockedDoctorMiddleware, (req, res) => {
   doctorController.loginDoctor(req, res);
 });
 
@@ -60,13 +66,13 @@ doctorRoute.post("/refresh-token", (req, res) => {
   doctorController.refreshAccessToken(req, res);
 });
 
-doctorRoute.get("/profile/:id",
+doctorRoute.get(
+  "/profile/:id",
   authenticateToken("doctor"),
-  blockedDoctorMiddleware, 
+  blockedDoctorMiddleware,
   (req, res) => doctorController.getProfile(req, res)
 );
-doctorRoute.put("/updateProfile/:id",
-  authenticateToken("doctor"), (req, res) =>
+doctorRoute.put("/updateProfile/:id", authenticateToken("doctor"), (req, res) =>
   doctorController.updateProfile(req, res)
 );
 doctorRoute.post(
@@ -106,7 +112,15 @@ doctorRoute.get(
   (req, res) => bookingController.getPatients(req, res)
 );
 
-// Prescription 
-doctorRoute.post('/createPrescription',(req , res)=> prescriptionController.createPrescription(req , res))
+// Prescription
+doctorRoute.post("/createPrescription", (req, res) =>
+  prescriptionController.createPrescription(req, res)
+);
+doctorRoute.get("/allPrescriptions", (req, res) =>
+  prescriptionController.getAllPrescriptions(req, res)
+);
+
+// chat
+doctorRoute.get('/chats/users/:doctorId', authenticateToken('doctor'), (req, res) => chatController.getUsersWhoMessaged(req, res));
 
 export default doctorRoute;
