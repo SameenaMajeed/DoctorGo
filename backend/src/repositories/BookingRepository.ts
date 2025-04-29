@@ -258,12 +258,24 @@ export class BookingRepository
 
   // get User data for the perticular doctor
   async getPatientsForDoctor(doctorId: string): Promise<IBooking[]> {
-    console.log('from repo',doctorId)
-    const patients = await Booking.find({ doctor_id : doctorId })
+    console.log("from repo", doctorId);
+    const patients = await Booking.find({ doctor_id: doctorId })
       .populate("user_id", "name email mobile_no gender age profilePicture")
       .exec();
 
-      console.log('patient from repository',patients)
-    return patients
+    console.log("patient from repository", patients);
+    return patients;
+  }
+
+  // review
+  async findAppointmentByDoctorAndPatient(
+    doctorId: string,
+    patientId: string
+  ): Promise<IBooking | null> {
+    return await Booking.findOne({
+      doctor_id: doctorId,
+      user_id: patientId,
+      status: "completed", 
+    });
   }
 }

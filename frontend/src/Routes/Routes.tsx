@@ -41,6 +41,7 @@ import Page404 from "../pages/Page404.tsx";
 import NewRecord from "../components/Doctor/NewRecord.tsx";
 import ChatPage from "../components/Doctor/ChatPage.tsx";
 import PrecipitationList from "../components/User/PrecipitationList.tsx";
+import ReviewForm from "../components/User/ReviewForm.tsx";
 
 export const routes = (
   <>

@@ -18,6 +18,9 @@ import { ChatController } from "../controllers/chatController";
 import PrescriptionController from "../controllers/prescriptionController";
 import PrescriptionService from "../services/prescriptionService";
 import prescriptionRepository from "../repositories/prescriptionRepository";
+import { ReviewController } from "../controllers/reviewController";
+import ReviewService from "../services/ReviewService";
+import ReviewRepository from "../repositories/ReviewRepository";
 
 const userRoute: Router = express.Router();
 const userRepository = new UserRepository();
@@ -26,6 +29,7 @@ const doctorRepository = new DoctorRepository();
 const bookingRepository = new BookingRepository();
 const slotRepository = new SlotRepository();
 const PrescriptionRepository = new prescriptionRepository();
+const reviewRepository = new ReviewRepository()
 
 const userService = new UserService(
   userRepository,
@@ -44,6 +48,8 @@ const prescriptionService = new PrescriptionService(
   userRepository
 );
 
+const reviewService = new ReviewService(reviewRepository , bookingRepository)
+
 const paymentService = new PaymentService();
 const doctorService = new DoctorService(doctorRepository, otpRepository);
 const doctorController = new DoctorController(doctorService);
@@ -51,6 +57,7 @@ const userController = new Usercontroller(userService);
 const bookingController = new BookingController(bookingService, paymentService);
 const chatController = new ChatController();
 const prescriptionController = new PrescriptionController(prescriptionService);
+const reviewController = new ReviewController(reviewService)
 
 // User authentication routes
 // Register user:
@@ -185,5 +192,11 @@ userRoute.get("/prescriptions", authenticateToken("user"), (req, res) =>
 userRoute.get("/prescriptions/:prescriptionId/download",authenticateToken("user"), (req, res) =>
   prescriptionController.downloadPrescription(req, res)
 );
+
+// Review
+userRoute.post('/submitReview',authenticateToken("user"), (req, res) =>
+  reviewController.addReview(req, res))
+userRoute.get('/review//doctor/:doctorId',(req, res) =>
+  reviewController.getReview(req, res))
 
 export default userRoute;

@@ -65,7 +65,7 @@ export class CookieManager {
       httpOnly: true,
       secure,
       sameSite: "strict",
-      maxAge: 10 * 60 * 1000, // default: 10 minutes
+      maxAge: 30 * 60 * 1000, // default: 10 minutes
     };
   }
 }

@@ -33,4 +33,6 @@ export interface IBookingRepository {
     findOneByUserAndSlot(userId: Types.ObjectId, slotId: Types.ObjectId): Promise<IBooking | null>;
 
     getPatientsForDoctor(doctorId: string) : Promise<IBooking []>
+
+    findAppointmentByDoctorAndPatient(doctorId: string, patientId: string): Promise<IBooking | null>;
 }

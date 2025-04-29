@@ -121,12 +121,8 @@ export class Usercontroller {
         return;
       }
 
-      console.log(
-        "Attempting to refresh access token with refreshToken:",
-        refreshToken
-      );
-
       const tokens = await this.userService.refreshAccessToken(refreshToken);
+    console.log('tokens : ' ,tokens)
 
       if (!tokens || !tokens.accessToken) {
         console.warn("Invalid refresh token or no tokens returned");
@@ -138,12 +134,7 @@ export class Usercontroller {
 
       // Set the new access token in cookies
       console.log("Setting new access token in cookies");
-      res.cookie("accessToken", tokens.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 10 * 60 * 1000, // default: 10 minutes
-      });
+      res.cookie("accessToken", tokens.accessToken, CookieManager.getCookieOptions());
 
       res.status(200).json({
         tokens: {

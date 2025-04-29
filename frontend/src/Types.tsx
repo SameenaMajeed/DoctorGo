@@ -75,62 +75,17 @@ export interface Prescription {
   createdAt: string;
 }
 
-// interface MedicalRecord {
-//   date: string;
-//   complaint: string;
-//   cost: string;
-//   diagnosis: string;
-//   treatment: string;
-//   prescription: string;
-// }
+export interface Review {
+  _id: string;
+  doctor_id: string;
+  user_id : string;
+  rating: number;
+  reviewText: string;
+  createdAt: string;
+}
 
-// export interface Medication {
-//   id: number;
-//   name: string;
-//   dosage: string;
-//   duration: string;
-//   composition?: string;
-// }
-
-// export interface Prescription {
-//   doctorName: string;
-//   qualification: string;
-//   regNo: string;
-//   hospital: string;
-//   address: string;
-//   contact: string;
-//   patientId: string;
-//   patientDetails: string;
-//   patientMobile: string;
-//   patientAddress: string;
-//   vitals: string;
-//   date: string;
-//   complaints: string[];
-//   findings: string[];
-//   diagnosis: string[];
-//   medications: Medication[];
-//   advice: string[];
-//   followUp: string;
-//   note?: string;
-// }
-
-// export interface Medication {
-//   name: string;
-//   dosage: string;
-//   duration: string;
-// }
-
-// export interface Prescription {
-//   id: string;
-//   patientName: string;
-//   age: number;
-//   gender: string;
-//   appointmentId: string;
-//   date: string;
-//   doctorName: string;
-//   specialization: string;
-//   clinicName: string;
-//   diagnosis: string;
-//   medications: Medication[];
-//   notes: string;
-// }
+export interface ReviewFormData {
+  doctor_id: string | undefined;
+  rating: number;
+  reviewText: string;
+}

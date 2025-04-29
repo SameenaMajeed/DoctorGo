@@ -154,10 +154,11 @@ export class UserService implements IUserService {
   async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string }> {
     try {
       const decoded = verifyToken(refreshToken);
+      console.log(decoded)
       if (!decoded || typeof decoded !== 'object' || !('id' in decoded)) {
         throw new AppError(HttpStatus.BadRequest, MessageConstants.INVALID_REFRESH_TOKEN);
       }
-      const newAccessToken = generateAccessToken({ id: (decoded as { id: string }).id, role: 'user' });
+      const newAccessToken = generateAccessToken({ id: (decoded as { id: string }).id, role: 'user' ,email : decoded.email});
       console.log("Generating new access token for user ID:", newAccessToken);
       return { accessToken: newAccessToken };
     } catch (error: unknown) {

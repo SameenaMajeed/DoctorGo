@@ -23,6 +23,7 @@ const AppointmentsList: React.FC = () => {
   const fetchAppointments = async () => {
     try {
       const response = await api.get(`/appointments/${userId}`);
+      console.log(response)
       if (Array.isArray(response.data.data)) {
         setAppointments(response.data.data);
       } else {
