@@ -78,7 +78,7 @@ export interface Prescription {
 export interface Review {
   _id: string;
   doctor_id: string;
-  user_id : string;
+  user_id : { name: string , profilePicture?: string};
   rating: number;
   reviewText: string;
   createdAt: string;

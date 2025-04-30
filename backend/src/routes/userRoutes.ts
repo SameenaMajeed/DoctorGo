@@ -196,7 +196,8 @@ userRoute.get("/prescriptions/:prescriptionId/download",authenticateToken("user"
 // Review
 userRoute.post('/submitReview',authenticateToken("user"), (req, res) =>
   reviewController.addReview(req, res))
-userRoute.get('/review//doctor/:doctorId',(req, res) =>
+
+userRoute.get('/reviews/doctor/:doctorId',(req, res) =>
   reviewController.getReview(req, res))
 
 export default userRoute;

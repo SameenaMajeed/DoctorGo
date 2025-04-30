@@ -5,7 +5,8 @@ import api from "../../axios/UserInstance";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import ReviewForm from "./ReviewForm";
-import { FaStar, FaTrashAlt } from "react-icons/fa";
+import { FaInfoCircle, FaStar, FaTrashAlt } from "react-icons/fa";
+import ViewDetails from "./ViewDetails";
 
 interface AppointmentCardProps {
   appointment: Appointment;
@@ -17,6 +18,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
   onCancel,
 }) => {
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [showViewDetails , setShowViewDetails ] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
   const navigate = useNavigate();
 
@@ -57,11 +59,19 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
   };
 
   const handleAddReview = () => {
-    setShowReviewForm(true); // Show the modal
+    setShowReviewForm(true);
   };
 
   const handleCloseReviewForm = () => {
-    setShowReviewForm(false); // Hide the modal
+    setShowReviewForm(false); 
+  };
+
+  const handleViewDetails = () => {
+    setShowViewDetails(true);
+  };
+
+  const handleCloseViewDetails  = () => {
+    setShowViewDetails(false); 
   };
 
   const formatTimeString = (timeString: string | null | undefined) => {
@@ -118,7 +128,10 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
     <div className="flex flex-col md:flex-row md:items-center justify-between bg-white p-6 rounded-xl shadow-md mb-6 border hover:shadow-lg transition-all duration-300">
       <div className="flex items-center w-full md:w-auto gap-4">
         <img
-          src={appointment.doctor_id?.profilePicture || "https://via.placeholder.com/80"}
+          src={
+            appointment.doctor_id?.profilePicture ||
+            "https://via.placeholder.com/80"
+          }
           alt={appointment.doctor_id?.name || "Doctor"}
           className="w-20 h-20 rounded-full border object-cover"
         />
@@ -139,7 +152,9 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
           <p className="text-sm text-gray-600">
             <strong>Time:</strong>{" "}
             {appointment.slot_id
-              ? `${formatTimeString(appointment.slot_id.startTime)} - ${formatTimeString(appointment.slot_id.endTime)}`
+              ? `${formatTimeString(
+                  appointment.slot_id.startTime
+                )} - ${formatTimeString(appointment.slot_id.endTime)}`
               : "Time slot not specified"}
           </p>
           <p className="text-sm mt-1">
@@ -159,6 +174,24 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
         {appointment.status.toLowerCase() === "completed" ? (
           <>
             <button
+              onClick={handleViewDetails}
+              className="flex items-center gap-2 bg-blue-50 text-blue-700 border border-blue-300 px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-100 
+          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
+          active:scale-95 
+          transition-all duration-200
+        "
+              aria-label="View appointment details"
+            >
+              <FaInfoCircle className="text-blue-600 w-5 h-5" />
+              <span>View Details</span>
+            </button>
+            {showViewDetails&& (
+              <ViewDetails
+                appointment={appointment}
+                onClose={handleCloseViewDetails}
+                />
+            )}
+            <button
               onClick={handleAddReview}
               className="flex items-center gap-2 border border-green-600 text-green-600 px-4 py-2 rounded-md hover:bg-green-100 transition"
             >
@@ -166,10 +199,10 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
             </button>
             {showReviewForm && (
               <ReviewForm
-                doctorId ={appointment.doctor_id._id}
+                doctorId={appointment.doctor_id._id}
                 doctorName={appointment.doctor_id?.name || "Unknown Doctor"}
                 appointmentDate={appointment.appointmentDate}
-                onClose={handleCloseReviewForm} 
+                onClose={handleCloseReviewForm}
               />
             )}
           </>

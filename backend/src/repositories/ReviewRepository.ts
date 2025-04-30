@@ -10,8 +10,8 @@ class ReviewRepository implements IReviewRepository {
   }
 
   async getReviewsByDoctorId(doctorId: string): Promise<IReview[]> {
-    return await ReviewModel.find({ doctor: doctorId })
-      .populate('patient', 'name')
+    return await ReviewModel.find({ doctor_id: doctorId })
+      .populate('user_id', 'name profilePicture')
       .sort({ createdAt: -1 });
   }
 

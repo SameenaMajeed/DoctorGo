@@ -62,6 +62,7 @@ export class ReviewController {
         throw new AppError(HttpStatus.BadRequest, 'Doctor ID is required');
       }
       const reviews = await this.reviewService.getReviewsByDoctorId(doctorId);
+      
       sendResponse(res, HttpStatus.OK, 'Reviews fetched successfully', reviews);
     } catch (error: unknown) {
       console.error('Error fetching branch reviews:', error instanceof Error ? error.message : 'Unknown error');
