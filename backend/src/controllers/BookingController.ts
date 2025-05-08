@@ -224,6 +224,7 @@ export class BookingController {
         limitNum,
         status as AppointmentStatus | undefined
       );
+      
 
       sendResponse(res, HttpStatus.OK, MessageConstants.APPOINTMENT_FETCHED, {
         bookings: result.appointment,

@@ -14,7 +14,7 @@ export interface IBookingRepository {
     findByUserId(userId: string, doctorId?: Types.ObjectId): Promise<IBooking[]>;
     findByDoctorId(id: string): Promise<IBooking[]>
     findByDoctorIdWithPagination(
-        branchId: string,
+        doctorId: string,
         skip: number,
         limit: number,
         status?: AppointmentStatus

@@ -169,7 +169,7 @@ export class BookingRepository
       if (status) query.status = status;
 
       const appointments = await Booking.find(query)
-        .populate("user_id", "name email phone")
+        .populate("user_id", "name email mobile_no profilePicture age")
         .sort({ appointmentDate: -1 })
         .skip(skip)
         .limit(limit)

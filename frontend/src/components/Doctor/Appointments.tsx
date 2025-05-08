@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { IAppointment, IDoctor, IPatient } from "../../Types";
-import doctorApi from "../../axios/DoctorInstance";
+import { IAppointment} from "../../Types";
+
 import toast from "react-hot-toast";
 import {
   ChevronLeft,
@@ -18,8 +18,7 @@ import {
   fetchDoctorAppointments,
   updateAppointmentStatus,
 } from "../../Api/DoctorApis";
-import { IUser } from "../../types/auth";
-import { ISlotData } from "../../types/Slot";
+
 
 const Appointments: React.FC = () => {
   const { doctorId } = useParams<{ doctorId: string }>();
@@ -95,6 +94,7 @@ const Appointments: React.FC = () => {
   const handleAddPrescription = (appointment: IAppointment) => {
     const patient =
       typeof appointment.user_id === "object" ? appointment.user_id : null;
+      console.log('patient:',patient)
     if (!patient) {
       toast.error("Patient information is missing");
       return;
