@@ -5,14 +5,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../../axios/UserInstance";
 import toast from "react-hot-toast";
 import slotApi from "../../axios/SlotInstance";
-import { Slot } from "../../types/Slot";
+import { ISlot } from "../../types/Slot";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
-import { Review } from "../../Types";
+import { IReview } from "../../Types";
 
-interface Doctor {
+interface IDoctor {
   _id: string;
   name: string;
   specialization: string;
@@ -29,15 +29,15 @@ const AppointmentPage: React.FC = () => {
   const navigate = useNavigate();
   const userId = useSelector((state: RootState) => state.user?.user?.id);
 
-  const [doctor, setDoctor] = useState<Doctor | null>(null);
-  const [availableSlots, setAvailableSlots] = useState<Slot[]>([]);
+  const [doctor, setDoctor] = useState<IDoctor | null>(null);
+  const [availableSlots, setAvailableSlots] = useState<ISlot[]>([]);
   const [userBookedSlots, setUserBookedSlots] = useState<string[]>([]);
-  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<ISlot | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isLoadingSlots, setIsLoadingSlots] = useState<boolean>(false);
   const [isBooking, setIsBooking] = useState<boolean>(false);
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState<IReview[]>([]);
   const [activeReviewIndex, setActiveReviewIndex] = useState<number>(0);
   const [isPaused, setIsPaused] = useState<boolean>(false);
 

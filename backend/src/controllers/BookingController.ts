@@ -114,6 +114,7 @@ export class BookingController {
         );
 
       const { paymentId, ...bookingDetails } = req.body;
+      console.log()
 
       if (!paymentId) {
         throw new AppError(
@@ -130,6 +131,7 @@ export class BookingController {
       };
 
       const booking = await this.bookingService.bookAppointment(bookingData);
+      console.log('booking:' ,booking)
 
       sendResponse(
         res,

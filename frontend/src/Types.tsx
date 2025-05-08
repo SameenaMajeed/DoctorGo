@@ -1,7 +1,7 @@
-import { User } from "./types/auth";
-import { SlotData } from "./types/Slot";
+import { IUser } from "./types/auth";
+import { ISlotData } from "./types/Slot";
 
-export interface Doctor {
+export interface IDoctor {
   _id: string;
   name: string;
   email: string;
@@ -18,11 +18,11 @@ export interface Doctor {
 //   patientName : string
 // }
 
-export interface Appointment {
+export interface IAppointment {
     _id: string;
-    doctor_id: Doctor; // Ensure doctor_id is an object, not a string
-    user_id: User | string;
-    slot_id: SlotData;
+    doctor_id: IDoctor; // Ensure doctor_id is an object, not a string
+    user_id: IUser | string;
+    slot_id: ISlotData;
     appointmentDate: string;
     appointmentTime: string;
     modeOfAppointment: string;
@@ -31,12 +31,12 @@ export interface Appointment {
     paymentId: string;
     paymentMethod: string;
     ticketPrice: number;
-    patientDetails : Patient;
+    patientDetails : IPatient;
 }
 
 
 // Interface for frontend display (adjusted to match backend)
-export interface MedicalRecord {
+export interface IMedicalRecord {
   _id: string;
   date: string;
   complaint: string; 
@@ -46,46 +46,63 @@ export interface MedicalRecord {
   cost: string; 
 }
 
-export interface Patient {
-  name: string;
-  email?: string;
+export interface IPatient {
+  patientName: string;
+  contactNumber?: string;
   phone?: string;
-  records: MedicalRecord[];
+  records: IMedicalRecord[];
 }
 
-export interface TestReport {
+export interface ITestReport {
   img: string;
 }
 
-export interface Medicine {
+export interface IMedicine {
   name: string;
   quantity: number;
   time_gap: string;
+  dosage: string;
 }
 
-export interface Prescription {
+export interface IPrescription {
   _id: string;
   userId: string;
   doctorId: string;
-  medicines: Medicine[];
+  medicines: IMedicine[];
   symptoms: string;
   disease: string;
-  testReports: TestReport[];
+  testReports: ITestReport[];
   vitalSigns?: string;
   createdAt: string;
 }
 
-export interface Review {
+export interface IReview {
   _id: string;
   doctor_id: string;
   user_id : { name: string , profilePicture?: string};
   rating: number;
   reviewText: string;
   createdAt: string;
+  // appointmentId: string;
 }
 
-export interface ReviewFormData {
+export interface IReviewFormData {
   doctor_id: string | undefined;
+  _id?: string;
+  // appointmentId: string | undefined;
   rating: number;
   reviewText: string;
+  reviewId : string | undefined
 }
+
+
+export interface IMessage {
+  _id: string;
+  userId: string;
+  doctorId: string;
+  senderId: string;
+  senderRole: "user" | "doctor";
+  message: string;
+  timestamp: string | Date;
+}
+

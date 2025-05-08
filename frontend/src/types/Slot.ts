@@ -1,4 +1,4 @@
-export interface Slot {
+export interface ISlot {
   id: any;
   _id: string;
   doctorId: string;
@@ -17,7 +17,7 @@ export interface Slot {
   fee : number
 }
 // Interface for slot data (adjust based on your ISlot type)
-export interface SlotData {
+export interface ISlotData {
   doctorId: string;
   startTime: string;
   endTime: string;

@@ -3,21 +3,15 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
 import api from "../../axios/UserInstance";
-import { Doctor } from "../../Types";
-import { User } from "../../types/auth";
+import { IDoctor, IMedicine } from "../../Types";
+import { IUser } from "../../types/auth";
 
-interface Medicine {
-  name: string;
-  quantity: number;
-  time_gap: string;
-  dosage: string;
-}
 
-interface Prescription {
+interface IPrescription {
   _id: string;
-  userId: User;
-  doctorId: Doctor;
-  medicines: Medicine[];
+  userId: IUser;
+  doctorId: IDoctor;
+  medicines: IMedicine[];
   symptoms: string;
   disease: string;
   createdAt: string;
@@ -25,7 +19,7 @@ interface Prescription {
 }
 
 const PrescriptionList: React.FC = () => {
-  const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
+  const [prescriptions, setPrescriptions] = useState<IPrescription[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);

@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom";
 import api from "../../axios/UserInstance";
 import { useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
-import { Appointment } from "../../Types";
+import { IAppointment } from "../../Types";
 
 
 const AppointmentsList: React.FC = () => {
   const navigate = useNavigate();
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [appointments, setAppointments] = useState<IAppointment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const appointmentsPerPage = 3;

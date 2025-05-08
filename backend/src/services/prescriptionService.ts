@@ -44,7 +44,9 @@ export default class PrescriptionService {
         throw new Error("Invalid test report image.");
       }
     }
-    return await this.prescriptionRepo.createPrescription(prescriptionData);
+    const result = await this.prescriptionRepo.createPrescription(prescriptionData);
+    console.log('result : ' , result)
+    return result
   }
 
   async getPrescriptions(

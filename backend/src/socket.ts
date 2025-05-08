@@ -12,6 +12,7 @@ interface SocketData {
   id: string;
   role: "user" | "doctor";
   email: string;
+  name: string;
 }
 
 interface AuthenticatedSocket extends Socket {
@@ -21,11 +22,12 @@ interface AuthenticatedSocket extends Socket {
 export const initializeSocket = (server: HttpServer): Server => {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: process.env.CLIENT_URL || "http://localhost:5173",
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
       allowedHeaders: ["Content-Type", "Authorization"],
       credentials: true,
     },
+    pingTimeout: 60000,
   });
 
   io.use((socket: Socket, next) => {
@@ -43,7 +45,12 @@ export const initializeSocket = (server: HttpServer): Server => {
       ) {
         return next(new Error("Invalid token"));
       }
-      (socket as AuthenticatedSocket).data = decoded as SocketData;
+      (socket as AuthenticatedSocket).data = {
+        id: decoded.id,
+        role: decoded.role,
+        email: decoded.email || "",
+        name: decoded.name || "",
+      };
       next();
     } catch (error) {
       console.error("Socket auth error:", error);
@@ -59,14 +66,17 @@ export const initializeSocket = (server: HttpServer): Server => {
     const { role, id } = socket.data;
     const notificationRoom = role === "user" ? `user_${id}` : `doctor_${id}`;
     socket.join(notificationRoom);
-    console.log(
-      `Socket ${socket.id} joined notification room: ${notificationRoom}`
-    );
 
+    // Handle reconnection
+    socket.on("reconnect", () => {
+      socket.join(notificationRoom);
+      console.log(`Reconnected: ${socket.id}`);
+    });
+
+    // Chat room handling
     socket.on("joinChat", async (data: { userId: string; doctorId: string }) => {
       try {
         const { userId, doctorId } = data;
-        console.log(data)
         if (!userId || !doctorId) {
           socket.emit("error", "Missing userId or doctorId");
           return;
@@ -95,13 +105,13 @@ export const initializeSocket = (server: HttpServer): Server => {
           .sort({ timestamp: 1 })
           .lean();
         socket.emit("previousMessages", previousMessages);
-        socket.emit("joined", { room });
       } catch (error) {
         console.error("Error in joinChat:", error);
         socket.emit("error", "Failed to join chat");
       }
     });
 
+    // Message handling
     socket.on(
       "sendMessage",
       async (data: { userId: string; doctorId: string; message: string }) => {
@@ -130,12 +140,147 @@ export const initializeSocket = (server: HttpServer): Server => {
           };
           const newMessage = await new messageModel(messageData).save();
           io.to(room).emit("receiveMessage", newMessage);
+
+          // Update last message for both participants
+          await userModel.findByIdAndUpdate(userId, {
+            lastMessage: message,
+            lastMessageTime: new Date(),
+          });
+          await doctorModel.findByIdAndUpdate(doctorId, {
+            lastMessage: message,
+            lastMessageTime: new Date(),
+          });
         } catch (error) {
           console.error("Error in sendMessage:", error);
           socket.emit("error", "Failed to send message");
         }
       }
     );
+
+    // Video call handling
+    socket.on(
+      "startVideoCall",
+      async (data: { userId: string; doctorId: string; room: string; callerName: string }) => {
+        try {
+          const { userId, doctorId, room, callerName } = data;
+          if (!userId || !doctorId || !room) {
+            socket.emit("error", "Missing userId, doctorId, or room");
+            return;
+          }
+
+          const user = await userModel.findById(userId).lean();
+          const doctor = await doctorModel.findById(doctorId).lean();
+          if (!user || !doctor) {
+            socket.emit("error", "User or doctor not found");
+            return;
+          }
+
+          if (role === "user" && id !== userId) {
+            socket.emit("error", "Unauthorized: Cannot start video call for another user");
+            return;
+          }
+          if (role === "doctor" && id !== doctorId) {
+            socket.emit("error", "Unauthorized: Cannot start video call for another doctor");
+            return;
+          }
+
+          // Notify the doctor about the incoming call
+          io.to(`doctor_${doctorId}`).emit("incomingVideoCall", {
+            room,
+            callerName,
+            callerId: userId,
+          });
+
+          // Confirm to the caller that the call was initiated
+          socket.emit("videoCallInitiated", { room });
+
+          console.log(`Video call initiated by ${userId} to ${doctorId} in room ${room}`);
+        } catch (error) {
+          console.error("Error in startVideoCall:", error);
+          socket.emit("error", "Failed to start video call");
+        }
+      }
+    );
+
+    // When doctor accepts the call
+    socket.on("acceptVideoCall", async (data: { room: string; doctorId: string; userId: string }) => {
+      try {
+        const { room, doctorId, userId } = data;
+        if (!room || !doctorId || !userId) {
+          socket.emit("error", "Missing room, doctorId, or userId");
+          return;
+        }
+
+        // Verify the doctor is the one accepting
+        if (socket.data.role !== "doctor" || socket.data.id !== doctorId) {
+          socket.emit("error", "Unauthorized call acceptance");
+          return;
+        }
+
+        // Notify both parties that the call is starting
+        io.to(`user_${userId}`).emit("doctorJoinedCall");
+        io.to(room).emit("videoCallStarted", { room });
+
+        console.log(`Doctor ${doctorId} joined call in room ${room}`);
+      } catch (error) {
+        console.error("Error in acceptVideoCall:", error);
+        socket.emit("error", "Failed to accept video call");
+      }
+    });
+
+    // When doctor rejects the call
+    socket.on("rejectVideoCall", (data: { userId: string; doctorId: string }) => {
+      try {
+        const { userId, doctorId } = data;
+        if (!userId || !doctorId) {
+          socket.emit("error", "Missing userId or doctorId");
+          return;
+        }
+
+        // Verify the doctor is the one rejecting
+        if (socket.data.role !== "doctor" || socket.data.id !== doctorId) {
+          socket.emit("error", "Unauthorized call rejection");
+          return;
+        }
+
+        // Notify the user that the call was rejected
+        io.to(`user_${userId}`).emit("videoCallRejected");
+
+        console.log(`Doctor ${doctorId} rejected call from user ${userId}`);
+      } catch (error) {
+        console.error("Error in rejectVideoCall:", error);
+        socket.emit("error", "Failed to reject video call");
+      }
+    });
+
+    // End video call
+    socket.on("endVideoCall", async (data: { userId: string; doctorId: string }) => {
+      try {
+        const { userId, doctorId } = data;
+        if (!userId || !doctorId) {
+          socket.emit("error", "Missing userId or doctorId");
+          return;
+        }
+
+        // Verify permissions
+        const isUser = socket.data.role === "user" && socket.data.id === userId;
+        const isDoctor = socket.data.role === "doctor" && socket.data.id === doctorId;
+        
+        if (!isUser && !isDoctor) {
+          socket.emit("error", "Unauthorized to end this call");
+          return;
+        }
+
+        // Notify both parties
+        io.to(`user_${userId}`).emit("endVideoCall");
+        io.to(`doctor_${doctorId}`).emit("endVideoCall");
+
+        console.log(`Video call ended between user ${userId} and doctor ${doctorId}`);
+      } catch (error) {
+        console.error("Error in endVideoCall:", error);
+        socket.emit("error", "Failed to end video call");
+      }
+    });
 
     socket.on("disconnect", () => {
       console.log(`Disconnected: ${socket.id} (Role: ${socket.data.role}, ID: ${socket.data.id})`);
@@ -144,186 +289,3 @@ export const initializeSocket = (server: HttpServer): Server => {
 
   return io;
 };
-
-// import { Server, Socket } from "socket.io";
-// import { Server as HttpServer } from "http";
-// import { verifyToken } from "./utils/jwt";
-// import chatModel from "./models/messageModel";
-
-// import dotenv from "dotenv";
-// dotenv.config();
-
-// interface SocketData {
-//   id: string;
-//   role: "user" | "doctor";
-//   email: string;
-// }
-
-// interface AuthenticatedSocket extends Socket {
-//   data: SocketData;
-// }
-
-// export const initializeSocket = (server: HttpServer): Server => {
-//   const io = new Server(server, {
-//     cors: {
-//       origin: "http://localhost:5173",
-//       methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-//       allowedHeaders: ["Content-Type", "Authorization"],
-//       credentials: true,
-//     },
-//   });
-
-//   // middleware for a Socket.IO server : authenticate user before the connection
-//   io.use((socket: Socket, next) => {
-//     const token = socket.handshake.auth.token;
-
-//     if (!token)
-//       return next(new Error("Authentication error : No token Provided"));
-
-//     try {
-//       const decoded = verifyToken(token);
-//       if (
-//         !decoded ||
-//         typeof decoded !== "object" ||
-//         !("id" in decoded) ||
-//         !("role" in decoded)
-//       ) {
-//         return next(new Error("Invalid token"));
-//       }
-
-//       (socket as AuthenticatedSocket).data = decoded as SocketData;
-//       next();
-//     } catch (error) {
-//       console.error("Socket auth error:", error);
-//       next(new Error("Authentication error: Invalid token"));
-//     }
-//   });
-
-//   //when a User successfully connects,This execute(after passing authentication):
-//   io.on("connection", (socket: AuthenticatedSocket) => {
-//     console.log(
-//       `Connected: ${socket.id} (Role: ${socket.data.role}, ID: ${socket.data.id})`
-//     );
-
-//     // Join notification room based on role
-//     const { role, id } = socket.data;
-//     let notificationRoom: string | null = null;
-//     if (role === "user") {
-//       notificationRoom = `user_${id}`;
-//     } else if (role === "doctor") {
-//       notificationRoom = `doctor_${id}`;
-//     }
-
-//     if (notificationRoom) {
-//       socket.join(notificationRoom);
-//       console.log(
-//         `Socket ${socket.id} joined notification room: ${notificationRoom}`
-//       );
-//     }
-
-//     // Optional: Log incoming notifications for debugging
-//     socket.on("receiveNotification", (notification: any) => {
-//       console.log(
-//         `Notification received by ${socket.id} (Role: ${role}, ID: ${id}):`,
-//         notification
-//       );
-//     });
-
-//     // request to join a private chat room between different roles:
-//     socket.on(
-//       "joinChat",
-//       async (data: { userId?: string; doctorId?: string }) => {
-//         try {
-//           const { userId, doctorId } = data;
-//           console.log("Join chat request:", {
-//             userId,
-//             doctorId,
-//             role: socket.data.role,
-//             id: socket.data.id,
-//           });
-
-//           // User <=> doctor
-//           if (userId && doctorId) {
-//             const room = `chat_user_${userId}_${doctorId}`;
-
-//             if (socket.data.role === "user" && socket.data.id !== userId) {
-//               socket.emit(
-//                 "error",
-//                 "Unauthorized: Cannot join chat for another user"
-//               );
-//               return;
-//             }
-
-//             if (socket.data.role === "doctor" && socket.data.id !== doctorId) {
-//               socket.emit(
-//                 "error",
-//                 "Unauthorized: Cannot join chat for another doctor"
-//               );
-//               return;
-//             }
-//             socket.join(room);
-
-//             const previousMessages = await chatModel
-//               .find({ userId, doctorId })
-//               .sort({ timestamp: 1 })
-//               .lean();
-//             console.log(
-//               `Joined room ${room} with ${previousMessages.length} previous messages`
-//             );
-//             socket.emit("previousMessages", previousMessages);
-//             socket.emit("joined", { room });
-//           }else {
-//             socket.emit('error', 'Invalid chat parameters');
-//             console.log('Invalid joinChat parameters:', data);
-//           }
-//         } catch (error) {
-//           console.error("Error in joinChat:", error);
-//           socket.emit("error", "Failed to join chat");
-//         }
-//       });
-
-//     // sending a message:  
-//       socket.on('sendMessage', async (data: { userId?: string; doctorId?: string; message: string }) => {
-//         try {
-//           const { userId, doctorId , message } = data;
-//           console.log('Send message request:', { userId, doctorId, message, senderRole: socket.data.role, senderId: socket.data.id });
-  
-//           if (!message) {
-//             socket.emit('error', 'Missing message');
-//             console.log('Missing message in sendMessage');
-//             return;
-//           }
-  
-//           // Doctor <=> User Message
-//           if (userId && doctorId) {
-//             const room = `chat_user_${userId}_${doctorId}`;
-//             const messageData = {
-//               userId,
-//               doctorId,
-//               senderId: socket.data.id,
-//               senderRole: socket.data.role as 'user' | 'doctor',
-//               message,
-//               timestamp: new Date(),
-//             };
-//             console.log('Saving doctor <=> User message:', messageData);
-//             const newMessage = await new chatModel(messageData).save();
-//             console.log(`Message saved for room ${room}`);
-//             io.to(room).emit('receiveMessage', newMessage);
-//           }else {
-//             socket.emit('error', 'Invalid message parameters');
-//             console.log('Invalid sendMessage parameters:', data);
-//           }
-//         } catch (error) {
-//           console.error('Error in sendMessage:', error);
-//           socket.emit('error', 'Failed to send message');
-//         }
-//       });
-
-      
-//       socket.on('disconnect', () => {
-//       console.log(`Disconnected: ${socket.id} (Role: ${socket.data.role}, ID: ${socket.data.id})`);
-//     });
-//   });
-
-//   return io;
-// };

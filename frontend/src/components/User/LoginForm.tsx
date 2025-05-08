@@ -10,7 +10,7 @@ import ForgotPasswordModel from "../CommonComponents/ForgotPasswordModel";
 import {getAuth , signInWithPopup , GoogleAuthProvider} from "firebase/auth"
 import App from "../../FirebaseAuthentication/config";
 import { toast } from "react-hot-toast";
-import { GoogleSignInResponse, LoginResponse } from "../../types/auth";
+import { IGoogleSignInResponse, ILoginResponse } from "../../types/auth";
 import { loginUser } from "../../Api/UserApis";
 
 const LoginForm: React.FC = () => {
@@ -74,7 +74,7 @@ const LoginForm: React.FC = () => {
       const result = await signInWithPopup(auth, provider);
       const idToken = await result.user.getIdToken();
   
-      const response : any = await api.post<GoogleSignInResponse>('/google', { idToken }, { withCredentials: true });
+      const response : any = await api.post<IGoogleSignInResponse>('/google', { idToken }, { withCredentials: true });
   
       console.log('Full API response:', response.data);
   

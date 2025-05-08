@@ -1,5 +1,5 @@
 
-export interface ProfilePictureResponse {
+export interface IProfilePictureResponse {
     status?: number;
     message: string;
     success : boolean
@@ -8,7 +8,7 @@ export interface ProfilePictureResponse {
     };
   }
 
-  export interface AxiosError {
+  export interface IAxiosError {
     response?: {
       status: any;
       data?: {
@@ -20,7 +20,7 @@ export interface ProfilePictureResponse {
   }
 
    
-export interface User {
+export interface IUser {
   id : string;
   _id:string
   name: string;
@@ -39,28 +39,28 @@ export interface User {
 
  
 
-export  interface FetchUsersResponse {
-  users: User[];
+export  interface IFetchUsersResponse {
+  users: IUser[];
   total: number;
 }
 
-export interface LoginResponse {
+export interface ILoginResponse {
   status: number;
   message: string;
   data: {
-    user: User;
+    user: IUser;
     accessToken?: string;
     refreshToken?: string;
   };
 }
 
-export interface GoogleSignInResponse {
+export interface IGoogleSignInResponse {
   status: number;
   message: string;
-  data: User;
+  data: IUser;
 }
 
-export interface SignupFormInputs {
+export interface ISignupFormInputs {
   name: string;
   email: string;
   password: string;
@@ -68,25 +68,25 @@ export interface SignupFormInputs {
   mobile: string;
 }
 
-export interface SignupResponse {
+export interface ISignupResponse {
   status: number;
   message: string;
   data: {
-    user: User;
+    user: IUser;
   };
 }
 
-export interface ProfileResponse {
+export interface IProfileResponse {
   profilePicture?: string | null;
   status: number;
   message: string;
-  data: User;
+  data: IUser;
 }
 
-export interface UpdateProfileResponse {
+export interface IUpdateProfileResponse {
   status: number;
   message: string;
-  data: User;
+  data: IUser;
 }
 
 
@@ -96,3 +96,29 @@ type BookingResponse = {
   razorpayOrder?: any; // Replace with proper Razorpay order type
   redirect?: boolean;
 };
+
+export interface IReviewResponse {
+  data: {
+    _id: string;
+    doctor_id: string;
+    user_id: string;
+    appointment_id: string;
+    reviewText: string;
+    rating: number;
+    createdAt: string;
+    updatedAt: string;
+  };
+  message: string;
+}
+
+export interface IReviewCheckResponse {
+  data: {
+    existingReview: {
+      _id: string;
+      rating: number;
+      reviewText: string;
+    } | null;
+    canReview: boolean;
+  };
+  message: string;
+}

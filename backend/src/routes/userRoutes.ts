@@ -130,7 +130,7 @@ userRoute.post("/reset-password", (req: Request, res: Response) => {
 userRoute.get(
   "/doctors",
   authenticateToken("user"),
-  blockedUserMiddleware,
+  // blockedUserMiddleware,
   (req: Request, res: Response) => {
     userController.getAllDoctors(req, res);
   }
@@ -199,5 +199,16 @@ userRoute.post('/submitReview',authenticateToken("user"), (req, res) =>
 
 userRoute.get('/reviews/doctor/:doctorId',(req, res) =>
   reviewController.getReview(req, res))
+
+userRoute.put("/updateReview/:id",authenticateToken("user"), (req, res) =>
+  reviewController.updateReview(req, res));
+
+// Check if user has already reviewed a doctor for a specific appointment
+userRoute.get('/reviews/check', authenticateToken("user"), (req, res) =>
+  reviewController.checkReview(req, res));
+
+// Get a single review by ID
+userRoute.get('/reviews/:id', authenticateToken("user"), (req, res) =>
+  reviewController.getReviewById(req, res));
 
 export default userRoute;

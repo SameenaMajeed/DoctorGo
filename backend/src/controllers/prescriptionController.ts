@@ -13,7 +13,7 @@ export default class PrescriptionController {
     try {
       const data = req.body;
     //   const userId = req.body.userId; // Assuming you have auth middleware
-    // const doctorId = req.body.doctorId; // Assuming you have auth middleware
+    const doctorId = req.data?.userId;
     
     // const { symptoms, disease, medicines, testReports } = req.body;
     
@@ -25,6 +25,9 @@ export default class PrescriptionController {
     //   medicines,
     //   testReports: testReports || [] // Handle case where no attachments
     // };
+
+
+    console.log(data)
 
       const prescription = await this.prescriptionService.createPrescription(
         data

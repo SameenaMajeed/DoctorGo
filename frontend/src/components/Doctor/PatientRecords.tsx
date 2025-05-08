@@ -4,26 +4,25 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../CommonComponents/Button";
 import { Card, CardContent } from "../CommonComponents/card";
 import { Eye, Trash2 } from "lucide-react";
-import { User } from "../../types/auth";
-import { Appointment, Prescription } from "../../Types";
+import { IUser } from "../../types/auth";
+import { IAppointment, IPrescription } from "../../Types";
 import doctorApi from "../../axios/DoctorInstance";
 import Pagination from "../../Pagination/Pagination";
 import { useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
 
-interface MedicalRecord {
+interface IMedicalRecord {
   date: string;
   complaint: string;
   diagnosis: string;
   treatment: string;
   prescription: string;
-  cost: string;
   _id?: string;
 }
 
-interface LocationState {
-  patient?: User;
-  appointment?: Appointment;
+interface ILocationState {
+  patient?: IUser;
+  appointment?: IAppointment;
 }
 
 const MedicalRecord: React.FC = () => {
@@ -36,14 +35,14 @@ const MedicalRecord: React.FC = () => {
   const location = useLocation();
 
   // State management
-  const [patient, setPatient] = useState<User | null>(null);
-  const [appointment, setAppointment] = useState<Appointment | null>(null);
-  const [records, setRecords] = useState<MedicalRecord[]>([]);
+  const [patient, setPatient] = useState<IUser | null>(null);
+  const [appointment, setAppointment] = useState<IAppointment | null>(null);
+  const [records, setRecords] = useState<IMedicalRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10); // Fixed limit, can be made dynamic
-  const [total, setTotal] = useState(0);
+  const limit = 4; 
+  const [total, setTotal] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch patient data and prescriptions
@@ -51,7 +50,7 @@ const MedicalRecord: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const state = location.state as LocationState | undefined;
+        const state = location.state as ILocationState | undefined;
         let patientData = state?.patient;
 
         if (!patientData && userId) {
@@ -82,11 +81,12 @@ const MedicalRecord: React.FC = () => {
 
         console.log(response.data);
 
+
         const { prescriptions, total } = response.data.data;
 
         // Map prescriptions to MedicalRecord format
-        const mappedRecords: MedicalRecord[] = prescriptions.map(
-          (p: Prescription) => ({
+        const mappedRecords: IMedicalRecord[] = prescriptions.map(
+          (p: IPrescription) => ({
             _id: p._id,
             date: new Date(p.createdAt).toLocaleDateString(),
             complaint: p.symptoms,
@@ -101,8 +101,11 @@ const MedicalRecord: React.FC = () => {
           })
         );
 
+        if (response.data.data) {
+          setTotal(Math.ceil(response.data.data.total / limit));
+        }
+
         setRecords(mappedRecords);
-        setTotal(total);
       } catch (err) {
         console.error("Failed to fetch data:", err);
         setError("Failed to load medical records");
@@ -119,7 +122,9 @@ const MedicalRecord: React.FC = () => {
   };
 
   const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+    if (newPage >= 1 && newPage <= total) {
+      setPage(newPage);
+    }
   };
 
   const handleDeleteRecord = async (recordId: string) => {
@@ -173,12 +178,7 @@ const MedicalRecord: React.FC = () => {
               variant="outline"
               className="w-full mt-4 bg-white hover:bg-gray-100 text-blue-600 border-blue-600 hover:border-blue-700 transition duration-200"
               onClick={() =>
-                navigate(`/doctor/patient-records/${patient._id}`, {
-                  state: {
-                    patient,
-                    appointment,
-                  },
-                })
+                navigate(`/doctor/${doctorId}/patients`)
               }
             >
               Back
@@ -234,9 +234,6 @@ const MedicalRecord: React.FC = () => {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-green-600 font-semibold">
-                      (INR) {record.cost}
-                    </p>
                     <div className="flex space-x-2 justify-end mt-2">
                       <Button variant="ghost">
                         <Eye className="w-4 h-4" />

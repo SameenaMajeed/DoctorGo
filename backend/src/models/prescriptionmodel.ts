@@ -5,7 +5,6 @@ interface Medicine {
   dosage: string;
   quantity: number;
   time_gap: string;
-  amount:number;
 }
 
 interface TestReport {
@@ -45,7 +44,6 @@ const PrescriptionSchema : Schema = new Schema<IPrescription>(
           dosage: { type: String, required: true },
           quantity: { type: Number, required: true },
           time_gap: { type: String, required: true },
-          amount: { type: Number, required: true },
         },
       ],
       symptoms: {

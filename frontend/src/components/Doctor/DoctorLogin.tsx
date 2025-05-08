@@ -7,7 +7,6 @@ import { setLoading } from "../../slice/user/userSlice";
 import doctorApi from "../../axios/DoctorInstance";
 import { setDoctor, setError } from "../../slice/Doctor/doctorSlice";
 import toast from "react-hot-toast";
-import { Doctor } from "../../Types";
 
 const DoctorLogin: React.FC = () => {
   const [email, setEmail] = useState("");

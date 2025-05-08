@@ -70,6 +70,7 @@ export class BookingService implements IBookingService {
       const slot = await this._slotRepo.findSlotById(slotId.toString());
       if (!slot) throw new AppError(HttpStatus.BadRequest, "Invalid slot ID.");
 
+
       if (slot.bookedCount >= slot.maxPatients) {
         throw new AppError(
           HttpStatus.BadRequest,
@@ -102,43 +103,6 @@ export class BookingService implements IBookingService {
     }
   }
 
-  // async getAppointments(id: string): Promise<IBooking[]> {
-  //   try {
-  //     const bookings = await this._bookingRepo.findByUserId(id)
-
-  //     if (!bookings.length)
-  //       throw new AppError(
-  //         HttpStatus.NotFound,
-  //         MessageConstants.BOOKING_NOT_FOUND
-  //       );
-
-  //     // Exclude cancelled appointments
-  //     const filteredBookings = bookings.filter(
-  //       (booking) => booking.status !== "cancelled"
-  //     );
-
-  //     if (!filteredBookings.length)
-  //       throw new AppError(HttpStatus.NotFound, "No active appointments found");
-
-  //     // Ensure appointmentTime is properly formatted
-  //     const updatedBookings = filteredBookings.map((booking) => {
-  //       if (booking.slot_id) {
-  //         booking.appointmentTime = `${booking.slot_id.startTime} - ${booking.slot_id.endTime}`;
-  //       } else {
-  //         booking.appointmentTime = "Time not available";
-  //       }
-  //       return booking;
-  //     });
-
-  //     return updatedBookings;
-  //   } catch (error) {
-  //     if (error instanceof AppError) throw error;
-  //     throw new AppError(
-  //       HttpStatus.InternalServerError,
-  //       MessageConstants.INTERNAL_SERVER_ERROR
-  //     );
-  //   }
-  // }
 
   async getAppointments(id: string): Promise<IBooking[]> {
     // Return an array

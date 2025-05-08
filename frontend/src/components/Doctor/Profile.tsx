@@ -14,7 +14,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
 import OtpModal from "../CommonComponents/OtpEmailModal";
 import toast from "react-hot-toast";
-import { ProfilePictureResponse } from "../../types/auth";
+import { IProfilePictureResponse } from "../../types/auth";
 
 // Validation Schema
 const profileSchema = yup.object().shape({
@@ -165,11 +165,9 @@ const Profile: React.FC = () => {
 
     const formData = new FormData();
     formData.append("profilePicture", selectedFile);
-    console.log("hi", selectedFile);
-    console.log("hi", formData);
 
     try {
-      const response = await doctorApi.post<ProfilePictureResponse>(
+      const response = await doctorApi.post<IProfilePictureResponse>(
         "/uploadProfilePicture",
         formData,
         {
@@ -181,7 +179,7 @@ const Profile: React.FC = () => {
 
       console.log('hi',response);
 
-      const uploadedImageUrl = response.data.data.profilePicture;
+      const uploadedImageUrl : any = response.data.data?.profilePicture;
       toast.success("Profile picture uploaded successfully");
       dispatch(updateProfilePicture(uploadedImageUrl));
       setSelectedFile(null);

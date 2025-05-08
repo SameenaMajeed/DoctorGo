@@ -8,7 +8,7 @@ import { MessageConstants } from "../constants/MessageConstants";
 import admin from "../config/firebase";
 import { CookieManager } from "../utils/cookieManager";
 import { AppError } from "../utils/AppError";
-import DoctorModel from "../models/DoctorModel";
+
 
 declare global {
   namespace Express {

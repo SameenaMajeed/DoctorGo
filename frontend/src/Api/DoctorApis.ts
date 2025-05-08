@@ -1,26 +1,26 @@
 import doctorApi from "../axios/DoctorInstance";
-import { Appointment, Doctor } from "../Types";
-import { AxiosError } from "../types/auth";
+import { IAppointment, IDoctor } from "../Types";
+import { IAxiosError } from "../types/auth";
 
-type FetchAppointmentsParams = {
+type IFetchAppointmentsParams = {
     doctorId: string;
     page: number;
     limit: number;
     statusFilter?: string;
 };
   
-type FetchAppointmentsResponse = {
+type IFetchAppointmentsResponse = {
     success: boolean;
     message: string;
-    appointments?: Appointment[];
+    appointments?: IAppointment[];
     totalPages?: number;
 };
 
 
 // Appointments listing  
 export const fetchDoctorAppointments = async (
-    params: FetchAppointmentsParams
-  ): Promise<FetchAppointmentsResponse> => {
+    params: IFetchAppointmentsParams
+  ): Promise<IFetchAppointmentsResponse> => {
     const { doctorId, page, limit, statusFilter } = params;
   
     if (!doctorId) {
@@ -38,6 +38,8 @@ export const fetchDoctorAppointments = async (
       if (!response.data?.data) {
         throw new Error("Invalid response structure");
       }
+
+      console.log('response.data.data.bookings :' , response.data.data.bookings )
   
       return {
         success: true,
@@ -46,7 +48,7 @@ export const fetchDoctorAppointments = async (
         totalPages: response.data.data.totalPages || 1,
       };
     } catch (error) {
-      const axiosError = error as AxiosError;
+      const axiosError = error as IAxiosError;
       let errorMessage = "Failed to fetch appointments";
   
       if (axiosError.response) {
@@ -99,7 +101,7 @@ export const updateAppointmentStatus = async (
         shouldRefresh: true, // Indicates appointments should be refetched
       };
     } catch (error) {
-      const axiosError = error as AxiosError;
+      const axiosError = error as IAxiosError;
       let errorMessage = "Failed to update appointment status";
   
       if (axiosError.response) {
@@ -131,8 +133,6 @@ export const updateAppointmentStatus = async (
 
 
 //   signup
-
-
 type DoctorSignupFormData = {
     [key: string]: string | File;
     certificationFile: File;
@@ -147,7 +147,7 @@ type DoctorSignupFormData = {
       id: string;
       isApproved: boolean;
       approvalStatus: string;
-      doctor: Doctor; 
+      doctor: IDoctor; 
       accessToken: string; 
       refreshToken: string; 
       role: string;
@@ -199,7 +199,7 @@ export const completeDoctorSignup = async (
         redirectTo: "/doctor/login"
       };
     } catch (error) {
-      const axiosError = error as AxiosError;
+      const axiosError = error as IAxiosError;
       let errorMessage = "Signup failed";
   
       if (axiosError.response) {

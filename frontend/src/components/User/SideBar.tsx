@@ -17,7 +17,7 @@ import { logoutUser } from "../../slice/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
 
-interface MenuItemType {
+interface IMenuItemType {
   icon: React.ReactNode;
   label: string;
   path: string;
@@ -47,7 +47,7 @@ const Sidebar: React.FC = () => {
     setIsCollapsed((prev) => !prev);
   };
 
-  const menuItems: MenuItemType[] = [
+  const menuItems: IMenuItemType[] = [
     {
       icon: <Calendar size={18} />,
       label: "Appointments",
@@ -66,7 +66,7 @@ const Sidebar: React.FC = () => {
     },
   ];
 
-  const footerItems: MenuItemType[] = [
+  const footerItems: IMenuItemType[] = [
     {
       icon: <HelpCircle size={18} />,
       label: "Help & Support",

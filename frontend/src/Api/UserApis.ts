@@ -1,11 +1,13 @@
 import api from "../axios/UserInstance";
 import { setLoading, setError, setUser } from "../slice/user/userSlice";
 import {
-  AxiosError,
-  LoginResponse,
-  ProfilePictureResponse,
-  ProfileResponse,
-  UpdateProfileResponse,
+  IAxiosError,
+  ILoginResponse,
+  IProfilePictureResponse,
+  IProfileResponse,
+  IReviewCheckResponse,
+  IReviewResponse,
+  IUpdateProfileResponse,
 } from "../types/auth";
 
 // Signup
@@ -39,7 +41,7 @@ export const loginUser = async (
   try {
     dispatch(setLoading());
 
-    const response = await api.post<LoginResponse>(
+    const response = await api.post<ILoginResponse>(
       "/login",
       { email, password },
       { withCredentials: true }
@@ -81,7 +83,7 @@ export const fetchUserProfile = async (
   try {
     dispatch(setLoading());
 
-    const response = await api.get<ProfileResponse>("/profile");
+    const response = await api.get<IProfileResponse>("/profile");
     const profileData = response.data.data;
 
     // Format data for form
@@ -137,7 +139,7 @@ export const updateUserProfile = async (
 ): Promise<{
   success: boolean;
   message: string;
-  updatedUser?: UpdateProfileResponse["data"];
+  updatedUser?: IUpdateProfileResponse["data"];
 }> => {
   try {
     dispatch(setLoading());
@@ -166,7 +168,7 @@ export const updateUserProfile = async (
       age: data.age,
     };
 
-    const response = await api.put<UpdateProfileResponse>(
+    const response = await api.put<IUpdateProfileResponse>(
       "/updateProfile",
       updateData
     );
@@ -185,7 +187,7 @@ export const updateUserProfile = async (
       updatedUser: response.data.data,
     };
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as IAxiosError;
     let errorMessage = "Failed to update profile";
 
     if (axiosError.response) {
@@ -220,7 +222,7 @@ export const updateUserProfile = async (
 export const updateProfilePicture = async (
   file: File | null,
   dispatch: any
-): Promise<ProfilePictureResponse> => {
+): Promise<IProfilePictureResponse> => {
   try {
     dispatch(setLoading());
 
@@ -268,7 +270,7 @@ export const updateProfilePicture = async (
       data: response.data.data,
     };
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as IAxiosError;
     let errorMessage = "Failed to update profile picture";
 
     if (axiosError.response) {
@@ -299,9 +301,87 @@ export const updateProfilePicture = async (
   }
 };
 
+//Submit new review
+export const submitReview = async (
+  reviewData: {
+    doctor_id: string;
+    appointment_id: string;
+    reviewText: string;
+    rating: number;
+  },
+  dispatch: any
+): Promise<IReviewResponse> => {
+  try {
+    dispatch(setLoading());
+    const response = await api.post<IReviewResponse>("/submitReview", reviewData);
+    return response.data;
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message || "Failed to submit review";
+    dispatch(setError(errorMessage));
+    throw error;
+  }
+};
 
+// Update existing review
+export const updateReview = async (
+  reviewId: string,
+  reviewData: {
+    rating?: number;
+    reviewText?: string;
+  },
+  dispatch: any
+): Promise<IReviewResponse> => {
+  try {
+    dispatch(setLoading());
+    const response = await api.put<IReviewResponse>(
+      `/updateReview/${reviewId}`,
+      reviewData
+    );
+    return response.data;
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message || "Failed to update review";
+    dispatch(setError(errorMessage));
+    throw error;
+  }
+};
 
+// Check if review exists for appointment
+export const checkReview = async (
+  appointmentId: string,
+  dispatch: any
+): Promise<IReviewCheckResponse> => {
+  try {
+    dispatch(setLoading());
+    const response = await api.get<IReviewCheckResponse>(
+      `/reviews/check?appointmentId=${appointmentId}`
+    );
+    return response.data;
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message || "Failed to check review status";
+    dispatch(setError(errorMessage));
+    throw error;
+  }
+};
 
+// Get reviews by doctor
+export const getDoctorReviews = async (
+  doctorId: string,
+  dispatch: any
+): Promise<{ data: IReviewResponse['data'][]; message: string }> => {
+  try {
+    dispatch(setLoading());
+    const response = await api.get(`/reviews/doctor/${doctorId}`);
+    return response.data;
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message || "Failed to fetch doctor reviews";
+    dispatch(setError(errorMessage));
+    throw error;
+  }
+};
 
 
 

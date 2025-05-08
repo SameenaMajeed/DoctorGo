@@ -40,7 +40,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onRestrictedAction }) => {
 
   const appointmentsPath = doctorId ? `/doctor/${doctorId}/appointments` : "#";
   const patientPath = doctorId ? `/doctor/${doctorId}/patients` : "#";
-  // const patient = userId ? `/doctor/patient-records/${userId}` : "#";
+  const review = userId ? `/reviews/doctor/${doctorId}` : "#";
 
 
   return (
@@ -49,11 +49,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onRestrictedAction }) => {
         collapsed ? "w-20" : "w-64"
       }`}
     >
-      {/* // <div 
-    //   className={`min-h-screen bg-black text-white transition-all duration-300 ${
-    //     collapsed ? "w-20" : "w-64"
-    //   }`}
-    // >
+      
       {/* Logo Section */}
       <div className="flex items-center justify-between p-3">
         <Link to="/doctor/home">
@@ -163,6 +159,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onRestrictedAction }) => {
           collapsed={collapsed}
           active={location.pathname === "/myChats"}
           onClick={(e) => handleRestrictedNavigation(e, "/myChats")}
+        />
+        <SidebarItem
+          href={review}
+          icon={<Calendar size={20} />}
+          label="Review"
+          collapsed={collapsed}
+          active={location.pathname === review}
+          onClick={(e) => handleRestrictedNavigation(e, review)}
         />
       </nav>
     </div>

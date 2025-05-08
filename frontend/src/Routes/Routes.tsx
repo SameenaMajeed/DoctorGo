@@ -42,6 +42,9 @@ import NewRecord from "../components/Doctor/NewRecord.tsx";
 import ChatPage from "../components/Doctor/ChatPage.tsx";
 import PrecipitationList from "../components/User/PrecipitationList.tsx";
 import ReviewForm from "../components/User/ReviewForm.tsx";
+import DoctorReviews from "../components/Doctor/DoctorReviews.tsx";
+import AboutPage from "../components/User/Home/AboutPage.tsx";
+import ContactPage from "../components/User/Home/ContactPage.tsx";
 
 export const routes = (
   <>
@@ -66,6 +69,8 @@ export const routes = (
         path="/appointment/verification"
         element={<AppointmentVerification />}
       />
+      <Route path="/about" element={<AboutPage/>}/>
+      <Route path="/contact" element={<ContactPage/>}/>
       <Route path="/appointment/success" element={<PaymentSuccess />} />
       <Route element={<UserLayout />}>
         <Route path="/my-profile" element={<UserProfile />}/>
@@ -89,6 +94,7 @@ export const routes = (
         <Route path="/doctor/newRecords" element={< NewRecord/>} />
         <Route path="/doctor/:doctorId/patients" element={<PatientDashboard />} />
         <Route path="/myChats" element={< ChatPage/>} />
+        <Route path="/reviews/doctor/:doctorId" element={< DoctorReviews/>} />
         <Route
           path="/doctor/slots/emergency-block"
           element={<EmergencyBlock />}

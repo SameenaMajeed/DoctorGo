@@ -35,4 +35,6 @@ export interface IBookingRepository {
     getPatientsForDoctor(doctorId: string) : Promise<IBooking []>
 
     findAppointmentByDoctorAndPatient(doctorId: string, patientId: string): Promise<IBooking | null>;
+
+    findAppointmentById(id: string): Promise<IBooking | null>;
 }

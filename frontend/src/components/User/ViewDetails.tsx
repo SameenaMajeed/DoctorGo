@@ -1,13 +1,13 @@
 import React from "react";
-import { Appointment } from "../../Types";
+import { IAppointment } from "../../Types";
 import { FaTimes, FaCalendarAlt, FaClock, FaUserMd, FaInfoCircle, FaVideo, FaStickyNote } from "react-icons/fa";
 
-interface ViewDetailsProps {
-  appointment: Appointment;
+interface IViewDetailsProps {
+  appointment: IAppointment;
   onClose: () => void;
 }
 
-const ViewDetails: React.FC<ViewDetailsProps> = ({ appointment, onClose }) => {
+const ViewDetails: React.FC<IViewDetailsProps> = ({ appointment, onClose }) => {
   const formatTime = (timeString: string | null | undefined) => {
     if (!timeString) return "Not specified";
     try {

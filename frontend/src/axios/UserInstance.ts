@@ -64,7 +64,8 @@ api.interceptors.response.use(
             { withCredentials: true } // Send cookies along with the request
           );
 
-          const { accessToken } = refreshResponse.data.tokens; // Retrieve the new access token
+          const { accessToken } = refreshResponse.data.tokens;
+          console.log('accessToken :',accessToken)
 
           // Retry the original request with the new access token in the Authorization header
           originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;

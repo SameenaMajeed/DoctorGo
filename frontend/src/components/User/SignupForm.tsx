@@ -14,7 +14,7 @@ import Footer from "../CommonComponents/Footer";
 import { registerUser } from "../../Api/UserApis";
 import { sendOtp } from "../../Api/OtpApis";
 
-interface SignupFormInputs {
+interface ISignupFormInputs {
   name: string;
   email: string;
   gender: string;
@@ -66,11 +66,11 @@ const SignupForm: React.FC = () => {
     handleSubmit,
     getValues,
     formState: { errors },
-  } = useForm<SignupFormInputs>({
+  } = useForm<ISignupFormInputs>({
     resolver: yupResolver(validationSchema),
   });
 
-  const onSubmit = async (data: SignupFormInputs) => {
+  const onSubmit = async (data: ISignupFormInputs) => {
     setMessage("");
     try {
       const { success, message: otpMessage } = await sendOtp(data.email, dispatch);

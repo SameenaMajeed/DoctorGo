@@ -2,14 +2,14 @@ import React from "react";
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
-interface MenuItemProps {
+interface IMenuItemProps {
   icon: React.ReactNode;
   label: string;
   to?: string;
   onClick?: () => void;
 }
 
-const MenuItem: React.FC<MenuItemProps> = ({ icon, label, to, onClick }) => {
+const MenuItem: React.FC<IMenuItemProps> = ({ icon, label, to, onClick }) => {
   const content = (
     <div
       onClick={onClick}

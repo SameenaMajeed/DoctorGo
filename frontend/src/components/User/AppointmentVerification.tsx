@@ -4,12 +4,11 @@ import Navbar from "./Home/Navbar";
 import Footer from "../CommonComponents/Footer";
 import api from "../../axios/UserInstance";
 import toast from "react-hot-toast";
-import { Slot } from "../../types/Slot";
+import { ISlot } from "../../types/Slot";
 import { useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
-import slotApi from "../../axios/SlotInstance";
 
-interface Doctor {
+interface IDoctor {
   _id: string;
   name: string;
   profilePicture: string;
@@ -17,7 +16,7 @@ interface Doctor {
   ticketPrice: number;
 }
 
-interface PaymentRequest {
+interface IPaymentRequest {
   amount: number;
   currency: string;
   appointmentData: {
@@ -37,8 +36,8 @@ const AppointmentVerification: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const { doctor, selectedSlot } = location.state as {
-    doctor: Doctor;
-    selectedSlot: Slot;
+    doctor: IDoctor;
+    selectedSlot: ISlot;
   };
 
   const userId = useSelector((state: RootState) => state.user?.user?.id);
@@ -51,7 +50,6 @@ const AppointmentVerification: React.FC = () => {
     hospitalNo: "",
   });
 
-
   const [errors, setErrors] = useState({
     patientName: "",
     contactNumber: "",
@@ -60,7 +58,12 @@ const AppointmentVerification: React.FC = () => {
   });
 
   const validateForm = () => {
-    let newErrors = { patientName: "", contactNumber: "", district: "", locality: "" };
+    let newErrors = {
+      patientName: "",
+      contactNumber: "",
+      district: "",
+      locality: "",
+    };
     let isValid = true;
 
     if (!formData.patientName.trim()) {
@@ -102,7 +105,6 @@ const AppointmentVerification: React.FC = () => {
       return;
     }
 
-  
     try {
       // // First check if slot is still available
       // const slotCheckResponse = await slotApi.get(`/time-slots/${selectedSlot._id}/availability`);
@@ -198,15 +200,7 @@ const AppointmentVerification: React.FC = () => {
               paymentMethod: "razorpay",
               ticketPrice: doctor.ticketPrice,
               appointmentDate: selectedSlot.date,
-              appointmentTime: `${new Date(
-                selectedSlot.startTime
-              ).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })} - ${new Date(selectedSlot.endTime).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}`,
+              appointmentTime: `${formatTimeString(selectedSlot.startTime)} - ${formatTimeString(selectedSlot.endTime)}`,
               patientDetails: { ...formData },
             };
 
@@ -238,12 +232,12 @@ const AppointmentVerification: React.FC = () => {
   const formatTimeString = (timeString: string) => {
     // Handle HH:mm format
     if (/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(timeString)) {
-      const [hours, minutes] = timeString.split(':').map(Number);
-      const period = hours >= 12 ? 'PM' : 'AM';
+      const [hours, minutes] = timeString.split(":").map(Number);
+      const period = hours >= 12 ? "PM" : "AM";
       const hours12 = hours % 12 || 12;
-      return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
+      return `${hours12}:${minutes.toString().padStart(2, "0")} ${period}`;
     }
-    
+
     // Handle ISO date string format (legacy)
     try {
       const date = new Date(timeString);
@@ -256,7 +250,7 @@ const AppointmentVerification: React.FC = () => {
     } catch (error) {
       console.error("Error formatting time:", error);
     }
-    
+
     return "Invalid Time";
   };
 
@@ -300,8 +294,7 @@ const AppointmentVerification: React.FC = () => {
 
               <p className="text-gray-700">
                 <strong>Time:</strong>{" "}
-                {formatTimeString(selectedSlot.startTime)}{" "}
-                -{" "}
+                {formatTimeString(selectedSlot.startTime)} -{" "}
                 {formatTimeString(selectedSlot.endTime)}
               </p>
             </div>

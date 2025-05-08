@@ -12,13 +12,13 @@ import { CalendarIcon, MoreHorizontal } from "lucide-react";
 import { format } from "date-fns";
 import doctorApi from "../../axios/DoctorInstance";
 import { useNavigate, useParams } from "react-router-dom";
-import { Appointment } from "../../Types";
-import { User } from "../../types/auth";
+import { IAppointment } from "../../Types";
+import { IUser } from "../../types/auth";
 
 const PatientDashboard: React.FC = () => {
   const navigate = useNavigate();
 
-  const [patients, setPatients] = useState<Appointment[]>([]);
+  const [patients, setPatients] = useState<IAppointment[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -162,7 +162,7 @@ const PatientDashboard: React.FC = () => {
           </thead>
           <tbody>
             {patients.map((booking) => {
-              const user = booking.user_id as User;
+              const user = booking.user_id as IUser;
               const createdAt = (booking as any)?.createdAt || "";
               const age = (user as any)?.age || "N/A";
               const mobile_no = (user as any)?.mobile_no || "N/A";

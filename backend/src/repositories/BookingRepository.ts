@@ -31,6 +31,22 @@ export class BookingRepository
     }
   }
 
+  async findAppointmentById(id: string): Promise<IBooking | null> {
+    try {
+      let appointment = await Booking.findById(id)
+      .select('doctor_id user_id status') // Only select needed fields
+      .lean();
+      console.log(appointment);
+      return appointment;
+    } catch (error) {
+      console.error("Error in findById:", error);
+      throw new AppError(
+        HttpStatus.InternalServerError,
+        MessageConstants.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   async updateStatus(
     id: string,
     status: AppointmentStatus
@@ -275,7 +291,7 @@ export class BookingRepository
     return await Booking.findOne({
       doctor_id: doctorId,
       user_id: patientId,
-      status: "completed", 
+      status: "completed",
     });
   }
 }

@@ -7,10 +7,10 @@ import slotApi from "../../../Api/SlotApis";
 import toast from "react-hot-toast";
 import useFetchData from "../../../Hooks/useFetchData";
 import Pagination from "../../../Pagination/Pagination";
-import { Slot } from "../../../types/Slot";
+import { ISlot } from "../../../types/Slot";
 
 const ManageSlots: React.FC = () => {
-  const [slots, setSlots] = useState<Slot[]>([]);
+  const [slots, setSlots] = useState<ISlot[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
   const [page, setPage] = useState(1);
@@ -57,7 +57,7 @@ const ManageSlots: React.FC = () => {
     }
   };
 
-  const getSlotStatus = (slot: Slot) => {
+  const getSlotStatus = (slot: ISlot) => {
     if (slot.isBlocked) return "blocked";
     if (slot.bookedCount >= slot.maxPatients) return "booked";
     if (slot.bookedCount > 0) return "partially-booked";

@@ -9,11 +9,14 @@ import TableActions from "./TableActions";
 import DataTable from "./DataTable";
 import AdminSidebar from "./Home/AdminSidebar";
 import { toast } from "react-hot-toast";
+import CancelConfirmationModal from "../CommonComponents/CancelConfirmationModal";
 
 const DoctorList: React.FC = () => {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [isBlockedFilter, setIsBlockedFilter] = useState("all");
+  const [blockingDoctorId, setBlockingDoctorId] = useState<string | null>(null);
+  const [showBlocking, setShowBlocking] = useState(false);
   const limit = 6;
 
   const fetchDoctorCallback = useCallback(
@@ -28,18 +31,34 @@ const DoctorList: React.FC = () => {
   const totalPages = Math.ceil(total / limit);
 
   const handleBlockedDoctors = async (doctorId: string, isBlocked: boolean) => {
-    const action = isBlocked ? "Block" : "Unblock";
-    if (window.confirm(`Do you really want to ${action.toLowerCase()} this user?`)) {
+    setBlockingDoctorId(doctorId);
+    setShowBlocking(true);
+  }
+
+  const confirmBlockUser = async () => {
+    if (!blockingDoctorId) return;
+
+    const action = doctors.find((u :any) => u._id === blockingDoctorId)?.isBlocked
+    ? "Unblock"
+    : "Block";
+
+    // const action = isBlocked ? "Block" : "Unblock";
+    const toastId = toast.loading(`Are you sure you want to ${action.toLowerCase()} this doctor?`);
+
       try {
-        await blockDoctor(doctorId, isBlocked);
-        toast.success(`User has been ${action.toLowerCase()}ed successfully.`);
+        await blockDoctor(blockingDoctorId, !doctors.find((u : any) => u._id === blockingDoctorId)?.isBlocked);
+      toast.success(`Doctor has been ${action.toLowerCase()}ed successfully.`, { id: toastId });
         refetch();
       } catch (err) {
         console.error("Error blocking/unblocking doctor:", err);
         toast.error("Something went wrong. Please try again.");
       }
+      finally {
+        setShowBlocking(false);
+        setBlockingDoctorId(null);
+      }
     }
-  };
+  
 
   const handleApproveDoctor = async (doctorId: string) => {
     if (window.confirm("Do you really want to approve this doctor?")) {
@@ -69,6 +88,12 @@ const DoctorList: React.FC = () => {
       setPage(newPage);
     }
   };
+
+  const handleCloseModal = () => {
+    setShowBlocking(false);
+    setBlockingDoctorId(null);
+  };
+
 
   if (loading) return <Loader />;
   if (error)
@@ -127,6 +152,15 @@ const DoctorList: React.FC = () => {
               )}
             />
           </div>
+
+          <CancelConfirmationModal
+            isOpen={showBlocking}
+            onConfirm={confirmBlockUser}
+            onClose={handleCloseModal}
+            message={`Are you sure you want to ${
+              doctors.find((u:any) => u._id === blockingDoctorId)?.isBlocked ? "unblock" : "block"
+            } this doctor?`}
+          />
 
           {/* Pagination */}
           {totalPages > 1 && (
