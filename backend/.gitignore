@@ -4,4 +4,4 @@ node_modules/
 src/config/serviceAccountKey.json
 logs/
 *.log
-uploads/
+src/uploads/
