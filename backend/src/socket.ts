@@ -1,9 +1,9 @@
 import { Server, Socket } from "socket.io";
 import { Server as HttpServer } from "http";
 import { verifyToken } from "./utils/jwt";
-import messageModel from "./models/messageModel";
-import userModel from "./models/userModel";
-import doctorModel from "./models/DoctorModel";
+import messageModel from "./models/commonModel/messageModel";
+import userModel from "./models/userModel/userModel";
+import doctorModel from "./models/doctorMpdel/DoctorModel";
 
 import dotenv from "dotenv";
 dotenv.config();

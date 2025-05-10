@@ -335,7 +335,7 @@ const ChatPage: React.FC = () => {
               >
                 <div className="relative">
                   <img
-                    src={user.profilePicture}
+                    src={user.profilePicture || "profile.png"}
                     alt={user.name}
                     className="w-10 h-10 rounded-full mr-3 object-cover"
                   />
@@ -380,7 +380,7 @@ const ChatPage: React.FC = () => {
             <div className="border-b border-gray-200 bg-white p-4 flex items-center">
               <div className="relative">
                 <img
-                  src={selectedUser.profilePicture}
+                  src={selectedUser.profilePicture || "profile.png"}
                   alt={selectedUser.name}
                   className="w-12 h-12 rounded-full mr-4 object-cover"
                 />

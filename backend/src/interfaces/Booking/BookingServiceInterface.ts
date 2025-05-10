@@ -1,5 +1,5 @@
-import { IBooking } from "../../models/BookingModel";
-import {AppointmentStatus} from '../../models/BookingModel'
+import { IBooking } from "../../models/commonModel/BookingModel";
+import {AppointmentStatus} from '../../models/commonModel/BookingModel'
 
 export interface IBookingService {
     bookAppointment(bookingData: Partial<IBooking>): Promise<IBooking> ;

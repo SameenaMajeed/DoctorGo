@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../../axios/UserInstance";
-import image from '../../../assets/doc1.png';
-import { Doctor } from "../../../Types";
+import { IDoctor } from "../../../Types";
 
 // // Define TypeScript interface for doctors
 // interface Doctor {
@@ -12,15 +11,15 @@ import { Doctor } from "../../../Types";
 //   specialization: string;
 // }
 
-const TopDoctors = () => {
+const TopDoctors :React.FC = () => {
   const navigate = useNavigate();
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [doctors, setDoctors] = useState<IDoctor[]>([]);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await api.get<{ data: Doctor[], message: string, success: boolean }>("/doctors");
+        const response = await api.get<{ data: IDoctor[], message: string, success: boolean }>("/doctors");
         console.log("response:", response);
 
         if (response.data.success) {
@@ -64,7 +63,7 @@ const TopDoctors = () => {
                 className="bg-white/70 backdrop-blur-lg border border-gray-200 p-5 rounded-2xl shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-2xl"
               >
                 <img
-                  src={item.profilePicture}
+                  src={item.profilePicture || "profile.png"}
                   alt={item.name}
                   className="w-full h-56 object-cover rounded-xl"
                 />

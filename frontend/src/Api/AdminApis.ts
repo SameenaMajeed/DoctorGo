@@ -1,6 +1,6 @@
 import adminApi from "../axios/AdminInstance";
-import { Doctor } from "../Types";
-import { AxiosError } from "../types/auth";
+import { IDoctor } from "../Types";
+import { IAxiosError } from "../types/auth";
 
 // login
 type AdminLoginCredentials = {
@@ -44,7 +44,7 @@ export const adminLoginService = async (
       accessToken
     };
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as IAxiosError;
     let errorMessage = "Invalid email or password. Please try again.";
 
     if (axiosError.response) {
@@ -88,7 +88,7 @@ interface PendingDoctorsResponse {
   success: boolean;
   message: string;
   data: {
-    doctors: Doctor[];
+    doctors: IDoctor[];
     total: number;
     page: number;
     limit: number;
@@ -123,7 +123,7 @@ export const fetchPendingDoctors = async (
       total: response.data.data.total || 0
     };
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as IAxiosError;
     let errorMessage = 'Failed to fetch pending doctors';
 
     if (axiosError.response) {
@@ -193,7 +193,7 @@ export const updateDoctorStatus = async (
       shouldRemove: true, // Indicates this doctor should be removed from the list
     };
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as IAxiosError;
     let errorMessage = 'Failed to update doctor status';
 
     if (axiosError.response) {

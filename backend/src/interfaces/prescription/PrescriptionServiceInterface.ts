@@ -1,4 +1,4 @@
-import { IPrescription } from "../../models/prescriptionmodel";
+import { IPrescription } from "../../models/commonModel/prescriptionmodel";
 
 export interface IPrescriptionService{
     createPrescription(prescriptionData: IPrescription): Promise<IPrescription>

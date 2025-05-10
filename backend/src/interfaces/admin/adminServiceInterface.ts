@@ -1,4 +1,4 @@
-import { IDoctor } from "../../models/DoctorModel";
+import { IDoctor } from "../../models/doctorMpdel/DoctorModel";
 
 export interface IAdminService {
   adminLogin(

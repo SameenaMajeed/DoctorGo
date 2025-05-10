@@ -1,4 +1,4 @@
-import { IReview, Review } from "../../models/ReviewModel";
+import { IReview, Review } from "../../models/commonModel/ReviewModel";
 
 export interface IReviewRepository {
     createReview(reviewData: Review): Promise<IReview>;

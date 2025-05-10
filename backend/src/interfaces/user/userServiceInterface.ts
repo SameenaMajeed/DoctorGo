@@ -1,7 +1,7 @@
-import { IUser } from "../../models/userModel";
+import { IUser } from "../../models/userModel/userModel";
 import { googleUserData } from "../../types/google";
-import { ForgotPasswordResponse } from "../../services/userServices";
-import { IDoctor } from "../../models/DoctorModel";
+import { ForgotPasswordResponse } from "../../services/userService/userServices";
+import { IDoctor } from "../../models/doctorMpdel/DoctorModel";
 
 export interface IUserService {
   registerUser(

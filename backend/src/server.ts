@@ -11,11 +11,11 @@ import path from "path";
 import { initializeSocket } from "./socket";
 
 // Import routes
-import userRoute from './routes/userRoutes';
-import otpRoute from './routes/OtpRoutes';
-import doctorRoute from './routes/doctorRoutes';
-import adminRoute from './routes/adminRoutes';
-import slotRoute from './routes/slotRoutes';
+import userRoute from './routes/userRoute/userRoutes';
+import otpRoute from './routes/commonRoute/OtpRoutes';
+import doctorRoute from './routes/doctorRoute/doctorRoutes';
+import adminRoute from './routes/adminRoute/adminRoutes';
+import slotRoute from './routes/commonRoute/slotRoutes';
 
 dotenv.config();
 

@@ -1,8 +1,8 @@
 import React from 'react';
-import { assets, specialityData } from '../../../assets/assets';
+import { specialityData } from '../../../assets/assets';
 import { Link } from 'react-router-dom';
 
-const SpecialityMenu = () => {
+const SpecialityMenu : React.FC = () => {
   return (
     <div id='speciality' className='py-12 px-4 bg-white text-center'>
       <h1 className='text-3xl font-bold text-gray-900 mb-4'>Find by Speciality</h1>

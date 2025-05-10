@@ -4,13 +4,12 @@ import { Button } from "../CommonComponents/Button";
 import TextArea from "../CommonComponents/TextArea";
 import { Plus, Trash2 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import  {IUser } from "../../types/auth";
+import { IUser } from "../../types/auth";
 import { IAppointment } from "../../Types";
 import { useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
 import doctorApi from "../../axios/DoctorInstance";
 import toast from "react-hot-toast";
-
 
 interface IMedicine {
   name: string;
@@ -40,75 +39,71 @@ const NewRecord: React.FC = () => {
     attachments: string[]
   ): FormErrors => {
     const newErrors: FormErrors = {};
-  
+
     // Validate complaints
-    if (!complaints) {
+    if (!complaints || !complaints.trim()) {
       newErrors.complaints = "Complaints are required";
-    } else if (complaints.length < 5) {
+    } else if (complaints.trim().length < 5) {
       newErrors.complaints = "Complaints must be at least 5 characters";
     }
-  
+
     // Validate diagnosis
-    if (!diagnosis) {
+    if (!diagnosis || !diagnosis.trim()) {
       newErrors.diagnosis = "Diagnosis is required";
-    } else if (diagnosis.length < 10) {
+    } else if (diagnosis.trim().length < 10) {
       newErrors.diagnosis = "Diagnosis must be at least 10 characters";
     }
-  
-    // Validate vitalSigns (optional, no validation needed)
-  
+
     // Validate medicines
     if (medicines.length === 0) {
       newErrors.medicines = "At least one medicine is required";
     } else {
       medicines.forEach((medicine, index) => {
         const medicineErrors: { [key: string]: string } = {};
-  
+
         // Validate medicine name
-        if (!medicine.name) {
+        if (!medicine.name || !medicine.name.trim()) {
           medicineErrors.name = "Medicine name is required";
-        } else if (medicine.name.length < 2) {
+        } else if (medicine.name.trim().length < 2) {
           medicineErrors.name = "Medicine name must be at least 2 characters";
         }
-  
+
         // Validate dosage
-        if (!medicine.dosage) {
+        if (!medicine.dosage || !medicine.dosage.trim()) {
           medicineErrors.dosage = "Dosage is required";
-        } else if (medicine.dosage.length < 2) {
+        } else if (medicine.dosage.trim().length < 2) {
           medicineErrors.dosage = "Dosage must be at least 2 characters";
         }
-  
+
         // Validate instruction
-        if (!medicine.instruction) {
+        if (!medicine.instruction || !medicine.instruction.trim()) {
           medicineErrors.instruction = "Instruction is required";
-        } else if (medicine.instruction.length < 2) {
-          medicineErrors.instruction = "Instruction must be at least 2 characters";
+        } else if (medicine.instruction.trim().length < 2) {
+          medicineErrors.instruction =
+            "Instruction must be at least 2 characters";
         }
-  
+
         // Validate quantity
         if (medicine.quantity < 1) {
           medicineErrors.quantity = "Quantity must be at least 1";
         }
-  
+
         // If there are errors for this medicine, add them to newErrors with the index
         if (Object.keys(medicineErrors).length > 0) {
           newErrors[`medicines[${index}]`] = JSON.stringify(medicineErrors);
         }
       });
     }
-  
-    // Validate attachments (optional, no validation needed)
-  
-    return newErrors;
-  };  
 
-   const {
-      doctor,
-      isAuthenticated,
-      loading: reduxLoading,
-    } = useSelector((state: RootState) => state.doctor);
-    console.log('doctor data fetched:',doctor)
-  
+    return newErrors;
+  };
+
+  const {
+    doctor,
+    isAuthenticated,
+    loading: reduxLoading,
+  } = useSelector((state: RootState) => state.doctor);
+  console.log("doctor data fetched:", doctor);
 
   if (!isAuthenticated || !doctor) {
     return (
@@ -119,7 +114,6 @@ const NewRecord: React.FC = () => {
       </div>
     );
   }
-  
 
   const navigate = useNavigate();
 
@@ -161,7 +155,7 @@ const NewRecord: React.FC = () => {
         vitalSigns: vitalSigns,
         medicines: medicines.map((med) => ({
           name: med.name,
-          dosage : med.dosage,
+          dosage: med.dosage,
           quantity: med.quantity,
           time_gap: med.instruction,
         })),
@@ -176,13 +170,13 @@ const NewRecord: React.FC = () => {
 
       // Handle success
       console.log("Prescription created:", response.data);
-      toast.success('Prescription created successfully');
+      toast.success("Prescription created successfully");
       navigate(`/doctor/patient-records/${patient._id}`, {
-          state: {
-            patient,
-            appointment,
-          },
-        });
+        state: {
+          patient,
+          appointment,
+        },
+      });
     } catch (error) {
       console.error("Error creating prescription:", error);
       // Handle error (show error message to user)
@@ -219,7 +213,11 @@ const NewRecord: React.FC = () => {
     setErrors(updatedErrors);
   };
 
-  const updateMedicine = (index: number, field: keyof IMedicine, value: any) => {
+  const updateMedicine = (
+    index: number,
+    field: keyof IMedicine,
+    value: any
+  ) => {
     const updatedMedicines = [...medicines];
     updatedMedicines[index] = {
       ...updatedMedicines[index],
@@ -254,7 +252,6 @@ const NewRecord: React.FC = () => {
   //   setMedicines(updatedMedicines);
   // };
 
-
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
@@ -271,7 +268,7 @@ const NewRecord: React.FC = () => {
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Sidebar Card (unchanged) */}
-          
+
           <div>
             <Card className="items-center text-center p-6 shadow-md border border-gray-200">
               <img
@@ -287,15 +284,22 @@ const NewRecord: React.FC = () => {
               <span className="inline-block bg-green-100 text-green-800 rounded-full px-3 py-1 text-sm mt-3">
                 Age : {patient.age}
               </span>
-               <div>
-               <Button variant="outline"  
-                  className="w-full mt-4 bg-white hover:bg-gray-100 text-blue-600 border-blue-600 hover:border-blue-700 transition duration-200" onClick={()=>navigate(`/doctor/patient-records/${patient._id}`, {
-          state: {
-            patient,
-            appointment,
-          },
-        })}>Back</Button>
-               </div>
+              <div>
+                <Button
+                  variant="outline"
+                  className="w-full mt-4 bg-white hover:bg-gray-100 text-blue-600 border-blue-600 hover:border-blue-700 transition duration-200"
+                  onClick={() =>
+                    navigate(`/doctor/patient-records/${patient._id}`, {
+                      state: {
+                        patient,
+                        appointment,
+                      },
+                    })
+                  }
+                >
+                  Back
+                </Button>
+              </div>
             </Card>
           </div>
 
@@ -320,7 +324,9 @@ const NewRecord: React.FC = () => {
                 id="complaints"
                 label="Complaints"
                 value={complaints}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setComplaints(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setComplaints(e.target.value)
+                }
                 placeholder="Complaints (e.g. Bad breath, toothache...)"
               />
               {errors.complaints && (
@@ -334,7 +340,9 @@ const NewRecord: React.FC = () => {
                 id="diagnosis"
                 label="Diagnosis"
                 value={diagnosis}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDiagnosis(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setDiagnosis(e.target.value)
+                }
                 placeholder="Diagnosis (e.g. Gingivitis, Periodontitis...)"
               />
               {errors.diagnosis && (
@@ -393,7 +401,9 @@ const NewRecord: React.FC = () => {
                                 className="w-full border-b border-gray-300 focus:outline-none"
                               />
                               {medicineErrors.name && (
-                                <p className="text-red-500 text-xs">{medicineErrors.name}</p>
+                                <p className="text-red-500 text-xs">
+                                  {medicineErrors.name}
+                                </p>
                               )}
                             </td>
                             <td className="p-3">
@@ -401,12 +411,18 @@ const NewRecord: React.FC = () => {
                                 type="text"
                                 value={medicine.instruction}
                                 onChange={(e) =>
-                                  updateMedicine(index, "instruction", e.target.value)
+                                  updateMedicine(
+                                    index,
+                                    "instruction",
+                                    e.target.value
+                                  )
                                 }
                                 className="w-full border-b border-gray-300 focus:outline-none"
                               />
                               {medicineErrors.instruction && (
-                                <p className="text-red-500 text-xs">{medicineErrors.instruction}</p>
+                                <p className="text-red-500 text-xs">
+                                  {medicineErrors.instruction}
+                                </p>
                               )}
                             </td>
                             <td className="p-3">
@@ -414,12 +430,18 @@ const NewRecord: React.FC = () => {
                                 type="text"
                                 value={medicine.dosage}
                                 onChange={(e) =>
-                                  updateMedicine(index, "dosage", e.target.value)
+                                  updateMedicine(
+                                    index,
+                                    "dosage",
+                                    e.target.value
+                                  )
                                 }
                                 className="w-full border-b border-gray-300 focus:outline-none"
                               />
                               {medicineErrors.dosage && (
-                                <p className="text-red-500 text-xs">{medicineErrors.dosage}</p>
+                                <p className="text-red-500 text-xs">
+                                  {medicineErrors.dosage}
+                                </p>
                               )}
                             </td>
                             <td className="p-3">
@@ -427,13 +449,19 @@ const NewRecord: React.FC = () => {
                                 type="number"
                                 value={medicine.quantity}
                                 onChange={(e) =>
-                                  updateMedicine(index, "quantity", parseInt(e.target.value) || 1)
+                                  updateMedicine(
+                                    index,
+                                    "quantity",
+                                    parseInt(e.target.value) || 1
+                                  )
                                 }
                                 className="w-full border-b border-gray-300 focus:outline-none"
                                 min="1"
                               />
                               {medicineErrors.quantity && (
-                                <p className="text-red-500 text-xs">{medicineErrors.quantity}</p>
+                                <p className="text-red-500 text-xs">
+                                  {medicineErrors.quantity}
+                                </p>
                               )}
                             </td>
                             <td className="p-3">
@@ -450,7 +478,10 @@ const NewRecord: React.FC = () => {
                       })
                     ) : (
                       <tr>
-                        <td colSpan={8} className="p-3 text-center text-gray-500">
+                        <td
+                          colSpan={8}
+                          className="p-3 text-center text-gray-500"
+                        >
                           No medicines added
                         </td>
                       </tr>

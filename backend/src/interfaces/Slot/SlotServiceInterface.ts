@@ -1,4 +1,4 @@
-import { ISlot } from "../../models/SlotModel";
+import { ISlot } from "../../models/commonModel/SlotModel";
 
 export interface ISlotService {
     createSlot(slot: ISlot): Promise<ISlot | ISlot[]>;

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { HttpStatus } from "../constants/Httpstatus";
 import { MessageConstants } from "../constants/MessageConstants";
-import DoctorModel from "../models/DoctorModel";
+import DoctorModel from "../models/doctorMpdel/DoctorModel";
 import { sendError } from "../utils/responseUtils";
 
 interface AuthenticatedRequest extends Request {

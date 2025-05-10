@@ -14,45 +14,33 @@ import doctorApi from "../../axios/DoctorInstance";
 import { useNavigate, useParams } from "react-router-dom";
 import { IAppointment } from "../../Types";
 import { IUser } from "../../types/auth";
-import Pagination from "../../Pagination/Pagination";
 
 const PatientDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { doctorId } = useParams<{ doctorId: string }>();
 
   const [patients, setPatients] = useState<IAppointment[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [gender, setGender] = useState("");
   const [sortBy, setSortBy] = useState("");
+  const [date, setDate] = useState(new Date());
 
-  const date = new Date();
-
-   // Pagination state
-   const [currentPage, setCurrentPage] = useState(1);
-   const [totalPages, setTotalPages] = useState(1);
-  //  const [totalPatients, setTotalPatients] = useState(0);
-   const patientsPerPage = 10;
-
-  const { doctorId } = useParams<{ doctorId: string }>();
+  
 
   useEffect(() => {
     const fetchPatients = async () => {
       try {
         const response = await doctorApi.get(`/${doctorId}/patients`, {
           params: {
-            page: currentPage,
-            limit: patientsPerPage,
             search: searchTerm,
             gender,
             sort: sortBy,
-            date: date.toISOString().split('T')[0] // Format as YYYY-MM-DD
-          }
-        })
+            date: date.toISOString().split("T")[0],
+          },
+        });
         console.log("API response:", response.data.data.patients);
         setPatients(response.data.data.patients);
-        // setTotalPatients(response.data.data.total || response.data.data.patients.length);
-        setTotalPages(Math.ceil(response.data.data.total / patientsPerPage));
       } catch (error) {
         console.error("Failed to fetch patients", error);
       } finally {
@@ -61,17 +49,7 @@ const PatientDashboard: React.FC = () => {
     };
 
     fetchPatients();
-  }, [doctorId , currentPage, searchTerm, gender, sortBy, date]);
-
-  // Handle page change
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  // Reset to first page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, gender, sortBy, date]);
+  }, [doctorId, searchTerm, gender, sortBy, date]);
 
   const formatDate = (dateString: string) => {
     try {
@@ -87,13 +65,6 @@ const PatientDashboard: React.FC = () => {
       return "Invalid Date";
     }
   };
-
-  // const handleFilter = patients.filter((patient)=>{
-  //   const appointmentDate = formatDate(patient.appointmentDate); 
-  //   const name = formatDate(patient.); 
-  //   const appointmentDate = formatDate(patient.appointmentDate); 
-  //   const appointmentDate = formatDate(patient.appointmentDate); 
-  // })
 
   if (loading) return <div>Loading...</div>;
 
@@ -121,61 +92,41 @@ const PatientDashboard: React.FC = () => {
       </div>
 
       <div className="flex gap-4 items-center flex-wrap">
-      <TextInput
-        placeholder="Search Patients"
-        className="w-1/3 min-w-[200px]"
-        value={searchTerm}
-        onChange={(e : any) => setSearchTerm(e.target.value)}
-      />
+        <TextInput
+          placeholder="Search Patients"
+          className="w-1/3 min-w-[200px]"
+          value={searchTerm}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setSearchTerm(e.target.value)
+          }
+        />
 
-      <select
-        className="border rounded px-3 py-2 text-sm"
-        value={sortBy}
-        onChange={(e) => setSortBy(e.target.value)}
-      >
-        <option value="">Sort by...</option>
-        <option value="date">Date</option>
-        <option value="name">Name</option>
-      </select>
-
-      <select
-        className="border rounded px-3 py-2 text-sm"
-        value={gender}
-        onChange={(e) => setGender(e.target.value)}
-      >
-        <option value="">Gender...</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        <option value="Other">Other</option>
-      </select>
-
-      <div className="flex items-center gap-2 border rounded px-3 py-2">
-        <CalendarIcon className="h-4 w-4" />
-        <span className="text-sm">{format(date, "MM/dd/yyyy")}</span>
-      </div>
-
-      {/* <Button className="ml-auto" onClick={handleFilter}>
-        Filter
-      </Button> */}
-    </div>
-
-      {/* <div className="flex gap-4 items-center">
-        <TextInput placeholder="Search Patients" className="w-1/3" />
-        <select className="border rounded px-3 py-2">
-          <option>Sort by...</option>
+        <select
+          className="border rounded px-3 py-2 text-sm"
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+        >
+          <option value="">Sort by...</option>
+          <option value="date">Date</option>
+          <option value="name">Name</option>
         </select>
-        <select className="border rounded px-3 py-2">
-          <option>Gender...</option>
+
+        <select
+          className="border rounded px-3 py-2 text-sm"
+          value={gender}
+          onChange={(e) => setGender(e.target.value)}
+        >
+          <option value="">Gender...</option>
           <option value="Male">Male</option>
           <option value="Female">Female</option>
           <option value="Other">Other</option>
         </select>
+
         <div className="flex items-center gap-2 border rounded px-3 py-2">
           <CalendarIcon className="h-4 w-4" />
-          <span>{format(new Date(), "MM/dd/yyyy")}</span>
+          <span className="text-sm">{format(date, "MM/dd/yyyy")}</span>
         </div>
-        <Button className="ml-auto">Filter</Button>
-      </div> */}
+      </div>
 
       <div className="bg-white rounded-xl shadow">
         <table className="min-w-full text-sm text-left">
@@ -192,11 +143,9 @@ const PatientDashboard: React.FC = () => {
           <tbody>
             {patients.map((booking) => {
               const user = booking.user_id as IUser;
-              const createdAt = (booking as any)?.createdAt || "";
               const age = (user as any)?.age || "N/A";
               const mobile_no = (user as any)?.mobile_no || "N/A";
-              const appoDate = booking.appointmentDate;
-              const appointmentDate = new Date(appoDate)
+              const appointmentDate = new Date(booking.appointmentDate)
                 .toISOString()
                 .split("T")[0];
 
@@ -265,12 +214,6 @@ const PatientDashboard: React.FC = () => {
             })}
           </tbody>
         </table>
-        {/* Pagination component */}
-        <Pagination 
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
       </div>
     </div>
   );

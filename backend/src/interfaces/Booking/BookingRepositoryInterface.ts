@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { AppointmentStatus, IBooking } from "../../models/BookingModel";
+import { AppointmentStatus, IBooking } from "../../models/commonModel/BookingModel";
 
 export interface IBookingRepository {
     create(bookingData: Partial<IBooking>): Promise<IBooking>;

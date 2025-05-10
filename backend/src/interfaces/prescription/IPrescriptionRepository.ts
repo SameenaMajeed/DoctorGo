@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { IPrescription } from "../../models/prescriptionmodel";
+import { IPrescription } from "../../models/commonModel/prescriptionmodel";
 
 export default interface IPrescriptionRepository {
   createPrescription(prescription: IPrescription): Promise<IPrescription>;

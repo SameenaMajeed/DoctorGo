@@ -372,7 +372,7 @@ const Chat: React.FC = () => {
                 >
                   <div className="relative mr-3">
                     <img
-                      src={doctor.profilePicture}
+                      src={doctor.profilePicture || "profile.png"}
                       alt={doctor.name}
                       className="w-12 h-12 rounded-full object-cover border border-gray-200"
                     />
@@ -418,7 +418,7 @@ const Chat: React.FC = () => {
             <div className="bg-white p-4 flex items-center border-b border-gray-200 shadow-sm">
               <div className="relative mr-4">
                 <img
-                  src={selectedDoctor.profilePicture}
+                  src={selectedDoctor.profilePicture || "profile.png"}
                   alt={selectedDoctor.name}
                   className="w-12 h-12 rounded-full object-cover border border-gray-200"
                 />
