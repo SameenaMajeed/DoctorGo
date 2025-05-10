@@ -63,6 +63,8 @@ export default class SlotController {
       const limit = parseInt(req.query.limit as string) || 10;
       const searchTerm = (req.query.searchTerm as string) || "";
 
+      console.log('Request params:', { doctorId, date, page, limit, searchTerm });
+
       if (!doctorId) {
         return sendError(res, HttpStatus.BadRequest, "Doctor ID is required");
       }

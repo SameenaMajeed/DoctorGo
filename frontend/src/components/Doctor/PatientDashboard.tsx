@@ -14,6 +14,7 @@ import doctorApi from "../../axios/DoctorInstance";
 import { useNavigate, useParams } from "react-router-dom";
 import { IAppointment } from "../../Types";
 import { IUser } from "../../types/auth";
+import Pagination from "../../Pagination/Pagination";
 
 const PatientDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -24,16 +25,34 @@ const PatientDashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [gender, setGender] = useState("");
   const [sortBy, setSortBy] = useState("");
-  const [date, setDate] = useState(new Date());
+
+  const date = new Date();
+
+   // Pagination state
+   const [currentPage, setCurrentPage] = useState(1);
+   const [totalPages, setTotalPages] = useState(1);
+  //  const [totalPatients, setTotalPatients] = useState(0);
+   const patientsPerPage = 10;
 
   const { doctorId } = useParams<{ doctorId: string }>();
 
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await doctorApi.get(`/${doctorId}/patients`);
+        const response = await doctorApi.get(`/${doctorId}/patients`, {
+          params: {
+            page: currentPage,
+            limit: patientsPerPage,
+            search: searchTerm,
+            gender,
+            sort: sortBy,
+            date: date.toISOString().split('T')[0] // Format as YYYY-MM-DD
+          }
+        })
         console.log("API response:", response.data.data.patients);
         setPatients(response.data.data.patients);
+        // setTotalPatients(response.data.data.total || response.data.data.patients.length);
+        setTotalPages(Math.ceil(response.data.data.total / patientsPerPage));
       } catch (error) {
         console.error("Failed to fetch patients", error);
       } finally {
@@ -42,7 +61,17 @@ const PatientDashboard: React.FC = () => {
     };
 
     fetchPatients();
-  }, [doctorId]);
+  }, [doctorId , currentPage, searchTerm, gender, sortBy, date]);
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, gender, sortBy, date]);
 
   const formatDate = (dateString: string) => {
     try {
@@ -236,6 +265,12 @@ const PatientDashboard: React.FC = () => {
             })}
           </tbody>
         </table>
+        {/* Pagination component */}
+        <Pagination 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );

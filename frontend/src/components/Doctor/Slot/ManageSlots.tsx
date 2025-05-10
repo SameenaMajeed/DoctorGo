@@ -24,7 +24,7 @@ const ManageSlots: React.FC = () => {
       const response = await slotApi.get(`/time-slots/${doctor?._id}`, {
         params: { page, limit, searchTerm, _: new Date().getTime() },
       });
-      console.log(response.data.data)
+      console.log('slots',response.data.data)
   
       if (response.data.data) {
         setSlots(response.data.data.slots || []);

@@ -104,44 +104,6 @@ const SignupForm: React.FC = () => {
     }
   };
 
-  // const onSubmit = async (data: SignupFormInputs) => {
-  //   setMessage("");
-  //   try {
-  //     const { success, message: otpMessage } = await sendOtp(
-  //       data.email,
-  //       dispatch
-  //     );
-  //     setMessage(otpMessage);
-  //     if (success) setShowOtpModal(true);
-  //   } catch (error) {
-  //     console.error("Error sending OTP:", error);
-  //     setMessage("Failed to send OTP. Please try again.");
-  //   }
-  // };
-
-  // const handleOtpSuccess = async (successMessage: string) => {
-  //   setMessage(successMessage);
-  //   setShowOtpModal(false);
-  //   const data = getValues();
-
-  //   try {
-  //     dispatch(setLoading());
-  //     await api.post("/register", {
-  //       name: data.name,
-  //       email: data.email,
-  //       password: data.password,
-  //       mobile_no: data.mobileNo,
-  //       gender: data.gender,
-  //     });
-  //     setMessage("User registered successfully!");
-  //     navigate("/login");
-  //   } catch (error) {
-  //     console.error("Error registering user:", error);
-  //     dispatch(setError("Error registering user."));
-  //     setMessage("Error registering user. Please try again.");
-  //   }
-  // };
-
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />

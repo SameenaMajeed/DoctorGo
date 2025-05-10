@@ -130,7 +130,7 @@ userRoute.post("/reset-password", (req: Request, res: Response) => {
 userRoute.get(
   "/doctors",
   authenticateToken("user"),
-  // blockedUserMiddleware,
+  blockedUserMiddleware,
   (req: Request, res: Response) => {
     userController.getAllDoctors(req, res);
   }

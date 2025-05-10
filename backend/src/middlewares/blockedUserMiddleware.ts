@@ -9,11 +9,13 @@ const blockedUserMiddleware = async (
   try {
     const email = req.data?.email || req.body.email;
 
-    console.log('email : ' ,email)
+    console.log("email : ", email);
 
     if (!email) {
-      res.status(400).json({ message: 'Email is required to check block status' });
-      return
+      res
+        .status(400)
+        .json({ message: "Email is required to check block status" });
+      return;
     }
     const user = await User.findOne({ email });
 

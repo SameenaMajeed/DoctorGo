@@ -94,7 +94,7 @@ export const routes = (
         <Route path="/doctor/newRecords" element={< NewRecord/>} />
         <Route path="/doctor/:doctorId/patients" element={<PatientDashboard />} />
         <Route path="/myChats" element={< ChatPage/>} />
-        <Route path="/reviews/doctor/:doctorId" element={< DoctorReviews/>} />
+        <Route path="/doctor/reviews/:doctorId" element={< DoctorReviews/>} />
         <Route
           path="/doctor/slots/emergency-block"
           element={<EmergencyBlock />}

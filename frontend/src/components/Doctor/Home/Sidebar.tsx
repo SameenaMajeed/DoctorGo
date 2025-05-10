@@ -36,11 +36,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onRestrictedAction }) => {
   const doctorId = doctor?._id;
   console.log("doctorId from sideBar :", doctorId);
 
-  const userId = user?.id
+  // const userId = user?.id
+
 
   const appointmentsPath = doctorId ? `/doctor/${doctorId}/appointments` : "#";
   const patientPath = doctorId ? `/doctor/${doctorId}/patients` : "#";
-  const review = userId ? `/reviews/doctor/${doctorId}` : "#";
+  const review = doctorId ? `/doctor/reviews/${doctorId}` : "#";
 
 
   return (
