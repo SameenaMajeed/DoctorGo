@@ -470,10 +470,13 @@ export class BookingService implements IBookingService {
   }
 
   // get user data for a perticular doctor:
-  async getPatientsForDoctor(doctorId: string) :Promise<IBooking[]> {
+  async getPatientsForDoctor(doctorId: string, page: number = 1,
+    limit: number = 10,) :Promise<{patients: IBooking[] ; total: number }> {
     console.log('from service',doctorId)
-    const patients = await this._bookingRepo.getPatientsForDoctor(doctorId);
+    const {patients , total} = await this._bookingRepo.getPatientsForDoctor(doctorId ,
+      page,
+      limit,);
     console.log('patient from service',patients)
-    return patients
+    return {patients , total}
 }
 }

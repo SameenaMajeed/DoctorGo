@@ -276,14 +276,22 @@ export class BookingRepository
   }
 
   // get User data for the perticular doctor
-  async getPatientsForDoctor(doctorId: string): Promise<IBooking[]> {
+  async getPatientsForDoctor(
+    doctorId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ patients: IBooking[]; total: number }> {
     console.log("from repo", doctorId);
-    const patients = await Booking.find({ doctor_id: doctorId })
+    const [patients , total] = await Promise.all([
+      Booking.find({ doctor_id: doctorId })
       .populate("user_id", "name email mobile_no gender age profilePicture")
-      .exec();
-
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec(),
+      Booking.countDocuments({ doctor_id: doctorId }),  
+    ]);
     console.log("patient from repository", patients);
-    return patients;
+    return {patients, total};
   }
 
   // review

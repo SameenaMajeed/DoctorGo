@@ -14,6 +14,7 @@ import doctorApi from "../../axios/DoctorInstance";
 import { useNavigate, useParams } from "react-router-dom";
 import { IAppointment } from "../../Types";
 import { IUser } from "../../types/auth";
+import Pagination from "../../Pagination/Pagination";
 
 const PatientDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -26,7 +27,10 @@ const PatientDashboard: React.FC = () => {
   const [sortBy, setSortBy] = useState("");
   const [date, setDate] = useState(new Date());
 
-  
+  const [page, setPage] = useState(1);
+  const limit = 5;
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalPatients, setTotalPatients] = useState(0);
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -37,10 +41,18 @@ const PatientDashboard: React.FC = () => {
             gender,
             sort: sortBy,
             date: date.toISOString().split("T")[0],
+            page,
+            limit
           },
         });
-        console.log("API response:", response.data.data.patients);
-        setPatients(response.data.data.patients);
+        console.log("API response:", response.data.data);
+
+        const { patients, total } = response.data.data;
+
+        setPatients(patients);
+        setTotalPatients(total);
+        setTotalPages(Math.ceil(total / limit));
+
       } catch (error) {
         console.error("Failed to fetch patients", error);
       } finally {
@@ -49,7 +61,11 @@ const PatientDashboard: React.FC = () => {
     };
 
     fetchPatients();
-  }, [doctorId, searchTerm, gender, sortBy, date]);
+  }, [doctorId, searchTerm, gender, sortBy, date, page, limit]);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
 
   const formatDate = (dateString: string) => {
     try {
@@ -215,6 +231,13 @@ const PatientDashboard: React.FC = () => {
           </tbody>
         </table>
       </div>
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      )}
     </div>
   );
 };

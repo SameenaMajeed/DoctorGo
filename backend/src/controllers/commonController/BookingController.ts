@@ -378,12 +378,27 @@ export class BookingController {
   async getPatients(req: Request, res: Response) {
     try {
       const doctorId = req.params.doctorId;
-      console.log(doctorId);
-      const patients = await this.bookingService.getPatientsForDoctor(doctorId);
-      console.log("patients :", patients);
-      sendResponse(res, HttpStatus.OK, "Booked Users Populated successfully", {
-        patients,
+
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      // const searchTerm = (req.query.searchTerm as string) || "";
+
+      console.log("Request params:", {
+        doctorId,
+        page,
+        limit,
       });
+
+      if (!doctorId) {
+        return sendError(res, HttpStatus.BadRequest, "Doctor ID is required");
+      }
+
+      const { patients, total } =
+        await this.bookingService.getPatientsForDoctor(doctorId, page, limit);
+      console.log("patients :", patients);
+      sendResponse(res, HttpStatus.OK, patients.length > 0 ?"Booked Users Populated successfully" : 'No Patients available',
+        {patients ,total },
+      );
     } catch (error) {
       if (error instanceof AppError) {
         sendError(res, error.status, error.message);

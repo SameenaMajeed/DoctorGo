@@ -30,6 +30,7 @@ export interface IBookingService {
     getUserBookings(userId: string, doctorId?: string): Promise<IBooking[]>
     checkUserBooking(userId: string, slotId: string): Promise<boolean>
 
-    getPatientsForDoctor(doctorId: string) :Promise<IBooking[]>
+    getPatientsForDoctor(doctorId: string, page: number,
+        limit: number,) :Promise<{patients : IBooking[] ; total: number }>
 }   
 
