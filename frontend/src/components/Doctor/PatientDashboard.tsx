@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "../CommonComponents/card";
-import { Button } from "../CommonComponents/Button";
 import TextInput from "../CommonComponents/TextInput";
 import {
   DropdownMenu,
@@ -63,24 +62,26 @@ const PatientDashboard: React.FC = () => {
     fetchPatients();
   }, [doctorId, searchTerm, gender, sortBy, date, page, limit]);
 
+  console.log('totalPatients:',totalPatients)
+
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
   };
 
-  const formatDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return "Invalid Date";
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    } catch (error) {
-      console.error("Error formatting date:", error);
-      return "Invalid Date";
-    }
-  };
+  // const formatDate = (dateString: string) => {
+  //   try {
+  //     const date = new Date(dateString);
+  //     if (isNaN(date.getTime())) return "Invalid Date";
+  //     return date.toLocaleDateString("en-US", {
+  //       year: "numeric",
+  //       month: "long",
+  //       day: "numeric",
+  //     });
+  //   } catch (error) {
+  //     console.error("Error formatting date:", error);
+  //     return "Invalid Date";
+  //   }
+  // };
 
   if (loading) return <div>Loading...</div>;
 

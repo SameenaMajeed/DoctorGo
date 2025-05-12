@@ -145,6 +145,8 @@ class AdminController {
 
   async refreshAccessToken(req: Request, res: Response): Promise<void> {
     try {
+      console.log('reached at refresh token on doctorside')
+
       const refreshToken = req.cookies.refreshToken;
       if (!refreshToken) {
         sendError(

@@ -53,7 +53,7 @@ const Navbar: React.FC = () => {
         >
           {[
             { path: "/", label: "HOME" },
-            { path: "/doctors", label: "ALL DOCTORS" },
+            { path: "/doctorsList", label: "ALL DOCTORS" },
             { path: "/about", label: "ABOUT" },
             { path: "/contact", label: "CONTACT" },
           ].map((link) => (

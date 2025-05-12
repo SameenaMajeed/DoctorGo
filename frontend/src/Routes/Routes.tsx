@@ -2,7 +2,7 @@ import { Route } from "react-router-dom";
 
 // User Pages
 import UserProtected from "../components/User/UserProtected";
-import LoginForm from "../components/User/LoginForm";
+// import LoginForm from "../components/User/LoginForm";
 import UserHomePage from "../pages/user/UserHomePage";
 import SignupForm from "../components/User/SignupForm";
 import AdminDashBoard from "../pages/Admin/AdminDashBoard";
@@ -41,10 +41,11 @@ import Page404 from "../pages/Page404.tsx";
 import NewRecord from "../components/Doctor/NewRecord.tsx";
 import ChatPage from "../components/Doctor/ChatPage.tsx";
 import PrecipitationList from "../components/User/PrecipitationList.tsx";
-import ReviewForm from "../components/User/ReviewForm.tsx";
+// import ReviewForm from "../components/User/ReviewForm.tsx";
 import DoctorReviews from "../components/Doctor/DoctorReviews.tsx";
 import AboutPage from "../components/User/Home/AboutPage.tsx";
 import ContactPage from "../components/User/Home/ContactPage.tsx";
+import DoctorsList from "../components/User/Home/DoctorsList.tsx";
 
 export const routes = (
   <>
@@ -71,6 +72,7 @@ export const routes = (
       />
       <Route path="/about" element={<AboutPage/>}/>
       <Route path="/contact" element={<ContactPage/>}/>
+      <Route path="/doctorsList" element={<DoctorsList/>}/>
       <Route path="/appointment/success" element={<PaymentSuccess />} />
       <Route element={<UserLayout />}>
         <Route path="/my-profile" element={<UserProfile />}/>

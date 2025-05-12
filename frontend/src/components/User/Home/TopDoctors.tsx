@@ -58,7 +58,7 @@ const TopDoctors :React.FC = () => {
           {Array.isArray(doctors) && doctors.length > 0 ? (
             doctors.slice(0, 10).map((item) => (
               <div
-                onClick={() => handleAppointment(item._id)} // ✅ Corrected this line
+                onClick={() => handleAppointment(item._id)} 
                 key={item._id}
                 className="bg-white/70 backdrop-blur-lg border border-gray-200 p-5 rounded-2xl shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-2xl"
               >
