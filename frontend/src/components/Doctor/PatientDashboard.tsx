@@ -27,7 +27,7 @@ const PatientDashboard: React.FC = () => {
   const [date, setDate] = useState(new Date());
 
   const [page, setPage] = useState(1);
-  const limit = 5;
+  const limit = 4;
   const [totalPages, setTotalPages] = useState(1);
   const [totalPatients, setTotalPatients] = useState(0);
 

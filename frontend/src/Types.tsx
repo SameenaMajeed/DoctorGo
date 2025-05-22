@@ -106,3 +106,22 @@ export interface IMessage {
   timestamp: string | Date;
 }
 
+export interface IChatUser {
+  id: string;
+  name: string;
+  email?: string;
+  mobile_no?: string;
+  profilePicture?: string;
+  lastMessage?: string;
+  lastMessageTime?: string;
+  online?: boolean;
+  specialization?: string;
+  qualification?: string;
+  unreadCount?: number;
+}
+
+
+export type NetworkQuality = "good" | "poor" | "bad";
+export type VideoQuality = "high" | "low";
+export type CallStatus = "idle" | "calling" | "ringing" | "connecting" | "active" | "failed";
+

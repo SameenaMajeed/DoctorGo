@@ -48,12 +48,10 @@ export class ChatService {
     async getDoctorsWhoMessaged(userId: string): Promise<{ id: string; name: string; profilePicture?: string }[]> {
       try {
         const doctorIds = await this.chatRepository.getDoctorsWhoMessaged(userId);
-        console.log('doctorIds:',doctorIds)
         if (!doctorIds.length) {
           // return [];
         }
         const doctors = await this.chatRepository.getDoctorDetails(doctorIds);
-        console.log('doctors from service:',doctors)
         return doctors;
       } catch (error) {
         if (error instanceof AppError) throw error;

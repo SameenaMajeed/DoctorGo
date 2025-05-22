@@ -12,7 +12,7 @@ interface TokenResponse {
 
 // Setup Axios instance for admin
 const adminApi = axios.create({
-  baseURL: "http://localhost:5000/api/admin", // Backend API URL
+  baseURL:import.meta.env.VITE_Base_Url_Admin ,
   headers: {
     "Content-Type": "application/json",
   },

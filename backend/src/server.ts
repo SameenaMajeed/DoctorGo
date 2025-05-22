@@ -61,6 +61,8 @@ app.get("/", (req, res) => {
     res.send("Server is running!");
 });
 
+app.set("io", io);
+
 // Start server
 const PORT: number | string = process.env.PORT || 5000;
 

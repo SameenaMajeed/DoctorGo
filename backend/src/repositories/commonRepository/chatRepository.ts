@@ -136,7 +136,6 @@ export class ChatRepository {
           };
         })
       );
-      console.log("result:", result);
       return result;
     } catch (error) {
       throw new AppError(

@@ -5,7 +5,7 @@ import api from "../../axios/UserInstance";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import ReviewForm from "./ReviewForm";
-import { FaInfoCircle, FaStar, FaTrashAlt } from "react-icons/fa";
+import { FaInfoCircle, FaStar, FaTrashAlt, FaVideo } from "react-icons/fa";
 import ViewDetails from "./ViewDetails";
 import CancelConfirmationModal from "../CommonComponents/CancelConfirmationModal";
 
@@ -24,6 +24,7 @@ const AppointmentCard: React.FC<IAppointmentCardProps> = ({
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [existingReview, setExistingReview] = useState<any>(null);
   const [isCheckingReview, setIsCheckingReview] = useState(false);
+  const [roomIdInput, setRoomIdInput] = useState<string>("");
   const navigate = useNavigate();
 
   // Check for existing review when component mounts or appointment changes
@@ -96,7 +97,6 @@ const AppointmentCard: React.FC<IAppointmentCardProps> = ({
 
   const handleCloseReviewForm = () => {
     setShowReviewForm(false);
-    // Refresh the review data when the form closes
     checkForExistingReview();
   };
 
@@ -106,6 +106,14 @@ const AppointmentCard: React.FC<IAppointmentCardProps> = ({
 
   const handleCloseViewDetails = () => {
     setShowViewDetails(false);
+  };
+
+  const handleJoinVideoCall = () => {
+    if (!roomIdInput.trim()) {
+      toast.error("Please enter a valid Room ID");
+      return;
+    }
+    navigate(`/user/video-call?roomId=${roomIdInput}&bookingId=${appointment._id}`);
   };
 
   const formatTimeString = (timeString: string | null | undefined) => {
@@ -252,6 +260,39 @@ const AppointmentCard: React.FC<IAppointmentCardProps> = ({
                 existingReview={existingReview}
               />
             )}
+          </>
+        ) : appointment.status.toLowerCase() === "confirmed" &&
+          appointment.modeOfAppointment.toLowerCase() === "online" ? (
+          <>
+            <div className="flex items-center gap-2 w-full">
+              <input
+                type="text"
+                value={roomIdInput}
+                onChange={(e) => setRoomIdInput(e.target.value)}
+                placeholder="Enter Room ID from email"
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 w-full"
+              />
+              <button
+                onClick={handleJoinVideoCall}
+                className="flex items-center gap-2 bg-purple-50 text-purple-700 border border-purple-300 px-4 py-2 rounded-lg font-medium text-sm hover:bg-purple-100 
+                focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 
+                active:scale-95 
+                transition-all duration-200"
+              >
+                <FaVideo className="text-purple-600 w-5 h-5" />
+                <span>Join Video Call</span>
+              </button>
+            </div>
+            <button
+              onClick={handleCancel}
+              disabled={isCanceling}
+              className={`flex items-center gap-2 border border-red-600 text-red-600 px-4 py-2 rounded-md transition ${
+                isCanceling ? "opacity-50 cursor-not-allowed" : "hover:bg-red-100"
+              }`}
+            >
+              <FaTrashAlt />
+              {isCanceling ? "Canceling..." : "Cancel Appointment"}
+            </button>
           </>
         ) : (
           <button

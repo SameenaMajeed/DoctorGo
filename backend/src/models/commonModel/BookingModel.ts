@@ -36,6 +36,7 @@ export interface IBooking extends Document {
   slot_id: mongoose.Types.ObjectId; // Add reference to slot
   createdAt: Date;
   updatedAt: Date;
+  videoCallRoomId?: string;
 }
 
 const BookingSchema: Schema = new Schema<IBooking>(
@@ -71,6 +72,7 @@ const BookingSchema: Schema = new Schema<IBooking>(
       locality: { type: String, required: true },
       hospitalNo: { type: String },
     },
+    videoCallRoomId: { type: String, required: false },
   },
   { timestamps: true }
 );
@@ -78,6 +80,8 @@ const BookingSchema: Schema = new Schema<IBooking>(
 // Add index for better query performance
 BookingSchema.index({ doctor_id: 1, appointmentDate: 1 });
 BookingSchema.index({ user_id: 1, status: 1 });
+// Add index for video call room ID if needed for querying
+BookingSchema.index({ videoCallRoomId: 1 });
 
 const BookingModel = mongoose.model<IBooking>("Booking", BookingSchema);
 

@@ -292,7 +292,7 @@ export class DoctorController {
   //     }
 
   //     res.status(HttpStatus.OK).json(doctor);
-  //   } catch (error) {
+  //   } catch (error) {z
   //     console.error("Error fetching doctor:", error);
 
   //     res.status(HttpStatus.InternalServerError).json({ message: "Internal server error" });

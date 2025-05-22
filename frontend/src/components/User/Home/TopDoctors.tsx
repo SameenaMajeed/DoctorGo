@@ -85,7 +85,7 @@ const TopDoctors :React.FC = () => {
         {/* More Button */}
         <button
           onClick={() => {
-            navigate("/doctors");
+            navigate("/doctorsList");
             scrollTo(0, 0);
           }}
           className="mt-12 px-6 py-3 bg-blue-600 text-white rounded-full text-lg font-semibold shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105"

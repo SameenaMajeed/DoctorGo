@@ -5,6 +5,7 @@ import userReducer from '../user/userSlice'
 import otpReducer from '../Otp/otpSlice'
 import adminReducer from '../admin/adminSlice'
 import doctorReducer from '../Doctor/doctorSlice'
+import videoCallReducer from '../VideoCall/videoCallSlice'
 import { combineReducers } from "@reduxjs/toolkit";
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
     otp: otpReducer,
     admin: adminReducer,
     doctor : doctorReducer,
+    videoCall: videoCallReducer,
 })
 
 const persistedReducer = persistReducer(persistConfig , rootReducer)

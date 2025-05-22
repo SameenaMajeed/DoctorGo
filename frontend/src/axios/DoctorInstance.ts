@@ -12,7 +12,7 @@ interface TokenResponse {
 
 // Set up Axios instance for doctor
 const doctorApi = axios.create({
-  baseURL: "http://localhost:5000/api/doctor",
+  baseURL:import.meta.env.VITE_Base_Url_Doctor,
   headers: {
     "Content-Type": "application/json",
   },

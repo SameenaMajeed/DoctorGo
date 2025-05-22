@@ -123,4 +123,11 @@ doctorRoute.get("/allPrescriptions", (req, res) =>
 // chat
 doctorRoute.get('/chats/users/:doctorId', authenticateToken('doctor'), (req, res) => chatController.getUsersWhoMessaged(req, res));
 
+doctorRoute.post(
+  "/create-video-call-room",
+  authenticateToken("doctor"),
+  blockedDoctorMiddleware,
+  (req, res) => bookingController.createVideoCallRoom(req, res)
+);
+
 export default doctorRoute;

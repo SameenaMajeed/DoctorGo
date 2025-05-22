@@ -13,7 +13,7 @@ interface TokenResponse {
 
 // Create Axios instance for slots
 const slotApi = axios.create({
-  baseURL: 'http://localhost:5000/api/slots', // Adjust to your slot API base URL
+  baseURL: import.meta.env.VITE_Base_Url_Slot, 
   headers: {
     'Content-Type': 'application/json',
   },

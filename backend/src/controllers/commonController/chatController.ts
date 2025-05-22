@@ -15,12 +15,10 @@ export class ChatController {
   async getDoctorsWhoMessaged(req: Request, res: Response): Promise<void> {
     try {
       const { userId } = req.params;
-      console.log("Fetching doctors for userId:", userId);
       if (!req.data?.id || req.data.id !== userId) {
         throw new AppError(HttpStatus.Forbidden, MessageConstants.UNAUTHORIZED);
       }
       const doctors = await this.chatService.getDoctorsWhoMessaged(userId);
-      console.log("All doctors fetched:", doctors);
       sendResponse(res, HttpStatus.OK, "All doctors fetched successfully", {
         doctors,
       });

@@ -1,3 +1,4 @@
+import { Server } from "socket.io";
 import { IBooking } from "../../models/commonModel/BookingModel";
 import {AppointmentStatus} from '../../models/commonModel/BookingModel'
 
@@ -32,5 +33,12 @@ export interface IBookingService {
 
     getPatientsForDoctor(doctorId: string, page: number,
         limit: number,) :Promise<{patients : IBooking[] ; total: number }>
+
+    sendVideoCallEmail(bookingId: string, roomId: string, userId: string): Promise<void>
+    createVideoCallRoom(
+        bookingId: string,
+        doctorId: string,
+        io: Server
+      ): Promise<{ roomId: string; booking: IBooking }>     
 }   
 

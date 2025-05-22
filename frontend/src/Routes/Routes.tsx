@@ -46,6 +46,7 @@ import DoctorReviews from "../components/Doctor/DoctorReviews.tsx";
 import AboutPage from "../components/User/Home/AboutPage.tsx";
 import ContactPage from "../components/User/Home/ContactPage.tsx";
 import DoctorsList from "../components/User/Home/DoctorsList.tsx";
+import VideoCall from "../components/VideoCall/VideoCallRoom.tsx";
 
 export const routes = (
   <>
@@ -70,15 +71,16 @@ export const routes = (
         path="/appointment/verification"
         element={<AppointmentVerification />}
       />
-      <Route path="/about" element={<AboutPage/>}/>
-      <Route path="/contact" element={<ContactPage/>}/>
-      <Route path="/doctorsList" element={<DoctorsList/>}/>
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/doctorsList" element={<DoctorsList />} />
       <Route path="/appointment/success" element={<PaymentSuccess />} />
       <Route element={<UserLayout />}>
-        <Route path="/my-profile" element={<UserProfile />}/>
+        <Route path="/my-profile" element={<UserProfile />} />
         <Route path="/my-appointments" element={<AppointmentsList />} />
+        <Route path="/user/video-call" element={<VideoCall />} />
         <Route path="/my-chats" element={<Chat />} />
-        <Route path="/prescriptionDownload" element={<PrecipitationList/>} />
+        <Route path="/prescriptionDownload" element={<PrecipitationList />} />
       </Route>
     </Route>
 
@@ -89,14 +91,22 @@ export const routes = (
         <Route path="/doctor/profile" element={<Profile />} />
         <Route path="/doctor/time-slots" element={<TimeSlots />} />
         <Route path="/doctor/slots" element={<ManageSlots />} />
+        <Route path="/doctor/video-call" element={<VideoCall />} />
+
         <Route path="/doctor/slots/create" element={<CreateSlot />} />
         <Route path="/doctor/time-slots/:slotId" element={<EditSlot />} />
         <Route path="/doctor/slots/calendar" element={<SlotCalendar />} />
-        <Route path="/doctor/patient-records/:userId" element={<MedicalRecord />} />
-        <Route path="/doctor/newRecords" element={< NewRecord/>} />
-        <Route path="/doctor/:doctorId/patients" element={<PatientDashboard />} />
-        <Route path="/myChats" element={< ChatPage/>} />
-        <Route path="/doctor/reviews/:doctorId" element={< DoctorReviews/>} />
+        <Route
+          path="/doctor/patient-records/:userId"
+          element={<MedicalRecord />}
+        />
+        <Route path="/doctor/newRecords" element={<NewRecord />} />
+        <Route
+          path="/doctor/:doctorId/patients"
+          element={<PatientDashboard />}
+        />
+        <Route path="/myChats" element={<ChatPage />} />
+        <Route path="/doctor/reviews/:doctorId" element={<DoctorReviews />} />
         <Route
           path="/doctor/slots/emergency-block"
           element={<EmergencyBlock />}
@@ -116,6 +126,6 @@ export const routes = (
       <Route path="/admin/users" element={<UserList />} />
     </Route>
 
-    <Route path='*' element={<Page404 />} />
+    <Route path="*" element={<Page404 />} />
   </>
 );

@@ -6,6 +6,7 @@ import { sendError, sendResponse } from "../../utils/responseUtils";
 import { MessageConstants } from "../../constants/MessageConstants";
 import { AppointmentStatus } from "../../models/commonModel/BookingModel";
 import { HttpStatus } from "../../constants/Httpstatus";
+import { Server } from "socket.io";
 
 export class BookingController {
   constructor(
@@ -23,6 +24,34 @@ export class BookingController {
         HttpStatus.InternalServerError,
         MessageConstants.INTERNAL_SERVER_ERROR
       );
+    }
+  }
+
+  async createVideoCallRoom(req: Request, res: Response): Promise<void> {
+    try {
+      const { bookingId } = req.body;
+      const doctorId = req.data?.id;
+      console.log('doctorId:' ,doctorId)
+
+      if (!doctorId) {
+        throw new AppError(HttpStatus.Unauthorized, MessageConstants.UNAUTHORIZED);
+      }
+
+      if (!bookingId) {
+        throw new AppError(HttpStatus.BadRequest, MessageConstants.REQUIRED_FIELDS_MISSING);
+      }
+
+      const io = req.app.get("io");
+      console.log('io :' ,io)
+      const { roomId, booking } = await this.bookingService.createVideoCallRoom(
+        bookingId,
+        doctorId,
+        io
+      );
+
+      sendResponse(res, HttpStatus.OK, "Video call room created", { roomId, booking });
+    } catch (error) {
+      this.handleError(res, error);
     }
   }
 
@@ -55,7 +84,7 @@ export class BookingController {
           prefill: {
             name: appointmentData.patientName,
             contact: appointmentData.contactNumber,
-            email: "patient@example.com", // You might want to get this from user data
+            email: appointmentData.email, 
           },
           theme: {
             color: "#3399cc",
@@ -411,4 +440,7 @@ export class BookingController {
       }
     }
   }
+
+  
+
 }

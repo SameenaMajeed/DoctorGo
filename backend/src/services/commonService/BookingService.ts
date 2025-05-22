@@ -1,7 +1,10 @@
 import mongoose, { Types, UpdateQuery } from "mongoose";
 import { IBookingService } from "../../interfaces/Booking/BookingServiceInterface";
 import { IBookingRepository } from "../../interfaces/Booking/BookingRepositoryInterface";
-import { AppointmentStatus, IBooking } from "../../models/commonModel/BookingModel";
+import {
+  AppointmentStatus,
+  IBooking,
+} from "../../models/commonModel/BookingModel";
 import { MessageConstants } from "../../constants/MessageConstants";
 import { AppError } from "../../utils/AppError";
 import { HttpStatus } from "../../constants/Httpstatus";
@@ -9,6 +12,9 @@ import { IDoctorRepository } from "../../interfaces/doctor/doctorRepositoryInter
 import { UserRepositoryInterface } from "../../interfaces/user/UserRepositoryInterface";
 import { ISlotRepository } from "../../interfaces/Slot/SlotRepositoryInterface";
 import { ISlot } from "../../models/commonModel/SlotModel";
+import { sentMail } from "../../utils/SendMail";
+import { v4 as uuidv4 } from "uuid";
+import { Server } from "socket.io";
 
 export class BookingService implements IBookingService {
   constructor(
@@ -17,6 +23,127 @@ export class BookingService implements IBookingService {
     private _patientRepo: UserRepositoryInterface,
     private _slotRepo: ISlotRepository
   ) {}
+
+  // Send email with video call room ID
+  async sendVideoCallEmail(
+    bookingId: string,
+    roomId: string,
+    userId: string
+  ): Promise<void> {
+    try {
+      const booking = await this._bookingRepo.findById(bookingId);
+      if (!booking) {
+        throw new AppError(
+          HttpStatus.NotFound,
+          MessageConstants.BOOKING_NOT_FOUND
+        );
+      }
+
+      const user = await this._patientRepo.findById(userId);
+      if (!user) {
+        throw new AppError(
+          HttpStatus.NotFound,
+          MessageConstants.INVALID_PATIENT
+        );
+      }
+
+      const subject = "Video Call Appointment Details";
+      const html = `
+        <h3>Your Online Appointment</h3>
+        <p>Your appointment with Dr. ${booking.doctor_id} is scheduled.</p>
+        <p><strong>Room ID:</strong> ${roomId}</p>
+        <p>Please use this Room ID to join the video call at the scheduled time: ${
+          booking.appointmentTime
+        } on ${booking.appointmentDate.toDateString()}.</p>
+        <p><a href="${
+          process.env.CLIENT_URL
+        }/video-call?roomId=${roomId}&bookingId=${bookingId}">Join Video Call</a></p>
+      `;
+
+      const emailSent = await sentMail(user.email, subject, html);
+      if (!emailSent) {
+        throw new AppError(
+          HttpStatus.InternalServerError,
+          "Failed to send video call email"
+        );
+      }
+    } catch (error) {
+      console.error("Error sending video call email:", error);
+      if (error instanceof AppError) throw error;
+      throw new AppError(
+        HttpStatus.InternalServerError,
+        "Failed to send video call email"
+      );
+    }
+  }
+
+  async createVideoCallRoom(
+    bookingId: string,
+    doctorId: string,
+    io: Server
+  ): Promise<{ roomId: string; booking: IBooking }> {
+    const booking = await this._bookingRepo.findById(bookingId);
+    if (!booking)
+      throw new AppError(
+        HttpStatus.NotFound,
+        MessageConstants.BOOKING_NOT_FOUND
+      );
+
+    if (booking.doctor_id._id.toString() !== doctorId) {
+      throw new AppError(
+        HttpStatus.Forbidden,
+        "Unauthorized: Doctor ID does not match"
+      );
+    }
+
+    if (
+      booking.modeOfAppointment !== "online" ||
+      booking.status !== AppointmentStatus.CONFIRMED
+    ) {
+      throw new AppError(
+        HttpStatus.BadRequest,
+        "Invalid booking for video call"
+      );
+    }
+
+    const roomId = uuidv4();
+    const updatedBooking = await this._bookingRepo.update(bookingId, {
+      videoCallRoomId: roomId,
+    });
+
+    if (!updatedBooking) {
+      throw new AppError(
+        HttpStatus.InternalServerError,
+        "Failed to update booking with room ID"
+      );
+    }
+
+    // Emit to sockets
+    io.to(`doctor_${doctorId}`).emit("videoCallRoomCreated", {
+      bookingId,
+      roomId,
+      role: "doctor", // Explicitly set role
+    });
+    // Emit to user's room
+    io.to(`user_${updatedBooking.user_id}`).emit("videoCallRoomAssigned", {
+      bookingId,
+      roomId,
+      role: "user", // Explicitly set role
+    });
+
+    // Optional: Catch email errors silently
+    try {
+      await this.sendVideoCallEmail(
+        bookingId,
+        roomId,
+        updatedBooking.user_id.toString()
+      );
+    } catch (emailError) {
+      console.error("Email sending failed:", emailError);
+    }
+
+    return { roomId, booking: updatedBooking };
+  }
 
   // user side
   async bookAppointment(bookingData: Partial<IBooking>): Promise<IBooking> {
@@ -70,7 +197,6 @@ export class BookingService implements IBookingService {
       const slot = await this._slotRepo.findSlotById(slotId.toString());
       if (!slot) throw new AppError(HttpStatus.BadRequest, "Invalid slot ID.");
 
-
       if (slot.bookedCount >= slot.maxPatients) {
         throw new AppError(
           HttpStatus.BadRequest,
@@ -103,7 +229,6 @@ export class BookingService implements IBookingService {
     }
   }
 
-
   async getAppointments(id: string): Promise<IBooking[]> {
     // Return an array
     try {
@@ -116,19 +241,15 @@ export class BookingService implements IBookingService {
           MessageConstants.BOOKING_NOT_FOUND
         );
 
-       // Exclude cancelled appointments
-    const filteredBookings = bookings.filter(
-      (booking) => booking.status !== "cancelled"
-    );
-
-    if (!filteredBookings.length)
-      throw new AppError(
-        HttpStatus.NotFound,
-        "No active appointments found"
+      // Exclude cancelled appointments
+      const filteredBookings = bookings.filter(
+        (booking) => booking.status !== "cancelled"
       );
 
-    return filteredBookings;
+      if (!filteredBookings.length)
+        throw new AppError(HttpStatus.NotFound, "No active appointments found");
 
+      return filteredBookings;
     } catch (error) {
       if (error instanceof AppError) throw error;
       throw new AppError(
@@ -470,13 +591,18 @@ export class BookingService implements IBookingService {
   }
 
   // get user data for a perticular doctor:
-  async getPatientsForDoctor(doctorId: string, page: number = 1,
-    limit: number = 10,) :Promise<{patients: IBooking[] ; total: number }> {
-    console.log('from service',doctorId)
-    const {patients , total} = await this._bookingRepo.getPatientsForDoctor(doctorId ,
+  async getPatientsForDoctor(
+    doctorId: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<{ patients: IBooking[]; total: number }> {
+    console.log("from service", doctorId);
+    const { patients, total } = await this._bookingRepo.getPatientsForDoctor(
+      doctorId,
       page,
-      limit,);
-    console.log('patient from service',patients)
-    return {patients , total}
-}
+      limit
+    );
+    console.log("patient from service", patients);
+    return { patients, total };
+  }
 }
