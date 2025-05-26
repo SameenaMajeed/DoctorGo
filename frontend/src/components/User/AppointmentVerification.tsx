@@ -7,33 +7,36 @@ import toast from "react-hot-toast";
 import { ISlot } from "../../types/Slot";
 import { useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
+import { IDoctor } from "../../Types";
+import slotApi from "../../axios/SlotInstance";
 
-interface IDoctor {
-  _id: string;
-  name: string;
-  profilePicture: string;
-  specialization: string;
-  ticketPrice: number;
-}
+// interface IDoctor {
+//   _id: string;
+//   name: string;
+//   profilePicture: string;
+//   specialization: string;
+//   ticketPrice: number;
+// }
 
-interface IPaymentRequest {
-  amount: number;
-  currency: string;
-  appointmentData: {
-    patientName: string;
-    contactNumber: string;
-    district: string;
-    locality: string;
-    hospitalNo?: string;
-    doctorId: string;
-    slotId: string;
-  };
-}
+// interface IPaymentRequest {
+//   amount: number;
+//   currency: string;
+//   appointmentData: {
+//     patientName: string;
+//     contactNumber: string;
+//     district: string;
+//     locality: string;
+//     hospitalNo?: string;
+//     doctorId: string;
+//     slotId: string;
+//   };
+// }
 
 const AppointmentVerification: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [appointmentType, setAppointmentType] = useState("online");
 
   const { doctor, selectedSlot } = location.state as {
     doctor: IDoctor;
@@ -193,14 +196,16 @@ const AppointmentVerification: React.FC = () => {
               doctor_id: doctor._id,
               user_id: userId,
               slot_id: selectedSlot._id,
-              modeOfAppointment: "online",
+              modeOfAppointment: appointmentType,
               is_paid: true,
               status: "confirmed",
               paymentId: razorpayResponse.razorpay_payment_id,
               paymentMethod: "razorpay",
               ticketPrice: doctor.ticketPrice,
               appointmentDate: selectedSlot.date,
-              appointmentTime: `${formatTimeString(selectedSlot.startTime)} - ${formatTimeString(selectedSlot.endTime)}`,
+              appointmentTime: `${formatTimeString(
+                selectedSlot.startTime
+              )} - ${formatTimeString(selectedSlot.endTime)}`,
               patientDetails: { ...formData },
             };
 
@@ -259,17 +264,105 @@ const AppointmentVerification: React.FC = () => {
       <Navbar />
       <div className="max-w-5xl mx-auto p-6">
         {doctor && (
-          <section className="bg-white shadow-md p-6 rounded-lg mt-6 flex items-center border border-gray-200">
-            <img
-              src={doctor.profilePicture}
-              alt={doctor.name}
-              className="w-28 h-28 rounded-full border-2 border-blue-500 shadow-md"
-            />
-            <div className="ml-6">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                {doctor.name}
-              </h2>
-              <p className="text-gray-500">{doctor.specialization}</p>
+          <section className="bg-white shadow-md p-6 rounded-lg mt-6 border border-gray-200">
+            {/* Doctor Profile */}
+            <div className="flex items-center">
+              <img
+                src={doctor.profilePicture}
+                alt={doctor.name}
+                className="w-28 h-28 rounded-full border-2 border-blue-500 shadow-md"
+              />
+              <div className="ml-6">
+                <h2 className="text-2xl font-semibold text-gray-800">
+                  {doctor.name}
+                </h2>
+                <p className="text-gray-500">{doctor.specialization}</p>
+              </div>
+            </div>
+
+            {/* Appointment Type Selection - Cleaner Version */}
+            <div className="mt-8">
+              <h3 className="text-lg font-medium text-gray-800 mb-4">
+                Appointment Type
+              </h3>
+
+              <div className="space-y-4">
+                {/* Online Option */}
+                <div
+                  className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                    appointmentType === "online"
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-200 hover:border-blue-300"
+                  }`}
+                  onClick={() => setAppointmentType("online")}
+                >
+                  <div className="flex items-start">
+                    <div
+                      className={`w-5 h-5 rounded-full border mt-1 mr-3 flex-shrink-0 ${
+                        appointmentType === "online"
+                          ? "border-blue-500 bg-blue-500"
+                          : "border-gray-300"
+                      }`}
+                    ></div>
+                    <div>
+                      <h4 className="font-medium text-gray-800">
+                        Online Consultation
+                      </h4>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Video call appointment
+                      </p>
+                      {appointmentType === "online" && (
+                        <p className="text-sm text-blue-600 mt-2">
+                          You'll receive a video call link before your
+                          appointment
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div className="relative flex items-center">
+                  <div className="flex-grow border-t border-gray-200"></div>
+                  <span className="flex-shrink mx-4 text-gray-400 text-sm">
+                    or
+                  </span>
+                  <div className="flex-grow border-t border-gray-200"></div>
+                </div>
+
+                {/* Offline Option */}
+                <div
+                  className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                    appointmentType === "offline"
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-200 hover:border-blue-300"
+                  }`}
+                  onClick={() => setAppointmentType("offline")}
+                >
+                  <div className="flex items-start">
+                    <div
+                      className={`w-5 h-5 rounded-full border mt-1 mr-3 flex-shrink-0 ${
+                        appointmentType === "offline"
+                          ? "border-blue-500 bg-blue-500"
+                          : "border-gray-300"
+                      }`}
+                    ></div>
+                    <div>
+                      <h4 className="font-medium text-gray-800">
+                        Offline Consultation
+                      </h4>
+                      <p className="text-sm text-gray-500 mt-1">
+                        In-person appointment
+                      </p>
+                      {/* {appointmentType === "offline" && (
+                        <p className="text-sm text-blue-600 mt-2">
+                          Clinic address: {doctor.clinicAddress}
+                        </p>
+                      )} */}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         )}

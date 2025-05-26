@@ -12,6 +12,8 @@ export interface IDoctor {
   role: string | null;
   accessToken?:string,
   refreshToken ?:string,
+  ticketPrice ?: number,
+  isOnline : boolean,
 }
 
 // interface Patient{
