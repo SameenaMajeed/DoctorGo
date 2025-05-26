@@ -16,7 +16,8 @@ const VideoCall: React.FC = () => {
   const doctor = useSelector((state: RootState) => state.doctor.doctor);
   const isDoctorRoute = window.location.pathname.includes("/doctor");
   const userRole = isDoctorRoute ? "doctor" : "user";
-  const accessToken = userRole === "doctor" ? doctor?.accessToken : user?.accessToken;
+  const accessToken =
+    userRole === "doctor" ? doctor?.accessToken : user?.accessToken;
 
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -40,10 +41,13 @@ const VideoCall: React.FC = () => {
       return;
     }
 
-    const socket = io(import.meta.env.VITE_Base_Url || "http://localhost:5000", {
-      auth: { token: accessToken, role: userRole },
-      query: { bookingId, isDoctor: userRole === "doctor" },
-    });
+    const socket = io(
+      import.meta.env.VITE_Base_Url || "http://localhost:5000",
+      {
+        auth: { token: accessToken, role: userRole },
+        query: { bookingId, isDoctor: userRole === "doctor" },
+      }
+    );
 
     socketRef.current = socket;
 
@@ -107,7 +111,9 @@ const VideoCall: React.FC = () => {
         if (data.senderRole === userRole) return;
 
         if (data.signalData.sdp) {
-          await peer.setRemoteDescription(new RTCSessionDescription(data.signalData.sdp));
+          await peer.setRemoteDescription(
+            new RTCSessionDescription(data.signalData.sdp)
+          );
           if (data.signalData.sdp.type === "offer") {
             const answer = await peer.createAnswer();
             await peer.setLocalDescription(answer);
@@ -119,27 +125,115 @@ const VideoCall: React.FC = () => {
           }
         } else if (data.signalData.candidate) {
           try {
-            await peer.addIceCandidate(new RTCIceCandidate(data.signalData.candidate));
+            await peer.addIceCandidate(
+              new RTCIceCandidate(data.signalData.candidate)
+            );
           } catch (e) {
             console.error("Error adding ICE candidate", e);
           }
         }
       });
 
+      // 🔁 Ensure both sides can initiate
+      const createOffer = async () => {
+        const offer = await peer.createOffer();
+        await peer.setLocalDescription(offer);
+        socket.emit("signal", {
+          roomId,
+          senderRole: userRole,
+          signalData: { sdp: offer },
+        });
+      };
+
       if (userRole === "doctor") {
-        peer.onnegotiationneeded = async () => {
-          const offer = await peer.createOffer();
-          await peer.setLocalDescription(offer);
-          socket.emit("signal", {
-            roomId,
-            senderRole: userRole,
-            signalData: { sdp: offer },
-          });
-        };
+        peer.onnegotiationneeded = () => createOffer();
+      } else {
+        // 🔁 Fallback: try sending offer manually if user
+        setTimeout(() => {
+          if (peer.signalingState === "stable" && !peer.remoteDescription) {
+            createOffer();
+          }
+        }, 1500);
       }
 
       socket.emit("joinVideoCall", { roomId, bookingId });
     };
+
+    // const setupPeerConnection = (stream: MediaStream) => {
+    //   const config: RTCConfiguration = {
+    //     iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+    //   };
+
+    //   const peer = new RTCPeerConnection(config);
+    //   peerConnectionRef.current = peer;
+
+    //   stream.getTracks().forEach((track) => peer.addTrack(track, stream));
+
+    //   peer.onicecandidate = (event) => {
+    //     if (event.candidate) {
+    //       socket.emit("signal", {
+    //         roomId,
+    //         senderRole: userRole,
+    //         signalData: { candidate: event.candidate },
+    //       });
+    //     }
+    //   };
+
+    //   peer.ontrack = (event) => {
+    //     const [remoteStream] = event.streams;
+    //     if (remoteVideoRef.current) {
+    //       remoteVideoRef.current.srcObject = remoteStream;
+    //     }
+    //   };
+
+    //   peer.oniceconnectionstatechange = () => {
+    //     console.log("ICE Connection State:", peer.iceConnectionState);
+    //     if (peer.iceConnectionState === "connected") {
+    //       setConnected(true);
+    //       dispatch(setVideoCallStatus("connected"));
+    //     } else if (peer.iceConnectionState === "disconnected") {
+    //       setConnected(false);
+    //       toast.error("Connection lost");
+    //     }
+    //   };
+
+    //   socket.on("signal", async (data) => {
+    //     if (data.senderRole === userRole) return;
+
+    //     if (data.signalData.sdp) {
+    //       await peer.setRemoteDescription(new RTCSessionDescription(data.signalData.sdp));
+    //       if (data.signalData.sdp.type === "offer") {
+    //         const answer = await peer.createAnswer();
+    //         await peer.setLocalDescription(answer);
+    //         socket.emit("signal", {
+    //           roomId,
+    //           senderRole: userRole,
+    //           signalData: { sdp: answer },
+    //         });
+    //       }
+    //     } else if (data.signalData.candidate) {
+    //       try {
+    //         await peer.addIceCandidate(new RTCIceCandidate(data.signalData.candidate));
+    //       } catch (e) {
+    //         console.error("Error adding ICE candidate", e);
+    //       }
+    //     }
+    //   });
+
+    //   if (userRole === "doctor") {
+    //     peer.onnegotiationneeded = async () => {
+    //       const offer = await peer.createOffer();
+    //       await peer.setLocalDescription(offer);
+    //       socket.emit("signal", {
+    //         roomId,
+    //         senderRole: userRole,
+    //         signalData: { sdp: offer },
+    //       });
+    //     };
+    //   }
+
+    //   socket.emit("joinVideoCall", { roomId, bookingId });
+    // };
 
     setupMedia();
 
@@ -157,7 +251,10 @@ const VideoCall: React.FC = () => {
 
   useEffect(() => {
     if (connected) {
-      const interval = setInterval(() => setCallDuration((prev) => prev + 1), 1000);
+      const interval = setInterval(
+        () => setCallDuration((prev) => prev + 1),
+        1000
+      );
       return () => clearInterval(interval);
     }
   }, [connected]);
@@ -199,15 +296,20 @@ const VideoCall: React.FC = () => {
       <h2 className="text-3xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
         Video Call ({userRole})
       </h2>
-      <div className={`text-sm font-medium mb-4 ${connected ? "text-green-500" : "text-red-500"} animate-pulse`}>
+      <div
+        className={`text-sm font-medium mb-4 ${
+          connected ? "text-green-500" : "text-red-500"
+        } animate-pulse`}
+      >
         {connected ? "Connected" : "Connecting..."}
       </div>
       <div className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-        Call Duration: {Math.floor(callDuration / 60)}:{(callDuration % 60).toString().padStart(2, "0")}
+        Call Duration: {Math.floor(callDuration / 60)}:
+        {(callDuration % 60).toString().padStart(2, "0")}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 animate-fade-in">
-          <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">{user?.name}</h3>
+          <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2"></h3>
           <div className="relative">
             <video
               ref={localVideoRef}
@@ -219,13 +321,15 @@ const VideoCall: React.FC = () => {
             />
             {isVideoOff && (
               <div className="absolute inset-0 flex items-center justify-center bg-gray-800 rounded-xl">
-                <span className="text-4xl font-bold text-white">{user?.name?.[0] || "U"}</span>
+                <span className="text-4xl font-bold text-white">
+                  {user?.name?.[0] || "U"}
+                </span>
               </div>
             )}
           </div>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 animate-fade-in">
-          <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">{doctor?.name}</h3>
+          <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2"></h3>
           <video
             ref={remoteVideoRef}
             autoPlay

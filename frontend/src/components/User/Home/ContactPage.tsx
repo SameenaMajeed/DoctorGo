@@ -31,7 +31,7 @@ const ContactPage: React.FC = () => {
               </p>
             </div>
             <div className="bg-white p-6 rounded-xl shadow-md">
-              <h3 className="text-2xl font-semibold mb-4 text-gray-900">CAREERS AT PRESCRIPTO</h3>
+              <h3 className="text-2xl font-semibold mb-4 text-gray-900">CAREERS AT DOCTOR GO</h3>
               <p className="text-gray-600 mb-6 leading-relaxed">
                 Learn more about our teams and job openings.
               </p>
