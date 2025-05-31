@@ -47,6 +47,8 @@ import AboutPage from "../components/User/Home/AboutPage.tsx";
 import ContactPage from "../components/User/Home/ContactPage.tsx";
 import DoctorsList from "../components/User/Home/DoctorsList.tsx";
 import VideoCall from "../components/VideoCall/VideoCallRoom.tsx";
+import BookingsPage from "../components/Admin/BookingsPage.tsx";
+import PaymentsPage from "../components/Admin/PaymentsPage.tsx";
 
 export const routes = (
   <>
@@ -124,6 +126,8 @@ export const routes = (
       <Route path="/admin/approvals" element={<ApproveDoctor />} />
       <Route path="/admin/Doctors" element={<DoctorList />} />
       <Route path="/admin/users" element={<UserList />} />
+      <Route path="/admin/appointments" element={<BookingsPage />} />
+      <Route path="/admin/payments" element={<PaymentsPage />} />
     </Route>
 
     <Route path="*" element={<Page404 />} />

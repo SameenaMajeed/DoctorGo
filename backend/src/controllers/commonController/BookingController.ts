@@ -31,25 +31,34 @@ export class BookingController {
     try {
       const { bookingId } = req.body;
       const doctorId = req.data?.id;
-      console.log('doctorId:' ,doctorId)
+      console.log("doctorId:", doctorId);
 
       if (!doctorId) {
-        throw new AppError(HttpStatus.Unauthorized, MessageConstants.UNAUTHORIZED);
+        throw new AppError(
+          HttpStatus.Unauthorized,
+          MessageConstants.UNAUTHORIZED
+        );
       }
 
       if (!bookingId) {
-        throw new AppError(HttpStatus.BadRequest, MessageConstants.REQUIRED_FIELDS_MISSING);
+        throw new AppError(
+          HttpStatus.BadRequest,
+          MessageConstants.REQUIRED_FIELDS_MISSING
+        );
       }
 
       const io = req.app.get("io");
-      console.log('io :' ,io)
+      console.log("io :", io);
       const { roomId, booking } = await this.bookingService.createVideoCallRoom(
         bookingId,
         doctorId,
         io
       );
 
-      sendResponse(res, HttpStatus.OK, "Video call room created", { roomId, booking });
+      sendResponse(res, HttpStatus.OK, "Video call room created", {
+        roomId,
+        booking,
+      });
     } catch (error) {
       this.handleError(res, error);
     }
@@ -84,7 +93,7 @@ export class BookingController {
           prefill: {
             name: appointmentData.patientName,
             contact: appointmentData.contactNumber,
-            email: appointmentData.email, 
+            email: appointmentData.email,
           },
           theme: {
             color: "#3399cc",
@@ -425,8 +434,13 @@ export class BookingController {
       const { patients, total } =
         await this.bookingService.getPatientsForDoctor(doctorId, page, limit);
       console.log("patients :", patients);
-      sendResponse(res, HttpStatus.OK, patients.length > 0 ?"Booked Users Populated successfully" : 'No Patients available',
-        {patients ,total },
+      sendResponse(
+        res,
+        HttpStatus.OK,
+        patients.length > 0
+          ? "Booked Users Populated successfully"
+          : "No Patients available",
+        { patients, total }
       );
     } catch (error) {
       if (error instanceof AppError) {
@@ -441,6 +455,27 @@ export class BookingController {
     }
   }
 
-  
+  async getAllBookings(req: Request, res: Response): Promise<void> {
+    try {
+      const { page = "1", limit = "10", status } = req.query;
+      const pageNum = parseInt(page as string, 10);
+      const limitNum = parseInt(limit as string, 10);
 
+      const result = await this.bookingService.getAllBookings(
+        pageNum,
+        limitNum,
+        status as AppointmentStatus | undefined
+      );
+
+      sendResponse(res, HttpStatus.OK, "Bookings fetched successfully", {
+        bookings: result.bookings,
+        total: result.total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: result.totalPages,
+      });
+    } catch (error) {
+      this.handleError(res, error);
+    }
+  }
 }

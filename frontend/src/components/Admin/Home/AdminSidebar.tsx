@@ -58,10 +58,10 @@ const AdminSidebar: React.FC = () => {
         <SidebarItem href="/admin/users" icon={<Users size={20} />} label="Users" />
         <SidebarItem href="/admin/doctors" icon={<Stethoscope size={20} />} label="Doctors" />
         <SidebarItem href="/admin/appointments" icon={<CalendarCheck size={20} />} label="Appointments" />
-        <SidebarItem href="/admin/approvals" icon={<CheckCircle size={20} />} label="Approvals" />
-        <SidebarItem href="/admin/sales_report" icon={<BarChart size={20} />} label="Sales Report" />
         <SidebarItem href="/admin/payments" icon={<CreditCard size={20} />} label="Payments" />
-        <SidebarItem href="/admin/reports" icon={<FileText size={20} />} label="Reports" />
+        <SidebarItem href="/admin/approvals" icon={<CheckCircle size={20} />} label="Approvals" />
+        {/* <SidebarItem href="/admin/sales_report" icon={<BarChart size={20} />} label="Sales Report" />
+        <SidebarItem href="/admin/reports" icon={<FileText size={20} />} label="Reports" /> */}
       </nav>
 
       {/* Logout Button */}

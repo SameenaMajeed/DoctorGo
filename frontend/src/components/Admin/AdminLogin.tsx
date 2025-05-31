@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../slice/Store/Store";
 import { useNavigate } from "react-router-dom";
 import { adminLogin } from "../../slice/admin/adminSlice";
-import adminApi from "../../axios/AdminInstance";
 import toast from "react-hot-toast";
 import { AiFillLock } from "react-icons/ai";
 import { adminLoginService } from "../../Api/AdminApis";

@@ -3,12 +3,13 @@ import { useSelector } from "react-redux";
 import {useNavigate } from "react-router-dom";
 import { RootState } from "../../../slice/Store/Store";
 import toast from "react-hot-toast";
+import DashboardStats from "./DashboardStats";
 
 interface MainProps {
-  onRestrictedAction?: () => void;  
+  onRestrictedAction?: () => void;
 }
 
-const Main : React.FC<MainProps> = ({ onRestrictedAction }) => {
+const Main : React.FC<MainProps> = ({ onRestrictedAction}) => {
 
   const { doctor } = useSelector((state: RootState) => state.doctor);
   const navigate = useNavigate();
@@ -36,13 +37,14 @@ const Main : React.FC<MainProps> = ({ onRestrictedAction }) => {
 
         {/* Quick Actions*/}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button onClick={()=>navigate('/doctor/appointments')} className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition">
+          <button  onClick={() => navigate(`/doctor/${doctor?._id}/appointments`)} className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition">
             View Appointments
           </button>
-          {/*<button className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition">
-            Add New Patient
-          </button>*/}
+      
         </div> 
+
+        {/* Dashboard Statistics */}
+        {/* <DashboardStats /> */}
       </main>
     </div>
   );

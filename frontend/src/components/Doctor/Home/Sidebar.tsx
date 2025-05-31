@@ -6,10 +6,9 @@ import {
   Menu,
   Clock,
   PlusCircle,
-  AlertCircle,
 } from "lucide-react";
 import SidebarItem from "./SideBarItem";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate,} from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../slice/Store/Store";
 import toast from "react-hot-toast";
@@ -18,10 +17,10 @@ interface SidebarProps {
   onRestrictedAction?: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onRestrictedAction }) => {
+const Sidebar: React.FC<SidebarProps> = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { doctor } = useSelector((state: RootState) => state.doctor);
-  const { user } = useSelector((state: RootState) => state.user);
+  // const { user } = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
   const location = useLocation();
 

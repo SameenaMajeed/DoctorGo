@@ -61,5 +61,8 @@ export const MessageConstants = {
     PAYMENT_VERIFIED: "Payment verified successfully.",
     PAYMENT_VERIFICATION_FAILED: "Payment verification failed.",
     USER_ID_NOT_FOUND : 'User Id not found',
-    PRESCRIPTION_CREATED :'Prescription Created Successfully'
+    PRESCRIPTION_CREATED :'Prescription Created Successfully',
+    NOTIFICATION_NOT_FOUND: 'Notification not found',
+    DASHBOARD_STATS_FETCHED: "Dashboard statistics fetched successfully",
+
 }

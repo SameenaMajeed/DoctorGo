@@ -126,4 +126,3 @@ export interface IChatUser {
 export type NetworkQuality = "good" | "poor" | "bad";
 export type VideoQuality = "high" | "low";
 export type CallStatus = "idle" | "calling" | "ringing" | "connecting" | "active" | "failed";
-

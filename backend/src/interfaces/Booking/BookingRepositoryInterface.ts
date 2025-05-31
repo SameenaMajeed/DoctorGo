@@ -65,4 +65,12 @@ export interface IBookingRepository {
   ): Promise<IBooking | null>;
 
   findAppointmentById(id: string): Promise<IBooking | null>;
+
+  findAllBookingsWithPagination(
+    skip: number,
+    limit: number,
+    status?: AppointmentStatus
+  ): Promise<{ bookings: IBooking[]; total: number }>;
+
+  find(query: any): Promise<IBooking[]>;
 }

@@ -18,6 +18,11 @@ import prescriptionRepository from "../../repositories/commonRepository/prescrip
 import PrescriptionService from "../../services/commonService/prescriptionService";
 import PrescriptionController from "../../controllers/commonController/prescriptionController";
 import { ChatController } from "../../controllers/commonController/chatController";
+import { DashboardService } from "../../services/doctorService/DashboardService";
+import { DoctorDashboardController } from "../../controllers/doctorController/doctorDashboardController";
+// import { NotificationService } from "../../services/commonService/NotificationService";
+// import { NotificationRepository } from "../../repositories/commonRepository/NotificationRepository";
+// import { NotificationController } from "../../controllers/commonController/NotificationController";
 // import { uploadCertifications } from '../middlewares/fileUpload';
 
 const otpRepository = new OtpRepository();
@@ -27,11 +32,15 @@ const userRepository = new UserRepository();
 const slotRepository = new SlotRepository();
 const PrescriptionRepository = new prescriptionRepository();
 
+// const notificationRepository = new NotificationRepository();
+// const notificationService = new NotificationService(notificationRepository);
+
 const bookingService = new BookingService(
   bookingRepository,
   doctorRepository,
   userRepository,
-  slotRepository
+  slotRepository,
+  // notificationService
 );
 
 const prescriptionService = new PrescriptionService(
@@ -51,6 +60,11 @@ const doctorController = new DoctorController(doctorService);
 const prescriptionController = new PrescriptionController(prescriptionService);
 
 const chatController = new ChatController();
+
+const dashboardService = new DashboardService(doctorRepository,userRepository,bookingRepository,PrescriptionRepository);
+const dashboardController = new DoctorDashboardController(doctorService, dashboardService);
+
+// const notificationController = new NotificationController();
 
 const doctorRoute: Router = express.Router();
 
@@ -129,5 +143,7 @@ doctorRoute.post(
   blockedDoctorMiddleware,
   (req, res) => bookingController.createVideoCallRoom(req, res)
 );
+
+doctorRoute.get("/:doctorId/dashboard-stats", authenticateToken('doctor'), (req, res) => dashboardController.getDashboardStats(req, res));
 
 export default doctorRoute;

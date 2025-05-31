@@ -40,7 +40,7 @@ const bookingService = new BookingService(
   bookingRepository,
   doctorRepository,
   userRepository,
-  slotRepository
+  slotRepository,
 );
 const prescriptionService = new PrescriptionService(
   PrescriptionRepository,
@@ -52,7 +52,7 @@ const reviewService = new ReviewService(reviewRepository , bookingRepository)
 
 const paymentService = new PaymentService();
 const doctorService = new DoctorService(doctorRepository, otpRepository);
-const doctorController = new DoctorController(doctorService);
+// const doctorController = new DoctorController(doctorService);
 const userController = new Usercontroller(userService);
 const bookingController = new BookingController(bookingService, paymentService);
 const chatController = new ChatController();

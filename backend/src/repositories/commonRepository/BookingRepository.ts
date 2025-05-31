@@ -17,6 +17,23 @@ export class BookingRepository
     super(Booking);
   }
 
+
+   async find(query: any): Promise<IBooking[]> {
+    try {
+      return await Booking.find(query)
+        .populate("doctor_id", "name specialization")
+        .populate("user_id", "name email")
+        .exec();
+    } catch (error) {
+      console.error("Error in find:", error);
+      throw new AppError(
+        HttpStatus.InternalServerError,
+        MessageConstants.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+
   async findById(id: string): Promise<IBooking | null> {
     try {
       let doctor = await Booking.findById(id)
@@ -279,19 +296,19 @@ export class BookingRepository
   async getPatientsForDoctor(
     doctorId: string,
     page: number = 1,
-    limit: number = 10,
+    limit: number = 10
   ): Promise<{ patients: IBooking[]; total: number }> {
     console.log("from repo", doctorId);
-    const [patients , total] = await Promise.all([
+    const [patients, total] = await Promise.all([
       Booking.find({ doctor_id: doctorId })
-      .populate("user_id", "name email mobile_no gender age profilePicture")
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .exec(),
-      Booking.countDocuments({ doctor_id: doctorId }),  
+        .populate("user_id", "name email mobile_no gender age profilePicture")
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec(),
+      Booking.countDocuments({ doctor_id: doctorId }),
     ]);
     console.log("patient from repository", patients);
-    return {patients, total};
+    return { patients, total };
   }
 
   // review
@@ -304,5 +321,35 @@ export class BookingRepository
       user_id: patientId,
       status: "completed",
     });
+  }
+
+  async findAllBookingsWithPagination(
+    skip: number,
+    limit: number,
+    status?: AppointmentStatus
+  ): Promise<{ bookings: IBooking[]; total: number }> {
+    try {
+      const query: any = {};
+      if (status) query.status = status;
+
+      const [bookings, total] = await Promise.all([
+        Booking.find(query)
+          .populate("doctor_id", "name") 
+          .populate("user_id", "name") 
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .exec(),
+        Booking.countDocuments(query),
+      ]);
+
+      return { bookings, total };
+    } catch (error) {
+      console.error("Error in findAllBookingsWithPagination:", error);
+      throw new AppError(
+        HttpStatus.InternalServerError,
+        MessageConstants.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 }
