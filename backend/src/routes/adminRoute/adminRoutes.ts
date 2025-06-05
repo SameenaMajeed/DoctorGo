@@ -16,6 +16,7 @@ import { PaymentService } from "../../services/commonService/PaymentService";
 import { AdminDashboardRepository } from "../../repositories/adminRepository/AdminDashboardRepository";
 import { AdminDashboardService } from "../../services/adminService/AdminDashboardService";
 import { AdminDashboardController } from "../../controllers/adminController/AdminDashboardController";
+import { NotificationRepository } from "../../repositories/commonRepository/NotificationRepository";
 
 const adminRoute: Router = express.Router();
 
@@ -24,6 +25,7 @@ const userRepository = new UserRepository();
 const adminRepository = new AdminRepository();
 const bookingRepository = new BookingRepository();
 const slotRepository = new SlotRepository();
+const notificationRepository = new NotificationRepository();
 
 const adminService = new AdminService(
   adminRepository,
@@ -36,7 +38,8 @@ const bookingService = new BookingService(
   bookingRepository,
   doctorRepository,
   userRepository,
-  slotRepository
+  slotRepository,
+  notificationRepository
 );
 
 const paymentService = new PaymentService();

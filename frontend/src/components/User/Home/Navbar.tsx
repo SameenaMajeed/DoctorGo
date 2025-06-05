@@ -7,6 +7,7 @@ import { logoutUser } from "../../../slice/user/userSlice";
 import api from "../../../axios/UserInstance";
 import { useDispatch, useSelector } from "react-redux";
 import { User } from "lucide-react";
+import NotificationBell from "../../CommonComponents/NotificationBell";
 
 const Navbar: React.FC = () => {
   const dispatch = useDispatch();
@@ -77,51 +78,57 @@ const Navbar: React.FC = () => {
         {/* Account Section */}
         <div className="hidden md:block">
           {user ? (
-            <div className="flex items-center gap-2 cursor-pointer group relative">
-              {user.profilePicture ? (
+            <div className="flex items-center space-x-6">
+              {/* Notifications */}
+              <div className="relative">
+                <NotificationBell />
+              </div>
+              <div className="flex items-center gap-2 cursor-pointer group relative">
+                {user.profilePicture ? (
+                  <img
+                    src={user.profilePicture}
+                    alt={user.name}
+                    className="w-8 rounded-full"
+                  />
+                ) : (
+                  <User size={16} className="text-blue-600" />
+                )}
+                {/* <img className="w-8 rounded-full" src={user.profilePicture} alt={user.name} /> */}
+                <span className="text-sm">Hello, {user.name}</span>
                 <img
-                  src={user.profilePicture}
-                  alt={user.name}
-                  className="w-8 rounded-full"
+                  className="w-2.5"
+                  src={assets.dropdown_icon}
+                  alt="Dropdown"
                 />
-              ) : (
-                <User size={16} className="text-blue-600" />
-              )}
-              {/* <img className="w-8 rounded-full" src={user.profilePicture} alt={user.name} /> */}
-              <span className="text-sm">Hello, {user.name}</span>
-              <img
-                className="w-2.5"
-                src={assets.dropdown_icon}
-                alt="Dropdown"
-              />
 
-              {/* Dropdown Menu */}
-              <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
-                <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4">
-                  <p
-                    onClick={() => navigate("/my-profile")}
-                    className="hover:text-black cursor-pointer"
-                  >
-                    My Profile
-                  </p>
-                  <p
-                    onClick={() => navigate("/my-appointments")}
-                    className="hover:text-black cursor-pointer"
-                  >
-                    My Appointments
-                  </p>
-                  <p
-                    onClick={() => navigate("/my-chats")}
-                    className="hover:text-black cursor-pointer"
-                  >
-                    Conversation
-                  </p>
-                  <p
-                    onClick={handleLogout}
-                    className="hover:text-black cursor-pointer"
-                  >
-                    Logout
-                  </p>
+                {/* Dropdown Menu */}
+                <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
+                  <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4">
+                    <p
+                      onClick={() => navigate("/my-profile")}
+                      className="hover:text-black cursor-pointer"
+                    >
+                      My Profile
+                    </p>
+                    <p
+                      onClick={() => navigate("/my-appointments")}
+                      className="hover:text-black cursor-pointer"
+                    >
+                      My Appointments
+                    </p>
+                    <p
+                      onClick={() => navigate("/my-chats")}
+                      className="hover:text-black cursor-pointer"
+                    >
+                      Conversation
+                    </p>
+                    <p
+                      onClick={handleLogout}
+                      className="hover:text-black cursor-pointer"
+                    >
+                      Logout
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

@@ -27,3 +27,28 @@ export interface ISlotData {
     endDate?: string;
   };
 }
+
+// export interface ISubSlot {
+//   startTime: string;
+//   endTime: string;
+//   isBooked: boolean;
+//   patientId?: string;
+// }
+
+// export interface ISlot {
+//   _id: string;
+//   doctorId: string;
+//   date: string;
+//   startTime: string;
+//   endTime: string;
+//   isBooked?: boolean;
+//   isBlocked: boolean;
+//   maxPatients: number;
+//   bookedCount: number;
+//   subSlots: ISubSlot[];
+//   recurring?: {
+//     isRecurring: boolean;
+//     frequency?: "daily" | "weekly" | "monthly";
+//     endDate?: string;
+//   };
+// }

@@ -268,7 +268,7 @@ export default class SlotService {
     return updatedSlot;
   }
 
-  // services/SlotService.ts
+ 
   public async checkSlotAvailability(
     slotId: string
   ): Promise<{ available: boolean; details: string }> {

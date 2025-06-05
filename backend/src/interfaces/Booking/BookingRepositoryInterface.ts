@@ -73,4 +73,6 @@ export interface IBookingRepository {
   ): Promise<{ bookings: IBooking[]; total: number }>;
 
   find(query: any): Promise<IBooking[]>;
-}
+
+  countAppointments(filter: any): Promise<number>
+findTodaysAppointments(doctorId: string, startOfDay: Date, endOfDay: Date): Promise<IBooking[]>}

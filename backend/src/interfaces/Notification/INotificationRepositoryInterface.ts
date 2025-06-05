@@ -1,7 +1,18 @@
 import { INotification } from "../../models/commonModel/NotificationModel";
 
 export interface INotificationRepository {
-    createNotification(data: Partial<INotification>): Promise<INotification>
-    getNotificationsByUserId(userId: string): Promise<INotification[]>
-    markAsRead(notificationId: string): Promise<INotification | null>
+  createNotification(data: {
+    recipientId: string;
+    recipientType: "user" | "doctor";
+    type: string;
+    title: string;
+    message: string;
+    metadata?: Record<string, any>;
+  }): Promise<INotification>;
+  findByRecipient(
+    recipientId: string,
+    recipientType: string
+  ): Promise<INotification[]>;
+  getUnreadCount(recipientId: string): Promise<number>;
+  markAsRead(notificationId: string): Promise<INotification | null>;
 }

@@ -1,19 +1,38 @@
-import notificationModel, { INotification, NotificationType } from '../../models/commonModel/NotificationModel';
 
-export class NotificationRepository {
-  async create(notification: Partial<INotification>): Promise<INotification> {
-    return await notificationModel.create(notification);
+import { INotificationRepository } from '../../interfaces/Notification/INotificationRepositoryInterface';
+import { INotification, Notification } from '../../models/commonModel/NotificationModel';
+
+export class NotificationRepository implements INotificationRepository{
+
+  async createNotification(data: {
+    recipientId: string;
+    recipientType: 'user' | 'doctor';
+    type: string;
+    title: string;
+    message: string;
+    metadata?: Record<string, any>;
+  }): Promise<INotification> {
+    return await Notification.create(data);
   }
 
-  async findByUserId(userId: string): Promise<INotification[]> {
-    return await notificationModel.find({ userId, read: false }).sort({ createdAt: -1 });
+
+  async findByRecipient(recipientId: string, recipientType: string): Promise<INotification[]> {
+    return Notification.find({ recipientId, recipientType ,read: false}).sort({ timestamp: -1 });
   }
 
-  async findByDoctorId(doctorId: string): Promise<INotification[]> {
-    return await notificationModel.find({ doctorId, read: false }).sort({ createdAt: -1 });
+  // Add other notification-related methods as needed
+  async getUnreadCount(recipientId: string): Promise<number> {
+    return await Notification.countDocuments({
+      recipientId,
+      read: false,
+    });
   }
 
-  async markAsRead(id: string): Promise<void> {
-    await notificationModel.findByIdAndUpdate(id, { read: true });
+  async markAsRead(notificationId: string): Promise<INotification | null> {
+    return await Notification.findByIdAndUpdate(
+      notificationId,
+      { $set: { read: true } },
+      { new: true }
+    );
   }
 }

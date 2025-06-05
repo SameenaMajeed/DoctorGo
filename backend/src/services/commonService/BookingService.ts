@@ -15,13 +15,16 @@ import { ISlot } from "../../models/commonModel/SlotModel";
 import { sentMail } from "../../utils/SendMail";
 import { v4 as uuidv4 } from "uuid";
 import { Server } from "socket.io";
+import { io } from "../../server";
+import { INotificationRepository } from "../../interfaces/Notification/INotificationRepositoryInterface";
 
 export class BookingService implements IBookingService {
   constructor(
     private _bookingRepo: IBookingRepository,
     private _doctorRepo: IDoctorRepository,
     private _patientRepo: UserRepositoryInterface,
-    private _slotRepo: ISlotRepository
+    private _slotRepo: ISlotRepository,
+    private _notificationRepo: INotificationRepository
   ) {}
 
   // Send email with video call room ID
@@ -218,6 +221,43 @@ export class BookingService implements IBookingService {
         paymentMethod: bookingData.paymentMethod || "razorpay",
         status: AppointmentStatus.CONFIRMED,
       });
+
+      // Save and emit patient notification using repository
+      const patientNotification = await this._notificationRepo.createNotification({
+        recipientId: patientId.toString(),
+        recipientType: "user",
+        type: "BOOKING_CONFIRMED",
+        title: "Booking Confirmed",
+        message: "Appointment confirmed!",
+        metadata: { link: "/appointments" }
+      });
+      
+      io.to(`user_${patientId}`).emit("receiveNotification", {
+        title: patientNotification.title,
+        message: patientNotification.message,
+        type: patientNotification.type,
+        link: patientNotification.link,
+        timestamp: patientNotification.createdAt
+      });
+
+      // Save and emit doctor notification using repository
+      const doctorNotification = await this._notificationRepo.createNotification({
+        recipientId: doctorId.toString(),
+        recipientType: "doctor",
+        type: "NEW_BOOKING_REQUEST",
+        title: "New Booking Request",
+        message: `New appointment booked by ${patient.name}`,
+        metadata: { link: "/doctor/appointments" }
+      });
+      
+      io.to(`doctor_${doctorId}`).emit("receiveNotification", {
+        title: doctorNotification.title,
+        message: doctorNotification.message,
+        type: doctorNotification.type,
+        link: doctorNotification.link,
+        timestamp: doctorNotification.createdAt
+      });
+
       return booking;
     } catch (error) {
       if (error instanceof AppError) throw error;
@@ -538,6 +578,15 @@ export class BookingService implements IBookingService {
         );
 
       await session.commitTransaction();
+      io.to(`user_${appointment.user_id.toString()}`).emit(
+        "receiveNotification",
+        {
+          type: "info",
+          message: `Your appointment has been ${status}.`,
+          link: `/appointments`,
+          timestamp: new Date(),
+        }
+      );
       return updatedAppointment;
     } catch (error) {
       await session.abortTransaction();
@@ -631,8 +680,22 @@ export class BookingService implements IBookingService {
       );
     }
   }
-}
 
+  async getTodaysAppointments(doctorId: string): Promise<IBooking[]> {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // Pass doctorId and date range
+    return this._bookingRepo.findTodaysAppointments(
+      doctorId,
+      startOfDay,
+      endOfDay
+    );
+  }
+}
 
 // import mongoose, { Types, UpdateQuery } from "mongoose";
 // import { IBookingService } from "../../interfaces/Booking/BookingServiceInterface";

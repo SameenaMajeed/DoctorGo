@@ -70,6 +70,7 @@ export class ChatController {
         "Users who messaged fetched successfully",
         { users }
       );
+      
     } catch (error) {
       if (error instanceof AppError) {
         sendError(res, error.status, error.message);

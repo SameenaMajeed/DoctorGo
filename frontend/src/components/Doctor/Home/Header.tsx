@@ -5,14 +5,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../slice/Store/Store";
 import doctorApi from "../../../axios/DoctorInstance";
 import { logoutDoctor } from "../../../slice/Doctor/doctorSlice";
+import NotificationBell from "../../CommonComponents/NotificationBell";
 
 const Header: React.FC = () => {
-  console.log("Header is rendering");
+  console.log('Header..')
   const [isOpen, setIsOpen] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const doctor = useSelector((state: RootState) => state.doctor.doctor);
+  
 
   const handleLogout = async () => {
     try {
@@ -42,10 +44,7 @@ const Header: React.FC = () => {
       <div className="flex items-center space-x-6">
         {/* Notifications */}
         <div className="relative">
-          <Bell className="w-6 h-6 text-gray-600 cursor-pointer" />
-          <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-            5
-          </span>
+          <NotificationBell/>
         </div>
 
         {/* Profile Dropdown */}

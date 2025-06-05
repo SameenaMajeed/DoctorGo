@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import BookingModel, {
   AppointmentStatus,
 } from "./models/commonModel/BookingModel";
+// import NotificationModel from "./models/commonModel/NotificationModel";
 dotenv.config();
 
 interface SocketData {
@@ -257,7 +258,7 @@ export const initializeSocket = (server: HttpServer): Server => {
           socket.to(videoRoom).emit("participantJoined", { role });
 
           console.log(`${role} joined video room ${videoRoom}`);
-        } catch (error : any) {
+        } catch (error: any) {
           console.error("Join error:", error);
           socket.emit("error", { message: error.message });
         }
@@ -295,6 +296,39 @@ export const initializeSocket = (server: HttpServer): Server => {
       socket.to(videoRoom).emit("ice-candidate", data.candidate);
     });
 
+    //   // Handle events like booking creation or modification
+    // socket.on("newBooking", async (data) => {
+    //   try {
+    //     const { userId, doctorId, message } = data;
+
+    //     // Save the notification in the database
+    //     const notification = new NotificationModel({
+    //       userId,
+    //       doctorId,
+    //       message,
+    //       read: false, // Initially, the notification is unread
+    //     });
+
+    //     await notification.save();
+
+    //     // Emit the notification to the appropriate user or doctor
+    //     if (socket.data.role === "user") {
+    //       io.to(`doctor_${doctorId}`).emit("notification", {
+    //         message,
+    //         timestamp: new Date(),
+    //       });
+    //     } else if (socket.data.role === "doctor") {
+    //       io.to(`user_${userId}`).emit("notification", {
+    //         message,
+    //         timestamp: new Date(),
+    //       });
+    //     }
+    //   } catch (error) {
+    //     console.error("Error in newBooking event:", error);
+    //     socket.emit("error", "Failed to send notification");
+    //   }
+    // })
+
     socket.on("disconnect", () => {
       console.log(
         `Disconnected: ${socket.id} (Role: ${socket.data.role}, ID: ${socket.data.id})`
@@ -304,7 +338,6 @@ export const initializeSocket = (server: HttpServer): Server => {
 
   return io;
 };
-
 
 // import { Server, Socket } from "socket.io";
 // import { Server as HttpServer } from "http";
@@ -365,7 +398,7 @@ export const initializeSocket = (server: HttpServer): Server => {
 //         role: decoded.role,
 //         email: decoded.email || "",
 //         name: decoded.name || "",
-        
+
 //       };
 //       next();
 //     } catch (error) {

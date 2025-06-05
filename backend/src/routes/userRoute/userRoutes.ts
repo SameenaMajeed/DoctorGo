@@ -21,6 +21,9 @@ import prescriptionRepository from "../../repositories/commonRepository/prescrip
 import { ReviewController } from "../../controllers/commonController/reviewController";
 import ReviewService from "../../services/commonService/ReviewService";
 import ReviewRepository from "../../repositories/commonRepository/ReviewRepository";
+import { NotificationRepository } from "../../repositories/commonRepository/NotificationRepository";
+import { NotificationController } from "../../controllers/commonController/NotificationController";
+import { NotificationService } from "../../services/commonService/NotificationService";
 
 const userRoute: Router = express.Router();
 const userRepository = new UserRepository();
@@ -30,6 +33,7 @@ const bookingRepository = new BookingRepository();
 const slotRepository = new SlotRepository();
 const PrescriptionRepository = new prescriptionRepository();
 const reviewRepository = new ReviewRepository()
+const notificationRepository = new NotificationRepository();
 
 const userService = new UserService(
   userRepository,
@@ -41,6 +45,8 @@ const bookingService = new BookingService(
   doctorRepository,
   userRepository,
   slotRepository,
+  notificationRepository
+
 );
 const prescriptionService = new PrescriptionService(
   PrescriptionRepository,
@@ -51,13 +57,17 @@ const prescriptionService = new PrescriptionService(
 const reviewService = new ReviewService(reviewRepository , bookingRepository)
 
 const paymentService = new PaymentService();
-const doctorService = new DoctorService(doctorRepository, otpRepository);
+// const doctorService = new DoctorService(doctorRepository, otpRepository);
+const notificationService = new NotificationService(notificationRepository);
+
 // const doctorController = new DoctorController(doctorService);
 const userController = new Usercontroller(userService);
 const bookingController = new BookingController(bookingService, paymentService);
 const chatController = new ChatController();
 const prescriptionController = new PrescriptionController(prescriptionService);
 const reviewController = new ReviewController(reviewService)
+const notificationController = new NotificationController(notificationService);
+
 
 // User authentication routes
 // Register user:
@@ -159,7 +169,7 @@ userRoute.patch(
   (req, res) => bookingController.cancelBooking(req, res)
 );
 
-// New endpoints for booking checks
+// booking checks
 userRoute.get("/bookings/user/:userId", authenticateToken("user"), (req, res) =>
   bookingController.getUserBookings(req, res)
 );
@@ -210,5 +220,19 @@ userRoute.get('/reviews/check', authenticateToken("user"), (req, res) =>
 // Get a single review by ID
 userRoute.get('/reviews/:id', authenticateToken("user"), (req, res) =>
   reviewController.getReviewById(req, res));
+
+// notification
+userRoute.get(
+  "/notifications",
+  authenticateToken("user"),
+  blockedUserMiddleware,
+  (req , res) => notificationController.getNotifications(req , res)
+);
+userRoute.patch(
+  "/notifications/:notificationId/read",
+  authenticateToken("user"),
+  blockedUserMiddleware,
+  (req , res) => notificationController.markAsRead(req , res)
+);
 
 export default userRoute;

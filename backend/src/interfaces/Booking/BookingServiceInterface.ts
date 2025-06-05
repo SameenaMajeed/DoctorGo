@@ -57,6 +57,7 @@ export interface IBookingService {
     limit: number,
     status?: AppointmentStatus
   ): Promise<{ bookings: IBooking[]; total: number; totalPages: number }>;
+  getTodaysAppointments(doctorId: string): Promise<IBooking[]>;
 
   // sendAppointmentReminders(): Promise<void>;
 }

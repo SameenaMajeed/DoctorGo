@@ -478,4 +478,35 @@ export class BookingController {
       this.handleError(res, error);
     }
   }
+
+  async getTodaysAppointments(req: Request, res: Response) {
+    try {
+      const doctorId = req.data?.id; // Get doctor ID from token (auth middleware)
+
+      if (!doctorId) {
+        throw new AppError(
+          HttpStatus.Unauthorized,
+          MessageConstants.UNAUTHORIZED
+        );
+      }
+
+      const appointments = await this.bookingService.getTodaysAppointments(
+        doctorId
+      );
+
+      sendResponse(res, HttpStatus.OK, "Booking check completed", {
+        appointments,
+      });
+    } catch (error) {
+      if (error instanceof AppError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(
+          res,
+          HttpStatus.InternalServerError,
+          MessageConstants.INTERNAL_SERVER_ERROR
+        );
+      }
+    }
+  }
 }

@@ -307,7 +307,6 @@ export class BookingRepository
         .exec(),
       Booking.countDocuments({ doctor_id: doctorId }),
     ]);
-    console.log("patient from repository", patients);
     return { patients, total };
   }
 
@@ -352,4 +351,22 @@ export class BookingRepository
       );
     }
   }
+
+ async countAppointments(filter: any): Promise<number> {
+  const total = await Booking.countDocuments(filter);
+  console.log('Total:', total);
+  return total;
+}
+
+async findTodaysAppointments(doctorId: string, startOfDay: Date, endOfDay: Date): Promise<IBooking[]> {
+  return Booking.find({
+    doctor_id: doctorId, // use correct DB field name
+    appointmentDate: {
+      $gte: startOfDay,
+      $lte: endOfDay
+    },
+    status: { $ne: 'cancelled' }
+  }).sort({ appointmentDate: 1 });
+}
+
 }

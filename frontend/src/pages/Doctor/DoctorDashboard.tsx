@@ -36,9 +36,9 @@ const DashboardLayout = () => {
       {/* Show Approval Status Banner if not approved */}
       {!doctor?.isApproved && <ApprovalBanner />}
 
-      <div className="flex h-screen">
+      <div className="flex flex-col md:flex-row h-screen">
         {/* Sidebar */}
-        <div className="h-full">
+        <div className="h-20 md:h-full md:w-64 overflow-y-auto">
           <Sidebar onRestrictedAction={handleRestrictedAction} />
         </div>
 
@@ -54,56 +54,4 @@ const DashboardLayout = () => {
   );
 };
 
-{
-  /* <div className="flex min-h-screen bg-black text-white">
-        <Sidebar onRestrictedAction={handleRestrictedAction} />
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <Header />
-          <main className="flex-1 overflow-auto bg-gray-50 text-black p-6">
-            <Main onRestrictedAction={handleRestrictedAction} />
-          </main>
-        </div>
-      </div> */
-}
-
 export default DashboardLayout;
-
-// import React from "react";
-// import Sidebar from "../../components/Doctor/Home/Sidebar";
-// import Header from "../../components/Doctor/Home/Header";
-// import Main from "../../components/Doctor/Home/Main";
-// import { useSelector } from "react-redux";
-// import { RootState } from "../../slice/Store/Store";
-// import { Navigate } from "react-router-dom";
-// import ApprovalBanner from '../../components/Doctor/Home/ApprovalBanner'
-
-// const DashboardLayout = () => {
-//   const { doctor, isAuthenticated } = useSelector((state: RootState) => state.doctor);
-
-//   // Redirect if not authenticated
-//   if (!isAuthenticated) {
-//     return <Navigate to="/doctor/login" />;
-//   }
-
-//   return (
-//     <div>
-//       {/* Approval Status Banner */}
-//       <ApprovalBanner />
-
-//       <div className="flex h-screen bg-gray-50">
-//         {/* Sidebar */}
-//         <Sidebar />
-
-//         {/* Main Content */}
-//         <div className="flex flex-col flex-1 overflow-hidden">
-//           <Header />
-//           <main className="flex-1 p-6 overflow-auto">
-//             <Main />
-//           </main>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default DashboardLayout;

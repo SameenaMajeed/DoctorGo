@@ -103,34 +103,7 @@ export default class SlotController {
       }
     }
   }
-  // async getAvailableSlots(req: Request, res: Response) {
-  //   try {
-  //     const { doctorId } = req.params;
-  //     const page = parseInt(req.query.page as string) || 1;
-  //     const limit = parseInt(req.query.limit as string) || 10;
-  //     const searchTerm = (req.query.searchTerm as string) || "";
-
-  //     if (!doctorId) {
-  //       return sendError(res, HttpStatus.BadRequest, "Doctor ID is required");
-  //     }
-
-  //     const { slots, total } = await this.slotService.getAvailableSlots(
-  //       doctorId,
-  //       page,
-  //       limit,
-  //       searchTerm
-  //     );
-
-  //     sendResponse(
-  //       res,
-  //       HttpStatus.OK,
-  //       slots.length > 0 ? "Success" : "No available slots found",
-  //       { slots, total } // Ensure `total` is included in the response
-  //     );
-  //   } catch (error: any) {
-  //     sendError(res, HttpStatus.InternalServerError, error.message);
-  //   }
-  // }
+  
   async bookSlot(req: Request, res: Response) {
     try {
       const slotId = req.params.slotId;
@@ -257,6 +230,12 @@ export default class SlotController {
   ): Promise<void> {
     try {
       const { slotId } = req.params;
+      if (!slotId) {
+        throw new AppError(
+          HttpStatus.BadRequest,
+          "Slot ID is required"
+        );
+      }
 
       const availability = await this.slotService.checkSlotAvailability(slotId);
 

@@ -21,7 +21,9 @@ import { ChatController } from "../../controllers/commonController/chatControlle
 import { DashboardService } from "../../services/doctorService/DashboardService";
 import { DoctorDashboardController } from "../../controllers/doctorController/doctorDashboardController";
 // import { NotificationService } from "../../services/commonService/NotificationService";
-// import { NotificationRepository } from "../../repositories/commonRepository/NotificationRepository";
+import { NotificationRepository } from "../../repositories/commonRepository/NotificationRepository";
+import { NotificationService } from "../../services/commonService/NotificationService";
+import { NotificationController } from "../../controllers/commonController/NotificationController";
 // import { NotificationController } from "../../controllers/commonController/NotificationController";
 // import { uploadCertifications } from '../middlewares/fileUpload';
 
@@ -32,15 +34,15 @@ const userRepository = new UserRepository();
 const slotRepository = new SlotRepository();
 const PrescriptionRepository = new prescriptionRepository();
 
-// const notificationRepository = new NotificationRepository();
-// const notificationService = new NotificationService(notificationRepository);
+const notificationRepository = new NotificationRepository();
+const notificationService = new NotificationService(notificationRepository);
 
 const bookingService = new BookingService(
   bookingRepository,
   doctorRepository,
   userRepository,
   slotRepository,
-  // notificationService
+  notificationRepository
 );
 
 const prescriptionService = new PrescriptionService(
@@ -61,10 +63,18 @@ const prescriptionController = new PrescriptionController(prescriptionService);
 
 const chatController = new ChatController();
 
-const dashboardService = new DashboardService(doctorRepository,userRepository,bookingRepository,PrescriptionRepository);
-const dashboardController = new DoctorDashboardController(doctorService, dashboardService);
+const dashboardService = new DashboardService(
+  doctorRepository,
+  userRepository,
+  bookingRepository,
+  PrescriptionRepository
+);
+const dashboardController = new DoctorDashboardController(
+  doctorService,
+  dashboardService
+);
 
-// const notificationController = new NotificationController();
+const notificationController = new NotificationController(notificationService);
 
 const doctorRoute: Router = express.Router();
 
@@ -135,7 +145,11 @@ doctorRoute.get("/allPrescriptions", (req, res) =>
 );
 
 // chat
-doctorRoute.get('/chats/users/:doctorId', authenticateToken('doctor'), (req, res) => chatController.getUsersWhoMessaged(req, res));
+doctorRoute.get(
+  "/chats/users/:doctorId",
+  authenticateToken("doctor"),
+  (req, res) => chatController.getUsersWhoMessaged(req, res)
+);
 
 doctorRoute.post(
   "/create-video-call-room",
@@ -144,6 +158,30 @@ doctorRoute.post(
   (req, res) => bookingController.createVideoCallRoom(req, res)
 );
 
-doctorRoute.get("/:doctorId/dashboard-stats", authenticateToken('doctor'), (req, res) => dashboardController.getDashboardStats(req, res));
+doctorRoute.get(
+  "/:doctorId/dashboard-stats",
+  authenticateToken("doctor"),
+  (req, res) => dashboardController.getDashboardStats(req, res)
+);
 
+doctorRoute.get(
+  "/appointments/today",
+  authenticateToken("doctor"),
+  blockedDoctorMiddleware,
+  (req, res) => bookingController.getTodaysAppointments(req, res)
+);
+
+// notification
+doctorRoute.get(
+  "/notifications",
+  authenticateToken("doctor"),
+  blockedDoctorMiddleware,
+  (req , res) => notificationController.getNotifications(req , res)
+);
+doctorRoute.patch(
+  '/notifications/:notificationId/read',
+  authenticateToken("doctor"),
+  blockedDoctorMiddleware,
+  (req , res) => notificationController.markAsRead(req , res)
+);
 export default doctorRoute;
