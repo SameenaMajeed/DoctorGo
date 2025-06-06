@@ -3,11 +3,18 @@ import { toast } from "react-toastify";
 import { IAppointment } from "../../Types";
 import api from "../../axios/UserInstance";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ReviewForm from "./ReviewForm";
-import { FaInfoCircle, FaStar, FaTrashAlt, FaVideo } from "react-icons/fa";
+import {
+  FaFilePrescription,
+  FaInfoCircle,
+  FaStar,
+  FaTrashAlt,
+  FaVideo,
+} from "react-icons/fa";
 import ViewDetails from "./ViewDetails";
 import CancelConfirmationModal from "../CommonComponents/CancelConfirmationModal";
+import { ClipboardList } from "lucide-react";
 
 interface IAppointmentCardProps {
   appointment: IAppointment;
@@ -113,7 +120,9 @@ const AppointmentCard: React.FC<IAppointmentCardProps> = ({
       toast.error("Please enter a valid Room ID");
       return;
     }
-    navigate(`/user/video-call?roomId=${roomIdInput}&bookingId=${appointment._id}`);
+    navigate(
+      `/user/video-call?roomId=${roomIdInput}&bookingId=${appointment._id}`
+    );
   };
 
   const formatTimeString = (timeString: string | null | undefined) => {
@@ -232,6 +241,17 @@ const AppointmentCard: React.FC<IAppointmentCardProps> = ({
                 onClose={handleCloseViewDetails}
               />
             )}
+            <Link
+                to={`/prescription/${appointment._id}`}
+                className="flex items-center gap-2 bg-indigo-50 text-indigo-700 border border-indigo-300 px-4 py-2 rounded-lg font-medium text-sm hover:bg-indigo-100 
+        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 
+        active:scale-95 
+        transition-all duration-200"
+                aria-label="View prescription"
+              >
+                <ClipboardList className="text-indigo-600 w-5 h-5" />
+                <span>Prescription</span>
+              </Link>
             <button
               onClick={handleAddOrEditReview}
               disabled={isCheckingReview}
@@ -287,7 +307,9 @@ const AppointmentCard: React.FC<IAppointmentCardProps> = ({
               onClick={handleCancel}
               disabled={isCanceling}
               className={`flex items-center gap-2 border border-red-600 text-red-600 px-4 py-2 rounded-md transition ${
-                isCanceling ? "opacity-50 cursor-not-allowed" : "hover:bg-red-100"
+                isCanceling
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-red-100"
               }`}
             >
               <FaTrashAlt />

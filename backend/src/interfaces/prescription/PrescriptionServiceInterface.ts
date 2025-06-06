@@ -8,4 +8,5 @@ export interface IPrescriptionService{
     getUserPrescriptions(userId: string): Promise<IPrescription[]>;
     generatePrescriptionPDF(prescriptionId: string): Promise<string>;
     getPrescriptionForDownload(prescriptionId: string, userId: string): Promise<{ prescription: IPrescription; filePath: string }>;
+    getPrescriptionByAppointment(appointmentId: string): Promise<IPrescription>
 }

@@ -149,57 +149,38 @@ export default class PrescriptionController {
       res.status(403).json({ message: error.message });
     }
   }
-  // async downloadPrescription(req: Request, res: Response) {
-  //   try {
-  //     const { prescriptionId } = req.params;
-  //     const userId = req.data?.id;
-  //     if (!userId) {
-  //       throw new AppError(HttpStatus.BadRequest, MessageConstants.USER_ID_NOT_FOUND);
-  //     }
-  //     const { filePath } = await this.prescriptionService.getPrescriptionForDownload(prescriptionId, userId);
 
-  //     res.download(filePath, `prescription_${prescriptionId}.pdf`, (err) => {
-  //       if (err) {
-  //         res.status(500).json({ message: "Error downloading file" });
-  //       }
-  //     });
-  //   } catch (error: any) {
-  //     res.status(403).json({ message: error.message });
-  //   }
-  // }
+  getPrescriptionByAppointment = async (req: Request, res: Response) => {
+    try {
+      const { appointmentId } = req.params;
+      console.log('appointmentId :',appointmentId)
+      if (!appointmentId) {
+        return sendError(
+          res,
+          HttpStatus.BadRequest,
+          "Appointment ID is required"
+        );
+      }
+      const prescription =
+        await this.prescriptionService.getPrescriptionByAppointment(
+          appointmentId
+        );
 
-  // async getAllPrescriptions(req: Request, res: Response) {
-  //   try {
-  //     const query: PrescriptionQuery = {
-  //       userId: req.query.userId as string,
-  //       doctorId: req.query.doctorId as string,
-  //       date: req.query.query as string,
-  //       page: parseInt(req.query.page as string) || 1,
-  //       limit: parseInt(req.query.limit as string) || 10,
-  //     };
-
-  //     // const query = req.body
-
-  //     const prescriptions = await this.prescriptionService.getPrescriptions(query);
-
-  //     sendResponse(
-  //       res,
-  //       HttpStatus.OK,
-  //       'Prescriptions found successfully',
-  //       { data: prescriptions }
-  //     );
-  //   } catch (error: any) {
-  //     if (error.message === "At least one of userId or doctorId is required") {
-  //       return res.status(400).json({ success: false, message: error.message });
-  //     }
-  //     if (error.message === "Invalid date format") {
-  //       return res.status(400).json({ success: false, message: error.message });
-  //     }
-  //     if (error.message === "No prescriptions found") {
-  //       return res.status(404).json({ success: false, message: error.message });
-  //     }
-  //     console.error("Error fetching prescriptions:", error);
-  //     res.status(500).json({ success: false, message: "Server error" });
-  //   }
-  // }
+      console.log('prescription:',prescription)  
+      sendResponse(res, HttpStatus.OK, "Prescription found successfully", {
+        prescription,
+      });
+    } catch (error: any) {
+      if (error instanceof AppError) {
+        sendError(res, error.status, error.message);
+      } else {
+        console.error("Error in Get Prescription:", error);
+        sendError(
+          res,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "Internal server error"
+        );
+      }
+    }
+  };
 }

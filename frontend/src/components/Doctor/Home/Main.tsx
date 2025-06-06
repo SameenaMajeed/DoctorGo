@@ -102,22 +102,6 @@ const Main: React.FC<MainProps> = ({ onRestrictedAction }) => {
                       🩺 Online
                     </span>
                   </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap gap-2">
-                    <button className="bg-red-100 text-red-600 px-3 py-1 rounded hover:bg-red-200 text-sm">
-                      Cancel
-                    </button>
-                    <button className="bg-blue-100 text-blue-600 px-3 py-1 rounded hover:bg-blue-200 text-sm">
-                      Complete
-                    </button>
-                    <button className="bg-indigo-100 text-indigo-600 px-3 py-1 rounded hover:bg-indigo-200 text-sm">
-                      Add Prescription
-                    </button>
-                    <button className="w-full bg-purple-100 text-purple-700 px-3 py-2 rounded mt-2 text-sm flex items-center justify-center hover:bg-purple-200">
-                      <span className="mr-2">📹</span> Start Video Call
-                    </button>
-                  </div>
                 </div>
               ))}
             </div>

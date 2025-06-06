@@ -99,9 +99,15 @@ export default class prescriptionRepository
       )
       .exec();
   }
-  // async getPrescriptionById(prescriptionId: Types.ObjectId): Promise<IPrescription | null> {
-  //   return PrescriptionModel.findById(prescriptionId)
-  //     .populate("doctorId", "name")
-  //     .lean();
-  // }
+  async findByAppointmentId(
+    appointmentId: string
+  ): Promise<IPrescription | null> {
+    return PrescriptionModel.findOne({ appointmentId })
+      .populate("userId", "name email age gender address mobile_no DOB address")
+      .populate(
+        "doctorId",
+        "name email phone qualification specialization registrationNumber "
+      )
+      .exec();
+  }
 }

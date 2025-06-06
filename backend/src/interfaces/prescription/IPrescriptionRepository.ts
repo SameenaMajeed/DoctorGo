@@ -20,4 +20,5 @@ export default interface IPrescriptionRepository {
   getPrescriptionById(
     prescriptionId: Types.ObjectId
   ): Promise<IPrescription | null>;
+  findByAppointmentId(appointmentId: string): Promise<IPrescription | null>;
 }

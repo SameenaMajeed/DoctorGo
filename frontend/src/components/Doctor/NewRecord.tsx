@@ -150,6 +150,7 @@ const NewRecord: React.FC = () => {
       const prescriptionData = {
         doctorId: doctor._id,
         userId: patient._id,
+        appointmentId:appointment._id,
         symptoms: complaints,
         disease: diagnosis,
         vitalSigns: vitalSigns,

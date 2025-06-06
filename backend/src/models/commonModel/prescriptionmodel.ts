@@ -14,6 +14,7 @@ interface TestReport {
 export interface IPrescription extends Document {
   userId: mongoose.Types.ObjectId;
   doctorId: mongoose.Types.ObjectId;
+  appointmentId: mongoose.Types.ObjectId;
   medicines: Medicine[];
   symptoms: string;
   disease: string;
@@ -34,6 +35,11 @@ const PrescriptionSchema: Schema = new Schema<IPrescription>(
     doctorId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Doctor",
+      required: true,
+    },
+    appointmentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Appointment",
       required: true,
     },
     vitalSigns: { type: String },

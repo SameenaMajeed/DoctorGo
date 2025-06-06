@@ -203,6 +203,9 @@ userRoute.get("/prescriptions/:prescriptionId/download",authenticateToken("user"
   prescriptionController.downloadPrescription(req, res)
 );
 
+userRoute.get("/prescription/:appointmentId", (req, res) =>prescriptionController.getPrescriptionByAppointment(req, res));
+
+
 // Review
 userRoute.post('/submitReview',authenticateToken("user"), (req, res) =>
   reviewController.addReview(req, res))

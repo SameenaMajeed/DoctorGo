@@ -84,13 +84,36 @@ export default class SlotService {
 
     console.log("Processed Slot Data:", slotData);
 
+    // if (slot.recurring?.isRecurring) {
+    //   console.log("Recurring slot detected, calling createRecurringSlots");
+    //   return await this.slotrepo.createRecurringSlots(slotData);
+    // }
+
+    // return await this.slotrepo.createSlot(slotData);
+    let createdSlot;
     if (slot.recurring?.isRecurring) {
-      console.log("Recurring slot detected, calling createRecurringSlots");
-      return await this.slotrepo.createRecurringSlots(slotData);
+        console.log("Recurring slot detected, calling createRecurringSlots");
+        createdSlot = await this.slotrepo.createRecurringSlots(slotData);
+    } else {
+        createdSlot = await this.slotrepo.createSlot(slotData);
     }
 
-    return await this.slotrepo.createSlot(slotData);
+    // Invalidate all cached slots for this doctor
+    this.invalidateDoctorSlotsCache(slot.doctorId.toString());
+
+    return createdSlot;
   }
+
+  private invalidateDoctorSlotsCache(doctorId: string) {
+    const cacheKeys = slotCache.keys();
+    const prefix = `slots:${doctorId}:`;
+    
+    cacheKeys.forEach(key => {
+        if (key.startsWith(prefix)) {
+            slotCache.del(key);
+        }
+    });
+}
 
   private formatTimeForDisplay(timeString: string): string {
     try {
@@ -233,10 +256,17 @@ export default class SlotService {
   }
 
   async deleteSlot(slotId: string): Promise<void> {
+    // First get the slot to know the doctorId
+    const slot = await this.slotrepo.findSlotById(slotId);
+    if (!slot) {
+        throw new Error("Slot not found");
+    }
     const result = await this.slotrepo.deleteSlot(slotId);
     if (!result) {
       throw new Error("Failed to delete slot or slot not found");
     }
+     // Invalidate cache
+    this.invalidateDoctorSlotsCache(slot.doctorId.toString());
   }
 
   async getSlots(slotId: string): Promise<ISlot | null> {
@@ -265,6 +295,9 @@ export default class SlotService {
     if (!updatedSlot) {
       throw new Error("Failed to update slot");
     }
+    // Invalidate cache
+    this.invalidateDoctorSlotsCache(slot.doctorId.toString());
+
     return updatedSlot;
   }
 

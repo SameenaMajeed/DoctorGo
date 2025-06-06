@@ -134,6 +134,42 @@ export class BookingService implements IBookingService {
       role: "user", // Explicitly set role
     });
 
+    // await this._notificationRepo.createNotification({
+    //   recipientId: updatedBooking.user_id.toString(),
+    //   recipientType: "user",
+    //   message: "Your video call room has been created.",
+    //   title: "Vedio call",
+    //   metadata: { link: `/video-call/${roomId}` },
+    //   type: "info",
+    // });
+
+    // // 🔔 Emit notification to user
+    // io.to(`user_${updatedBooking.user_id}`).emit("sendNotification", {
+    //   recipientId: updatedBooking.user_id,
+    //   recipientRole: "user",
+    //   type: "info",
+    //   message: "Your video call room has been created. Please join on time.",
+    //   link: `/video-call/${roomId}`,
+    // });
+    
+    // await this._notificationRepo.createNotification({
+    //   recipientId: updatedBooking.user_id.toString(),
+    //   recipientType: "doctor",
+    //   message: "A video call room has been created for your appointment.",
+    //   title: "Vedio call",
+    //   metadata: { link: `/video-call/${roomId}` },
+    //   type: "info",
+    // });
+
+    // // 🔔 Emit notification to doctor
+    // io.to(`doctor_${doctorId}`).emit("sendNotification", {
+    //   recipientId: doctorId,
+    //   recipientRole: "doctor",
+    //   type: "info",
+    //   message: "A video call room has been created for your appointment.",
+    //   link: `/video-call/${roomId}`,
+    // });
+
     // Optional: Catch email errors silently
     try {
       await this.sendVideoCallEmail(
@@ -223,39 +259,41 @@ export class BookingService implements IBookingService {
       });
 
       // Save and emit patient notification using repository
-      const patientNotification = await this._notificationRepo.createNotification({
-        recipientId: patientId.toString(),
-        recipientType: "user",
-        type: "BOOKING_CONFIRMED",
-        title: "Booking Confirmed",
-        message: "Appointment confirmed!",
-        metadata: { link: "/appointments" }
-      });
-      
+      const patientNotification =
+        await this._notificationRepo.createNotification({
+          recipientId: patientId.toString(),
+          recipientType: "user",
+          type: "BOOKING_CONFIRMED",
+          title: "Booking Confirmed",
+          message: "Appointment confirmed!",
+          metadata: { link: "/appointments" },
+        });
+
       io.to(`user_${patientId}`).emit("receiveNotification", {
         title: patientNotification.title,
         message: patientNotification.message,
         type: patientNotification.type,
         link: patientNotification.link,
-        timestamp: patientNotification.createdAt
+        timestamp: patientNotification.createdAt,
       });
 
       // Save and emit doctor notification using repository
-      const doctorNotification = await this._notificationRepo.createNotification({
-        recipientId: doctorId.toString(),
-        recipientType: "doctor",
-        type: "NEW_BOOKING_REQUEST",
-        title: "New Booking Request",
-        message: `New appointment booked by ${patient.name}`,
-        metadata: { link: "/doctor/appointments" }
-      });
-      
+      const doctorNotification =
+        await this._notificationRepo.createNotification({
+          recipientId: doctorId.toString(),
+          recipientType: "doctor",
+          type: "NEW_BOOKING_REQUEST",
+          title: "New Booking Request",
+          message: `New appointment booked by ${patient.name}`,
+          metadata: { link: "/doctor/appointments" },
+        });
+
       io.to(`doctor_${doctorId}`).emit("receiveNotification", {
         title: doctorNotification.title,
         message: doctorNotification.message,
         type: doctorNotification.type,
         link: doctorNotification.link,
-        timestamp: doctorNotification.createdAt
+        timestamp: doctorNotification.createdAt,
       });
 
       return booking;
@@ -578,13 +616,26 @@ export class BookingService implements IBookingService {
         );
 
       await session.commitTransaction();
+
+      // Save and emit patient notification using repository
+      const patientNotification =
+        await this._notificationRepo.createNotification({
+          recipientId: appointment.user_id.toString(),
+          recipientType: "user",
+          type: "UPDATE_STATUS",
+          title: "Status Updated",
+          message: `Your appointment has been ${status}.`,
+          metadata: { link: "/appointments" },
+        });
+
       io.to(`user_${appointment.user_id.toString()}`).emit(
         "receiveNotification",
         {
-          type: "info",
-          message: `Your appointment has been ${status}.`,
-          link: `/appointments`,
-          timestamp: new Date(),
+          title: patientNotification.title,
+          message: patientNotification.message,
+          type: patientNotification.type,
+          link: patientNotification.link,
+          timestamp: patientNotification.createdAt,
         }
       );
       return updatedAppointment;

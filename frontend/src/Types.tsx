@@ -7,13 +7,19 @@ export interface IDoctor {
   email: string;
   phone?: string;
   qualification?: string;
-  specialization?: string;
+  specialization: string;
   profilePicture ?: string;
   role: string | null;
   accessToken?:string,
   refreshToken ?:string,
   ticketPrice ?: number,
   isOnline : boolean,
+  rating?: number;
+  reviewsCount?: number;
+  extraCharge?: number; 
+  bio?: string;
+  experience?: number;
+
 }
 
 // interface Patient{
@@ -68,14 +74,16 @@ export interface IMedicine {
 
 export interface IPrescription {
   _id: string;
-  userId: string;
-  doctorId: string;
+  userId: IUser;       
+  doctorId: IDoctor;      
   medicines: IMedicine[];
   symptoms: string;
   disease: string;
   testReports: ITestReport[];
   vitalSigns?: string;
   createdAt: string;
+  updatedAt?: string;
+  followUpDate?: string;
 }
 
 export interface IReview {

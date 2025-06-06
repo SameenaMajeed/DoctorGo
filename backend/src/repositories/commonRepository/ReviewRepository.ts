@@ -52,6 +52,7 @@ class ReviewRepository implements IReviewRepository {
   ): Promise<IReview | null> {
     return await ReviewModel.findOne({ appointment_id: appointmentId });
   }
+  
 }
 
 export default ReviewRepository;

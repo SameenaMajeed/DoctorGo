@@ -260,4 +260,15 @@ export default class PrescriptionService {
     const filePath = await this.generatePrescriptionPDF(prescriptionId);
     return { prescription, filePath };
   }
+
+  async getPrescriptionByAppointment(appointmentId: string): Promise<IPrescription> {
+    const prescription = await this.prescriptionRepo.findByAppointmentId(appointmentId);
+    console.log('prescription form service:',prescription) 
+
+    if (!prescription) {
+      throw new AppError(HttpStatus.NotFound, "Prescription not found for this appointment");
+    }
+
+    return prescription;
+  }
 }
