@@ -86,13 +86,13 @@ const AppointmentPage: React.FC = () => {
     fetchUserBookings();
   }, [userId, doctorId]);
 
-  const isSameDate = (date1: Date, date2: Date): boolean => {
-    return (
-      date1.getFullYear() === date2.getFullYear() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getDate() === date2.getDate()
-    );
-  };
+  // const isSameDate = (date1: Date, date2: Date): boolean => {
+  //   return (
+  //     date1.getFullYear() === date2.getFullYear() &&
+  //     date1.getMonth() === date2.getMonth() &&
+  //     date1.getDate() === date2.getDate()
+  //   );
+  // };
 
   const fetchAppointmentsAndSlots = async (date: Date) => {
     try {
@@ -118,26 +118,26 @@ const AppointmentPage: React.FC = () => {
     }
   };
 
-  const formatTimeForDisplay = (timeString: string): string => {
-    if (/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(timeString)) {
-      return timeString;
-    }
+  // const formatTimeForDisplay = (timeString: string): string => {
+  //   if (/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(timeString)) {
+  //     return timeString;
+  //   }
 
-    try {
-      const date = new Date(timeString);
-      if (!isNaN(date.getTime())) {
-        return date.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        });
-      }
-    } catch {
-      console.warn("Invalid time format:", timeString);
-    }
+  //   try {
+  //     const date = new Date(timeString);
+  //     if (!isNaN(date.getTime())) {
+  //       return date.toLocaleTimeString([], {
+  //         hour: "2-digit",
+  //         minute: "2-digit",
+  //         hour12: false,
+  //       });
+  //     }
+  //   } catch {
+  //     console.warn("Invalid time format:", timeString);
+  //   }
 
-    return "Invalid Time";
-  };
+  //   return "Invalid Time";
+  // };
 
   const handleDateChange = (date: Date | null) => {
     if (date && !isNaN(date.getTime())) {

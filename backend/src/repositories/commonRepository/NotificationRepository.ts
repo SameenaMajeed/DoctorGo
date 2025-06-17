@@ -17,7 +17,7 @@ export class NotificationRepository implements INotificationRepository{
 
 
   async findByRecipient(recipientId: string, recipientType: string): Promise<INotification[]> {
-    return Notification.find({ recipientId, recipientType ,read: false}).sort({ timestamp: -1 });
+    return Notification.find({ recipientId, recipientType ,read: false}).sort({ createdAt : -1 });
   }
 
   // Add other notification-related methods as needed

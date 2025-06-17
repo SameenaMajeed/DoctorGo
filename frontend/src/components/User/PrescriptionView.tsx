@@ -68,6 +68,7 @@ const PrescriptionView: React.FC = () => {
   };
 
   if (loading) return <div className="p-4 text-center">Loading...</div>;
+  if(error) return <p className="text-center text-red-500 text-lg mb-4">{error}</p>
 
   if (!prescription) {
     return (

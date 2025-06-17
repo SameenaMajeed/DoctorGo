@@ -6,7 +6,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { Link, useNavigate } from "react-router-dom";
 import ReviewForm from "./ReviewForm";
 import {
-  FaFilePrescription,
   FaInfoCircle,
   FaStar,
   FaTrashAlt,
@@ -71,6 +70,8 @@ const AppointmentCard: React.FC<IAppointmentCardProps> = ({
       const response = await api.patch(
         `/appointments/${appointment._id}/cancel`
       );
+
+      console.log(response)
       if (response.status === 200) {
         onCancel(appointment._id);
         toast.update(toastId, {

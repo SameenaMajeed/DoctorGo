@@ -77,8 +77,11 @@ export class BookingController {
         );
       }
 
+      console.log("amount : ", amount);
+
       // Create Razorpay order
       const order = await this.paymentService.createOrder(amount, currency);
+      console.log("order :", order);
 
       // Prepare response with Razorpay options
       const response = {
@@ -88,7 +91,7 @@ export class BookingController {
           amount: order.amount,
           currency: order.currency,
           order_id: order.id,
-          name: "Doctor Go",
+          name: "Doctor GO",
           description: `Appointment with Dr. ${appointmentData.doctorId}`,
           prefill: {
             name: appointmentData.patientName,
@@ -151,7 +154,7 @@ export class BookingController {
           MessageConstants.UNAUTHORIZED
         );
 
-      const { paymentId, ...bookingDetails } = req.body;
+      const { paymentId, platformFee, ...bookingDetails } = req.body;
       console.log();
 
       if (!paymentId) {
@@ -166,6 +169,12 @@ export class BookingController {
         is_paid: true, // Mark as paid
         paymentMethod: "razorpay",
         paymentId, // Razorpay payment ID
+        platformFee: platformFee || 0,
+        totalAmount: (bookingDetails.ticketPrice || 0) + (platformFee || 0),
+        paymentBreakdown: {
+          doctorFee: bookingDetails.ticketPrice,
+          platformFee: platformFee || 0,
+        },
       };
 
       const booking = await this.bookingService.bookAppointment(bookingData);
@@ -211,9 +220,7 @@ export class BookingController {
 
   async cancelBooking(req: Request, res: Response): Promise<void> {
     try {
-      console.log("request hitting");
       const { id } = req.params;
-      console.log("id: ", id);
       if (!id)
         throw new AppError(
           HttpStatus.BadRequest,
@@ -233,6 +240,27 @@ export class BookingController {
         MessageConstants.APPOINTMENT_CANCELLED,
         booking
       );
+    } catch (error) {
+      this.handleError(res, error);
+    }
+  }
+
+  async createFailedBooking(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.data?.id;
+      if (!userId) throw new AppError(HttpStatus.Unauthorized, "Unauthorized");
+
+      const bookingData = req.body;
+
+      // Create a failed booking record
+      const booking = await this.bookingService.createFailedBooking({
+        ...bookingData,
+        user_id: userId,
+        status: "failed",
+        is_paid: false,
+      });
+
+      sendResponse(res, HttpStatus.Created, "Failed booking recorded", booking);
     } catch (error) {
       this.handleError(res, error);
     }

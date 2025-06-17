@@ -24,6 +24,8 @@ import ReviewRepository from "../../repositories/commonRepository/ReviewReposito
 import { NotificationRepository } from "../../repositories/commonRepository/NotificationRepository";
 import { NotificationController } from "../../controllers/commonController/NotificationController";
 import { NotificationService } from "../../services/commonService/NotificationService";
+import { WalletRepository } from "../../repositories/commonRepository/WalletRepository";
+import { WalletController } from "../../controllers/commonController/WalletController";
 
 const userRoute: Router = express.Router();
 const userRepository = new UserRepository();
@@ -34,6 +36,7 @@ const slotRepository = new SlotRepository();
 const PrescriptionRepository = new prescriptionRepository();
 const reviewRepository = new ReviewRepository()
 const notificationRepository = new NotificationRepository();
+const walletRepository = new WalletRepository()
 
 const userService = new UserService(
   userRepository,
@@ -45,8 +48,8 @@ const bookingService = new BookingService(
   doctorRepository,
   userRepository,
   slotRepository,
-  notificationRepository
-
+  notificationRepository,
+  walletRepository
 );
 const prescriptionService = new PrescriptionService(
   PrescriptionRepository,
@@ -67,6 +70,7 @@ const chatController = new ChatController();
 const prescriptionController = new PrescriptionController(prescriptionService);
 const reviewController = new ReviewController(reviewService)
 const notificationController = new NotificationController(notificationService);
+const walletController = new WalletController()
 
 
 // User authentication routes
@@ -94,13 +98,13 @@ userRoute.post("/refresh-token", (req: Request, res: Response) => {
   userController.refreshAccessToken(req, res);
 });
 
-userRoute.post("/forgot-password", (req: Request, res: Response) => {
-  userController.forgotPassword(req, res);
-});
+// userRoute.post("/forgot-password", (req: Request, res: Response) => {
+//   userController.forgotPassword(req, res);
+// });
 
-userRoute.post("/reset-password", (req: Request, res: Response) => {
-  userController.resetPassword(req, res);
-});
+// userRoute.post("/reset-password", (req: Request, res: Response) => {
+//   userController.resetPassword(req, res);
+// });
 
 userRoute.post("/logout", (req, res) => userController.logout(req, res));
 
@@ -187,6 +191,15 @@ userRoute.post(
   }
 );
 
+userRoute.post(
+  "/bookings/create-failed",
+  authenticateToken("user"),
+  (req, res) => {
+    bookingController.createFailedBooking(req, res);
+  }
+);
+
+
 // Chat route
 userRoute.get(
   "/chats/doctors/:userId",
@@ -237,5 +250,13 @@ userRoute.patch(
   blockedUserMiddleware,
   (req , res) => notificationController.markAsRead(req , res)
 );
+
+// wallet
+userRoute.get("/wallet",
+  authenticateToken("user"),
+  (req, res) => walletController.getWallet(req, res)
+)
+
+
 
 export default userRoute;

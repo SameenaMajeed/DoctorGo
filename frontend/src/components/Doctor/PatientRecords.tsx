@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { RecordCard } from "../CommonComponents/card";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../CommonComponents/Button";
 import { Card, CardContent } from "../CommonComponents/card";
@@ -36,14 +35,14 @@ const MedicalRecord: React.FC = () => {
 
   // State management
   const [patient, setPatient] = useState<IUser | null>(null);
-  const [appointment, setAppointment] = useState<IAppointment | null>(null);
+  const [appointment] = useState<IAppointment | null>(null);
   const [records, setRecords] = useState<IMedicalRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const limit = 4; 
+  const limit = 4;
   const [total, setTotal] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm] = useState("");
 
   // Fetch patient data and prescriptions
   useEffect(() => {
@@ -81,7 +80,6 @@ const MedicalRecord: React.FC = () => {
 
         console.log(response.data);
 
-
         const { prescriptions, total } = response.data.data;
 
         // Map prescriptions to MedicalRecord format
@@ -97,14 +95,14 @@ const MedicalRecord: React.FC = () => {
             prescription: p.medicines
               .map((m) => `${m.name}: ${m.quantity} doses, ${m.time_gap}`)
               .join("; "),
-            cost: "N/A", // Backend doesn't provide cost; adjust if available
+            cost: "N/A",
           })
         );
 
         if (response.data.data) {
           setTotal(Math.ceil(response.data.data.total / limit));
         }
-
+        setTotal(Math.ceil(total / limit));
         setRecords(mappedRecords);
       } catch (err) {
         console.error("Failed to fetch data:", err);
@@ -116,10 +114,10 @@ const MedicalRecord: React.FC = () => {
     fetchData();
   }, [location.state, userId, page, searchTerm, navigate]);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    setPage(1); // Reset to first page on search
-  };
+  // const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setSearchTerm(e.target.value);
+  //   setPage(1); // Reset to first page on search
+  // };
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= total) {
@@ -177,9 +175,7 @@ const MedicalRecord: React.FC = () => {
             <Button
               variant="outline"
               className="w-full mt-4 bg-white hover:bg-gray-100 text-blue-600 border-blue-600 hover:border-blue-700 transition duration-200"
-              onClick={() =>
-                navigate(`/doctor/${doctorId}/patients`)
-              }
+              onClick={() => navigate(`/doctor/${doctorId}/patients`)}
             >
               Back
             </Button>
@@ -191,13 +187,13 @@ const MedicalRecord: React.FC = () => {
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-semibold">Medical Record</h3>
           <div className="flex space-x-4">
-            <input
+            {/* <input
               type="text"
               placeholder="Search prescriptions..."
               value={searchTerm}
               onChange={handleSearch}
               className="border rounded-md p-2"
-            />
+            /> */}
             <Button
               onClick={() =>
                 navigate(`/doctor/newRecords`, {
@@ -274,4 +270,3 @@ const MedicalRecord: React.FC = () => {
 };
 
 export default MedicalRecord;
-

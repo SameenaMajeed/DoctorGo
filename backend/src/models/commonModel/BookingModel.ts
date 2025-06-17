@@ -21,6 +21,13 @@ export interface IBooking extends Document {
   paymentId?: string;
   paymentMethod?: "razorpay"; // | 'wallet';
   ticketPrice: number;
+  platformFee: number;
+  totalAmount: number;
+  paymentBreakdown: {
+    doctorFee: number;
+    platformFee: number;
+    tax?: number;
+  };
   appointmentDate: Date;
   appointmentTime: string;
   cancellationReason?: string;
@@ -59,6 +66,13 @@ const BookingSchema: Schema = new Schema<IBooking>(
     paymentId: { type: String },
     paymentMethod: { type: String, enum: ["razorpay"] },
     ticketPrice: { type: Number, required: true },
+    platformFee: { type: Number, required: true },
+    totalAmount: { type: Number, required: true },
+    paymentBreakdown: {
+      doctorFee: { type: Number, required: true },
+      platformFee: { type: Number, required: true },
+      tax: { type: Number, default: 0 },
+    },
     appointmentDate: { type: Date, required: true },
     appointmentTime: { type: String, required: true },
     cancellationReason: { type: String },

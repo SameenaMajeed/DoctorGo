@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import { assets } from "../../../assets/assets";
@@ -6,14 +6,14 @@ import { RootState } from "../../../slice/Store/Store";
 import { logoutUser } from "../../../slice/user/userSlice";
 import api from "../../../axios/UserInstance";
 import { useDispatch, useSelector } from "react-redux";
-import { User } from "lucide-react";
+import { User, WalletIcon } from "lucide-react";
 import NotificationBell from "../../CommonComponents/NotificationBell";
 
 const Navbar: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.user.user);
-
+  const [walletBalance, setWalletBalance] = useState<number>(0);
   const [showMenu, setShowMenu] = useState(false);
 
   const handleLogout = async () => {
@@ -25,6 +25,22 @@ const Navbar: React.FC = () => {
       console.error("Logout failed:", error);
     }
   };
+
+  // // Fetch wallet balance when user changes
+  useEffect(() => {
+    const fetchWalletBalance = async () => {
+      if (user?.id) {
+        try {
+          const response = await api.get(`/wallet`);
+          setWalletBalance(response.data.balance);
+        } catch (error) {
+          console.error("Failed to fetch wallet balance:", error);
+        }
+      }
+    };
+
+    fetchWalletBalance();
+  }, [user]);
 
   return (
     <nav className="bg-white shadow-md border-b border-gray-400 py-2 px-6 fixed w-full top-0 z-50">
@@ -79,6 +95,16 @@ const Navbar: React.FC = () => {
         <div className="hidden md:block">
           {user ? (
             <div className="flex items-center space-x-6">
+              <div
+                className="flex items-center gap-2 cursor-pointer hover:text-primary"
+                onClick={() => navigate("/wallet")}
+                title="Wallet"
+              >
+                <WalletIcon size={18} className="text-green-600" />
+                <span className="text-sm font-medium">
+                   ₹{(walletBalance ?? 0).toFixed(2)}
+                </span>
+              </div>
               {/* Notifications */}
               <div className="relative">
                 <NotificationBell />
@@ -121,6 +147,12 @@ const Navbar: React.FC = () => {
                       className="hover:text-black cursor-pointer"
                     >
                       Conversation
+                    </p>
+                    <p
+                      onClick={() => navigate("/wallet")}
+                      className="hover:text-black cursor-pointer"
+                    >
+                      Wallet
                     </p>
                     <p
                       onClick={handleLogout}

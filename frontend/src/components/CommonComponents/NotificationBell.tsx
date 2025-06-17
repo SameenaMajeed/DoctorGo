@@ -43,17 +43,18 @@ const NotificationBell = () => {
 
       // const data = response.data.data;
       // // Verify the exact response structure
-    const notifications = response.data.data?.notifications || response.data.notifications || [];
-    const unread = notifications.filter((n: any) => !n.read).length;
-    
-    console.log("Processed data:", { notifications, unread }); // Debug log
+      const notifications =
+        response.data.data?.notifications || response.data.notifications || [];
+      const unread = notifications.filter((n: any) => !n.read).length;
+
+      console.log("Processed data:", { notifications, unread }); // Debug log
       setNotifications(notifications);
       setUnreadCount(notifications.filter((n: any) => !n.read).length);
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
-    }finally {
-    setIsLoading(false);
-  }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -84,6 +85,12 @@ const NotificationBell = () => {
       setUnreadCount((prev) => prev + 1);
     });
 
+    socket.current.on("newNotification", (notification: any) => {
+      console.log("NewNotification received:", notification);
+      setNotifications((prev) => [notification, ...prev]);
+      setUnreadCount((prev) => prev + 1);
+    });
+
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -96,8 +103,12 @@ const NotificationBell = () => {
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
+      socket.current?.off("receiveNotification");
+      socket.current?.off("newNotification");
       socket.current?.disconnect();
       document.removeEventListener("mousedown", handleClickOutside);
+      // socket.current?.disconnect();
+      // document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [userId, accessToken, userRole]);
 
@@ -128,26 +139,37 @@ const NotificationBell = () => {
     if (notif.link) navigate(notif.link);
   };
 
-//   const markAllAsRead = async () => {
-//   try {
-//     await baseApi.patch(`/notifications/mark-all-read`, {
-//       recipientId: userId,
-//       recipientType: userRole
-//     });
-    
-//     setNotifications(prev => 
-//       prev.map(n => ({ ...n, read: true }))
-//     );
-    
-//     setUnreadCount(0);
-//   } catch (error) {
-//     console.error("Failed to mark all as read:", error);
-//   }
-// };
+  //   const markAllAsRead = async () => {
+  //   try {
+  //     await baseApi.patch(`/notifications/mark-all-read`, {
+  //       recipientId: userId,
+  //       recipientType: userRole
+  //     });
+
+  //     setNotifications(prev =>
+  //       prev.map(n => ({ ...n, read: true }))
+  //     );
+
+  //     setUnreadCount(0);
+  //   } catch (error) {
+  //     console.error("Failed to mark all as read:", error);
+  //   }
+  // };
 
   const toggleDropdown = () => {
     setShowDropdown((prev) => !prev);
     // setUnreadCount(0);
+  };
+
+  const getNotificationTime = (notif: any) => {
+    const timestamp = notif.createdAt || notif.timestamp;
+    if (!timestamp) return "Just now";
+
+    try {
+      return format(new Date(timestamp), "dd MMM yyyy, hh:mm a");
+    } catch {
+      return "Just now";
+    }
   };
 
   return (
@@ -178,10 +200,10 @@ const NotificationBell = () => {
 
           <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
             {isLoading ? (
-        <div className="flex justify-center py-4">
-          <Loader />
-        </div>
-      ) : notifications.length === 0 ? (
+              <div className="flex justify-center py-4">
+                <Loader />
+              </div>
+            ) : notifications.length === 0 ? (
               <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
                 🎉 You're all caught up!
               </p>
@@ -203,10 +225,7 @@ const NotificationBell = () => {
                       {notif.message}
                     </p>
                     <p className="text-xs text-gray-400 mt-1">
-                      {format(
-                        new Date(notif.timestamp || Date.now()),
-                        "dd MMM yyyy, hh:mm a"
-                      )}
+                      {getNotificationTime(notif)}
                     </p>
                   </div>
                   {loadingIds.includes(notif._id) ? (

@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Server } from "socket.io";
 import { io } from "../../server";
 import { INotificationRepository } from "../../interfaces/Notification/INotificationRepositoryInterface";
+import { IWalletRepositoryInterface } from "../../interfaces/wallet/IWalletRepositoryInterface";
 
 export class BookingService implements IBookingService {
   constructor(
@@ -24,7 +25,8 @@ export class BookingService implements IBookingService {
     private _doctorRepo: IDoctorRepository,
     private _patientRepo: UserRepositoryInterface,
     private _slotRepo: ISlotRepository,
-    private _notificationRepo: INotificationRepository
+    private _notificationRepo: INotificationRepository,
+    private _walletRepo: IWalletRepositoryInterface,
   ) {}
 
   // Send email with video call room ID
@@ -357,11 +359,28 @@ export class BookingService implements IBookingService {
         id,
         AppointmentStatus.CANCELLED
       );
+
+      console.log('updatedBooking:',updatedBooking)
       if (!updatedBooking)
         throw new AppError(
           HttpStatus.InternalServerError,
           MessageConstants.INTERNAL_SERVER_ERROR
         );
+        console.log('hii')
+      // If payment was made, refund to wallet
+    if (updatedBooking.is_paid) {
+      console.log('entered')
+      const wallet = await this._walletRepo.addCredit(
+        updatedBooking.user_id.toString(),
+        updatedBooking.ticketPrice,
+        `Refund for cancelled booking #${updatedBooking._id}`,
+        updatedBooking._id.toString()
+      );
+
+      console.log('wallet',wallet)
+    } 
+
+    console.log('hloo')
 
       await session.commitTransaction();
       return updatedBooking;
@@ -456,6 +475,52 @@ export class BookingService implements IBookingService {
       );
     }
   }
+
+  async createFailedBooking(bookingData: Partial<IBooking>): Promise<IBooking> {
+  try {
+    const doctorId = new Types.ObjectId(bookingData.doctor_id);
+    const patientId = new Types.ObjectId(bookingData.user_id);
+    const slotId = new Types.ObjectId(bookingData.slot_id);
+
+    // Validate required fields
+    if (!doctorId || !patientId || !slotId) {
+      throw new AppError(HttpStatus.BadRequest, "Required fields missing");
+    }
+
+    // Create the failed booking
+    const booking = await this._bookingRepo.create({
+      ...bookingData,
+      doctor_id: doctorId,
+      user_id: patientId,
+      slot_id: slotId,
+      is_paid: false,
+      status: bookingData.status
+    });
+
+    // Send notification to user
+    const notification = await this._notificationRepo.createNotification({
+      recipientId: patientId.toString(),
+      recipientType: "user",
+      type: "PAYMENT_FAILED",
+      title: "Payment Failed",
+      message: "Your appointment payment failed. Please try again.",
+      metadata: { link: "/appointments" }
+    });
+
+    io.to(`user_${patientId}`).emit("receiveNotification", {
+      title: notification.title,
+      message: notification.message,
+      type: notification.type,
+      link: notification.link,
+      timestamp: notification.createdAt
+    });
+
+    return booking;
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    throw new AppError(HttpStatus.InternalServerError, "Internal server error");
+  }
+}
 
   // doctors side
   async getAvailableDoctors(

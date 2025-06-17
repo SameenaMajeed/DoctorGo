@@ -101,7 +101,7 @@ const NewRecord: React.FC = () => {
   const {
     doctor,
     isAuthenticated,
-    loading: reduxLoading,
+    // loading: reduxLoading,
   } = useSelector((state: RootState) => state.doctor);
   console.log("doctor data fetched:", doctor);
 

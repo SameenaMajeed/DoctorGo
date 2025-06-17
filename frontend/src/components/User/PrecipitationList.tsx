@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
 import api from "../../axios/UserInstance";
@@ -26,7 +25,7 @@ const PrescriptionList: React.FC = () => {
   const prescriptionPerPage = 3;
 
   const token = useSelector((state: RootState) => state.user.user?.accessToken);
-  const userId = useSelector((state: RootState) => state.user.user?.id);
+  // const userId = useSelector((state: RootState) => state.user.user?.id);
 
   useEffect(() => {
     const fetchPrescriptions = async () => {

@@ -50,6 +50,7 @@ import VideoCall from "../components/VideoCall/VideoCallRoom.tsx";
 import BookingsPage from "../components/Admin/BookingsPage.tsx";
 import PaymentsPage from "../components/Admin/PaymentsPage.tsx";
 import PrescriptionView from "../components/User/PrescriptionView.tsx";
+import WalletPage from "../components/User/WalletPage.tsx";
 
 export const routes = (
   <>
@@ -85,6 +86,7 @@ export const routes = (
         <Route path="/my-chats" element={<Chat />} />
         <Route path="/prescriptionDownload" element={<PrecipitationList />} />
         <Route path="/prescription/:appointmentId" element={<PrescriptionView />} />
+        <Route path="/wallet" element={<WalletPage/>}/>
       </Route>
     </Route>
 

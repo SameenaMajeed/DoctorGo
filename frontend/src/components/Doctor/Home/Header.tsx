@@ -33,11 +33,11 @@ const Header: React.FC = () => {
     <header className="flex items-center justify-between bg-white shadow px-6 py-4">
       {/* Left: Search */}
       <div className="flex items-center gap-4 flex-1">
-        <input
+        {/* <input
           type="text"
           placeholder='Search "Patients"...'
           className="w-72 p-2 text-gray-700 border rounded-lg focus:ring-2 focus:ring-green-400"
-        />
+        /> */}
       </div>
 
       {/* Right: Notifications & Profile */}

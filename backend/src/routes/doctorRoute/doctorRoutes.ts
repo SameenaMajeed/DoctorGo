@@ -24,6 +24,7 @@ import { DoctorDashboardController } from "../../controllers/doctorController/do
 import { NotificationRepository } from "../../repositories/commonRepository/NotificationRepository";
 import { NotificationService } from "../../services/commonService/NotificationService";
 import { NotificationController } from "../../controllers/commonController/NotificationController";
+import { WalletRepository } from "../../repositories/commonRepository/WalletRepository";
 // import { NotificationController } from "../../controllers/commonController/NotificationController";
 // import { uploadCertifications } from '../middlewares/fileUpload';
 
@@ -36,13 +37,16 @@ const PrescriptionRepository = new prescriptionRepository();
 
 const notificationRepository = new NotificationRepository();
 const notificationService = new NotificationService(notificationRepository);
+const walletRepository = new WalletRepository()
+
 
 const bookingService = new BookingService(
   bookingRepository,
   doctorRepository,
   userRepository,
   slotRepository,
-  notificationRepository
+  notificationRepository,
+  walletRepository
 );
 
 const prescriptionService = new PrescriptionService(
@@ -78,6 +82,8 @@ const notificationController = new NotificationController(notificationService);
 
 const doctorRoute: Router = express.Router();
 
+// ......................Login Route.....................................................
+
 doctorRoute.post("/signup", upload.single("certificationFile"), (req, res) => {
   doctorController.registerDoctor(req, res);
 });
@@ -86,9 +92,15 @@ doctorRoute.post("/login", blockedDoctorMiddleware, (req, res) => {
   doctorController.loginDoctor(req, res);
 });
 
+doctorRoute.post("/logout", (req, res) => doctorController.logout(req, res));
+
+// ......................Token Route.....................................................
+
 doctorRoute.post("/refresh-token", (req, res) => {
   doctorController.refreshAccessToken(req, res);
 });
+
+// ......................Profile Route.....................................................
 
 doctorRoute.get(
   "/profile/:id",
@@ -96,16 +108,19 @@ doctorRoute.get(
   blockedDoctorMiddleware,
   (req, res) => doctorController.getProfile(req, res)
 );
+
 doctorRoute.put("/updateProfile/:id", authenticateToken("doctor"), (req, res) =>
   doctorController.updateProfile(req, res)
 );
+
 doctorRoute.post(
   "/uploadProfilePicture",
   authenticateToken("doctor"),
   upload.single("profilePicture"),
   (req, res) => doctorController.uploadProfilePicture(req, res)
 );
-doctorRoute.post("/logout", (req, res) => doctorController.logout(req, res));
+
+// ......................OTP Route.....................................................
 
 doctorRoute.post("/send-otp", (req, res) => {
   EmailVerificationController.sendVerificationOTP(req, res);
@@ -114,6 +129,8 @@ doctorRoute.post("/verify-otp", (req, res) => {
   console.log("Request Body:", req.body);
   EmailVerificationController.verifyOTPAndChangeEmail(req, res);
 });
+
+// ......................Appointment Route.....................................................
 
 doctorRoute.get(
   "/:doctorId/appointments",
@@ -128,6 +145,13 @@ doctorRoute.put(
   (req, res) => bookingController.updateDoctorAppointmentStatus(req, res)
 );
 
+doctorRoute.get(
+  "/appointments/today",
+  authenticateToken("doctor"),
+  blockedDoctorMiddleware,
+  (req, res) => bookingController.getTodaysAppointments(req, res)
+);
+
 // get Booked Users
 doctorRoute.get(
   "/:doctorId/patients",
@@ -136,18 +160,27 @@ doctorRoute.get(
   (req, res) => bookingController.getPatients(req, res)
 );
 
-// Prescription
-doctorRoute.post("/createPrescription", (req, res) =>
-  prescriptionController.createPrescription(req, res)
+// ......................Prescription Route.....................................................
+
+doctorRoute.post(
+  "/createPrescription",
+  authenticateToken("doctor"),
+  blockedDoctorMiddleware,
+  (req, res) => prescriptionController.createPrescription(req, res)
 );
-doctorRoute.get("/allPrescriptions", (req, res) =>
-  prescriptionController.getAllPrescriptions(req, res)
+doctorRoute.get(
+  "/allPrescriptions",
+  authenticateToken("doctor"),
+  blockedDoctorMiddleware,
+  (req, res) => prescriptionController.getAllPrescriptions(req, res)
 );
 
-// chat
+// ...................... chat Route.....................................................
+
 doctorRoute.get(
   "/chats/users/:doctorId",
   authenticateToken("doctor"),
+  blockedDoctorMiddleware,
   (req, res) => chatController.getUsersWhoMessaged(req, res)
 );
 
@@ -158,30 +191,27 @@ doctorRoute.post(
   (req, res) => bookingController.createVideoCallRoom(req, res)
 );
 
+// .......................Dashboard Route.....................................................
+
 doctorRoute.get(
   "/:doctorId/dashboard-stats",
   authenticateToken("doctor"),
+  blockedDoctorMiddleware,
   (req, res) => dashboardController.getDashboardStats(req, res)
 );
 
-doctorRoute.get(
-  "/appointments/today",
-  authenticateToken("doctor"),
-  blockedDoctorMiddleware,
-  (req, res) => bookingController.getTodaysAppointments(req, res)
-);
+// .......................notification Route.....................................................
 
-// notification
 doctorRoute.get(
   "/notifications",
   authenticateToken("doctor"),
   blockedDoctorMiddleware,
-  (req , res) => notificationController.getNotifications(req , res)
+  (req, res) => notificationController.getNotifications(req, res)
 );
 doctorRoute.patch(
-  '/notifications/:notificationId/read',
+  "/notifications/:notificationId/read",
   authenticateToken("doctor"),
   blockedDoctorMiddleware,
-  (req , res) => notificationController.markAsRead(req , res)
+  (req, res) => notificationController.markAsRead(req, res)
 );
 export default doctorRoute;

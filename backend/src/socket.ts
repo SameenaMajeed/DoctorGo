@@ -9,7 +9,8 @@ import dotenv from "dotenv";
 import BookingModel, {
   AppointmentStatus,
 } from "./models/commonModel/BookingModel";
-// import NotificationModel from "./models/commonModel/NotificationModel";
+
+import { Notification } from "./models/commonModel/NotificationModel";
 dotenv.config();
 
 interface SocketData {
@@ -34,8 +35,9 @@ export const initializeSocket = (server: HttpServer): Server => {
     pingTimeout: 60000,
   });
 
-  io.use((socket: Socket, next) => {
+  io.use(async(socket: Socket, next) => {
     const token = socket.handshake.auth.token;
+    console.log('token :',token)
     if (!token) {
       return next(new Error("Authentication error: No token provided"));
     }
@@ -49,12 +51,24 @@ export const initializeSocket = (server: HttpServer): Server => {
       ) {
         return next(new Error("Invalid token"));
       }
+      let name = "";
+
+    // Fetch name from DB
+    if (decoded.role === "user") {
+      const user = await userModel.findById(decoded.id);
+      name = user?.name || "";
+    } else if (decoded.role === "doctor") {
+      const doctor = await doctorModel.findById(decoded.id);
+      name = doctor?.name || "";
+    }
       (socket as AuthenticatedSocket).data = {
         id: decoded.id,
         role: decoded.role,
         email: decoded.email || "",
-        name: decoded.name || "",
+        name,
       };
+
+      console.log('data:',socket.data)
       next();
     } catch (error) {
       console.error("Socket auth error:", error);
@@ -166,6 +180,41 @@ export const initializeSocket = (server: HttpServer): Server => {
         } catch (error) {
           console.error("Error in sendMessage:", error);
           socket.emit("error", "Failed to send message");
+        }
+      }
+    );
+
+    socket.on(
+      "message",
+      async (data: { userId: string; doctorId: string; message: string }) => {
+        try {
+          const { userId, doctorId, message } = data;
+
+          // Create notification for the recipient
+          const notification = {
+            recipientId: socket.data.role === "user" ? doctorId : userId,
+            recipientType: socket.data.role === "user" ? "doctor" : "user",
+            type: "NEW_MESSAGE",
+            title: "New Message",
+            message: `You have a new message from ${socket.data.name}`,
+            // link: `/chat`,
+            read: false,
+            timestamp: new Date(),
+          };
+
+          // Save notification to database (implement this in your notification service)
+          const savedNotification =
+            await new Notification(notification).save()
+
+          // Emit notification to recipient
+          const recipientRoom =
+            socket.data.role === "user"
+              ? `doctor_${doctorId}`
+              : `user_${userId}`;
+          io.to(recipientRoom).emit("newNotification", savedNotification);
+
+        } catch (error) {
+          console.error("Error handling message notification:", error);
         }
       }
     );

@@ -21,7 +21,7 @@ export class NotificationController {
         recipientId as string,
         recipientType as string
       );
-      console.log('Notifications:',notifications)
+      
       sendResponse(res, HttpStatus.OK, "Notification fetched succesfully", {
         notifications,
       });

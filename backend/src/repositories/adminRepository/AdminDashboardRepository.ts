@@ -37,7 +37,7 @@ export class AdminDashboardRepository implements IAdminDashboardRepository {
 
     return await Booking.find(query)
       .sort({ appointmentDate: -1 })
-      .limit(10)
+      .limit(5)
       .populate("doctor_id", "name specialty")
       .populate("user_id", "name")
       .lean();

@@ -12,7 +12,7 @@ export interface IDoctor {
   role: string | null;
   accessToken?:string,
   refreshToken ?:string,
-  ticketPrice ?: number,
+  ticketPrice : number,
   isOnline : boolean,
   rating?: number;
   reviewsCount?: number;
@@ -134,3 +134,20 @@ export interface IChatUser {
 export type NetworkQuality = "good" | "poor" | "bad";
 export type VideoQuality = "high" | "low";
 export type CallStatus = "idle" | "calling" | "ringing" | "connecting" | "active" | "failed";
+
+
+export interface Wallet {
+  _id: string;
+  user_id: string;
+  balance: number;
+  transactions: Transaction[];
+}
+
+export interface Transaction {
+  _id: string;
+  amount: number;
+  type: 'credit' | 'debit';
+  description: string;
+  booking_id?: string;
+  createdAt: Date;
+}

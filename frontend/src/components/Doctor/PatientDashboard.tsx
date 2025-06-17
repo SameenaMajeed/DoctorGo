@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "../CommonComponents/card";
-import TextInput from "../CommonComponents/TextInput";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
 } from "../CommonComponents/dropdownmenu";
-import { CalendarIcon, MoreHorizontal } from "lucide-react";
-import { format } from "date-fns";
 import doctorApi from "../../axios/DoctorInstance";
 import { useNavigate, useParams } from "react-router-dom";
 import { IAppointment } from "../../Types";
 import { IUser } from "../../types/auth";
 import Pagination from "../../Pagination/Pagination";
+import { MoreHorizontal } from "lucide-react";
 
 const PatientDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -27,7 +25,7 @@ const PatientDashboard: React.FC = () => {
   const [date, setDate] = useState(new Date());
 
   const [page, setPage] = useState(1);
-  const limit = 4;
+  const limit = 5;
   const [totalPages, setTotalPages] = useState(1);
   const [totalPatients, setTotalPatients] = useState(0);
 
@@ -87,7 +85,138 @@ const PatientDashboard: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6">
+
       <div className="grid grid-cols-3 gap-6">
+        {/* Today's Patients */}
+        <Card className="border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-gray-500 text-sm">Today's Patients</div>
+                <div className="text-2xl font-semibold">10</div>
+              </div>
+              <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div className="text-sm text-green-500 mt-2 flex items-center">
+              <svg
+                className="w-4 h-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 10l7-7m0 0l7 7m-7-7v18"
+                />
+              </svg>
+              2 more than yesterday
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Monthly Patients */}
+        <Card className="border-l-4 border-purple-500 hover:shadow-lg transition-shadow">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-gray-500 text-sm">Monthly Patients</div>
+                <div className="text-2xl font-semibold">230</div>
+              </div>
+              <div className="p-3 rounded-full bg-purple-100 text-purple-600">
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div className="text-sm text-green-500 mt-2 flex items-center">
+              <svg
+                className="w-4 h-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 10l7-7m0 0l7 7m-7-7v18"
+                />
+              </svg>
+              15% increase from last month
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Yearly Patients */}
+        <Card className="border-l-4 border-green-500 hover:shadow-lg transition-shadow">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-gray-500 text-sm">Yearly Patients</div>
+                <div className="text-2xl font-semibold">1,500</div>
+              </div>
+              <div className="p-3 rounded-full bg-green-100 text-green-600">
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div className="text-sm text-green-500 mt-2 flex items-center">
+              <svg
+                className="w-4 h-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 10l7-7m0 0l7 7m-7-7v18"
+                />
+              </svg>
+              20% increase from last year
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      {/* <div className="grid grid-cols-3 gap-6">
         <Card>
           <CardContent className="p-4">
             <div className="text-gray-500 text-sm">Today Patients</div>
@@ -106,9 +235,9 @@ const PatientDashboard: React.FC = () => {
             <div className="text-2xl font-semibold">1500</div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
-      <div className="flex gap-4 items-center flex-wrap">
+      {/* <div className="flex gap-4 items-center flex-wrap">
         <TextInput
           placeholder="Search Patients"
           className="w-1/3 min-w-[200px]"
@@ -143,7 +272,7 @@ const PatientDashboard: React.FC = () => {
           <CalendarIcon className="h-4 w-4" />
           <span className="text-sm">{format(date, "MM/dd/yyyy")}</span>
         </div>
-      </div>
+      </div> */}
 
       <div className="bg-white rounded-xl shadow">
         <table className="min-w-full text-sm text-left">

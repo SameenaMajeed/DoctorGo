@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Home,
   ClipboardList,
+  Wallet,
 } from "lucide-react";
 import MenuItem from "./MenuItem";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -54,6 +55,11 @@ const Sidebar: React.FC = () => {
       icon: <MessageSquare size={18} />,
       label: "Conversations",
       path: "/my-chats",
+    },
+    {
+      icon: <Wallet size={18} />,
+      label: "Wallet",
+      path: "/wallet",
     },
     {
       icon: <ClipboardList size={18} />,

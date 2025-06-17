@@ -58,6 +58,6 @@ export interface IBookingService {
     status?: AppointmentStatus
   ): Promise<{ bookings: IBooking[]; total: number; totalPages: number }>;
   getTodaysAppointments(doctorId: string): Promise<IBooking[]>;
-
+  createFailedBooking(bookingData: Partial<IBooking>): Promise<IBooking>
   // sendAppointmentReminders(): Promise<void>;
 }

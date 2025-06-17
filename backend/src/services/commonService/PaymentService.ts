@@ -21,18 +21,51 @@ export class PaymentService implements IPaymentService {
         receipt: `Order_${Date.now()}`,
       };
       const order = await razorpayInstance.orders.create(options);
+      console.log('options:',options)
       return order;
     } catch (error) {
       console.error("Error creating Razorpay order:", error);
       throw new AppError(HttpStatus.InternalServerError, MessageConstants.INTERNAL_SERVER_ERROR);
     }
   }
+  // async createOrder(amount: number, currency: string): Promise<any> {
+  //   try {
+  //     const platformFeePercentage = 0.1; // 10% platform fee
+  //     const platformFee = Math.round(amount * platformFeePercentage); // in paisa
+  //     const totalAmount = Math.round(amount + platformFee)* 100 ; // doctor fee + platform fee in paisa
 
-  async verifyPayment(paymentId: string, orderId: string, signature: string): Promise<boolean> {
+  //     const options = {
+  //       amount: totalAmount, // Convert to paisa (smallest currency unit)
+  //       currency: currency,
+  //       receipt: `Order_${Date.now()}`,
+  //       notes: {
+  //         doctorFee: amount * 100, // in paisa
+  //         platformFee: platformFee * 100,
+  //       },
+  //     };
+  //     const order = await razorpayInstance.orders.create(options);
+  //     return order;
+  //   } catch (error) {
+  //     console.error("Error creating Razorpay order:", error);
+  //     throw new AppError(
+  //       HttpStatus.InternalServerError,
+  //       MessageConstants.INTERNAL_SERVER_ERROR
+  //     );
+  //   }
+  // }
+
+  async verifyPayment(
+    paymentId: string,
+    orderId: string,
+    signature: string
+  ): Promise<boolean> {
     try {
       // Validate inputs
       if (!paymentId || !orderId || !signature) {
-        throw new AppError(HttpStatus.BadRequest, "Invalid payment verification parameters");
+        throw new AppError(
+          HttpStatus.BadRequest,
+          "Invalid payment verification parameters"
+        );
       }
 
       // Generate expected signature
@@ -43,22 +76,23 @@ export class PaymentService implements IPaymentService {
 
       // Compare signatures
       const isValid = generatedSignature === signature;
-      
+
       if (!isValid) {
-        console.error(`Signature mismatch: Expected ${generatedSignature}, Received ${signature}`);
+        console.error(
+          `Signature mismatch: Expected ${generatedSignature}, Received ${signature}`
+        );
         return false;
       }
 
       // Optional: Verify with Razorpay API for additional security
       try {
         const payment = await razorpayInstance.payments.fetch(paymentId);
-        if (payment.order_id !== orderId || payment.status !== 'captured') {
-          console.error('Payment status verification failed');
+        if (payment.order_id !== orderId || payment.status !== "captured") {
+          console.error("Payment status verification failed");
           return false;
         }
       } catch (apiError) {
-        console.error('Razorpay API verification error:', apiError);
-        
+        console.error("Razorpay API verification error:", apiError);
       }
 
       return true;
@@ -66,5 +100,6 @@ export class PaymentService implements IPaymentService {
       console.error("Payment verification failed:", error);
       throw error;
     }
-}
+  }
+  
 }

@@ -5,7 +5,7 @@ import {
   FaImage,
   FaPaperclip,
   FaSpinner,
-  FaVideo,
+  // FaVideo,
 } from "react-icons/fa";
 import { cn } from "../../Utils/Utils";
 import io, { Socket } from "socket.io-client";
@@ -49,6 +49,7 @@ const ChatPage: React.FC = () => {
   const lastReadTimeRef = useRef<{ [key: string]: Date }>({});
 
   const doctorId = useSelector((state: RootState) => state.doctor.doctor?._id);
+  const userName = useSelector((state: RootState) => state.doctor.doctor?.name);
   const token = useSelector(
     (state: RootState) => state.doctor.doctor?.accessToken
   );
@@ -130,6 +131,12 @@ const ChatPage: React.FC = () => {
       }
     });
 
+    // Handle notifications
+    newSocket.on("newNotification", (notification: any) => {
+      // You can handle specific notifications here if needed
+      console.log("New notification received:", notification);
+    });
+
     newSocket.on("error", (err: string) => {
       setError(err);
     });
@@ -145,11 +152,22 @@ const ChatPage: React.FC = () => {
 
   const sendMessage = () => {
     if (!input.trim() || !selectedUser || !socket) return;
-    socket.emit("sendMessage", {
+
+    const messageData = {
       userId: selectedUser.id,
       doctorId,
       message: input.trim(),
+    };
+
+    socket.emit("sendMessage", messageData);
+     // Send notification
+    socket.emit("message", {
+      userId: selectedUser.id,
+      doctorId,
+      message: input,
+      senderName: userName,
     });
+
     setInput("");
   };
 
@@ -285,11 +303,11 @@ const ChatPage: React.FC = () => {
                   {selectedUser.online ? "Online" : "Last seen recently"}
                 </span>
               </div>
-              <div className="ml-auto flex space-x-3">
+              {/* <div className="ml-auto flex space-x-3">
                 <button>
                   <FaVideo className="text-lg" />
                 </button>
-              </div>
+              </div> */}
             </div>
 
             {/* Messages area */}

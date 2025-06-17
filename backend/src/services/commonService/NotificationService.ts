@@ -2,9 +2,7 @@ import { INotification } from "../../models/commonModel/NotificationModel";
 import { INotificationRepository } from "../../interfaces/Notification/INotificationRepositoryInterface";
 
 export class NotificationService {
-  constructor(
-    private notificationRepository: INotificationRepository
-  ) {}
+  constructor(private notificationRepository: INotificationRepository) {}
 
   async getNotifications(
     recipientId: string,
