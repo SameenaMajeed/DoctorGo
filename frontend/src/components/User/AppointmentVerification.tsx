@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "./Home/Navbar";
 import Footer from "../CommonComponents/Footer";
@@ -14,6 +14,13 @@ const AppointmentVerification: React.FC = () => {
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
   const [appointmentType, setAppointmentType] = useState("online");
+  const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "wallet">(
+    "razorpay"
+  );
+
+  //wallet balance state
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [isWalletLoading, setIsWalletLoading] = useState(true);
 
   const { doctor, selectedSlot } = location.state as {
     doctor: IDoctor;
@@ -36,6 +43,22 @@ const AppointmentVerification: React.FC = () => {
     district: "",
     locality: "",
   });
+
+  // to fetch wallet balance
+  useEffect(() => {
+    const fetchWalletBalance = async () => {
+      try {
+        const response = await api.get("/wallet");
+        console.log(response)
+        setWalletBalance(response.data.data.balance);
+        setIsWalletLoading(false);
+      } catch (error) {
+        console.error("Error fetching wallet balance:", error);
+        setIsWalletLoading(false);
+      }
+    };
+    fetchWalletBalance();
+  }, []);
 
   // Calculate fees including platform fee
   const calculateFees = () => {
@@ -114,30 +137,100 @@ const AppointmentVerification: React.FC = () => {
         return;
       }
 
-      const paymentRequest = {
-        amount: fees.totalAmount, // Include platform fee in total amount
-        currency: "INR",
-        appointmentData: {
-          ...formData,
-          doctorId: doctor._id,
-          slotId: selectedSlot._id,
-        },
-      };
+      if (paymentMethod === "wallet") {
+        if (walletBalance < fees.totalAmount) {
+          toast.error("Insufficient wallet balance");
+          setIsProcessing(false);
+          return;
+        }
 
-      console.log("paymentRequest:", paymentRequest);
-      const response = await api.post("/payments/create-order", paymentRequest);
+        // Create booking with wallet payment
+        const bookingData = {
+          doctor_id: doctor._id,
+          user_id: userId,
+          slot_id: selectedSlot._id,
+          modeOfAppointment: appointmentType,
+          is_paid: true,
+          status: "confirmed",
+          paymentMethod: "wallet",
+          ticketPrice: doctor.ticketPrice,
+          platformFee: fees.platformFee,
+          totalAmount: fees.totalAmount,
+          paymentBreakdown: {
+            doctorFee: doctor.ticketPrice,
+            platformFee: fees.platformFee,
+          },
+          appointmentDate: selectedSlot.date,
+          appointmentTime: `${formatTimeString(
+            selectedSlot.startTime
+          )} - ${formatTimeString(selectedSlot.endTime)}`,
+          patientDetails: { ...formData },
+        };
+        console.log(bookingData)
 
-      if (response.data.success) {
-        if (!(window as any).Razorpay) {
-          const script = document.createElement("script");
-          script.src = "https://checkout.razorpay.com/v1/checkout.js";
-          script.async = true;
-          script.onload = () => initializeRazorpay(response.data);
-          document.body.appendChild(script);
+        const response = await api.post("/bookings/create", bookingData);
+
+        console.log(' response :' , response)
+
+        if (response.data.success) {
+          toast.success("Appointment booked successfully using wallet!");
+          navigate("/appointment/success");
         } else {
-          initializeRazorpay(response.data);
+          throw new Error(response.data.message || "Booking failed");
+        }
+      } else {
+        // Existing Razorpay payment flow
+        const paymentRequest = {
+          amount: fees.totalAmount,
+          currency: "INR",
+          appointmentData: {
+            ...formData,
+            doctorId: doctor._id,
+            slotId: selectedSlot._id,
+          },
+        };
+
+        const response = await api.post(
+          "/payments/create-order",
+          paymentRequest
+        );
+        if (response.data.success) {
+          if (!(window as any).Razorpay) {
+            const script = document.createElement("script");
+            script.src = "https://checkout.razorpay.com/v1/checkout.js";
+            script.async = true;
+            script.onload = () => initializeRazorpay(response.data);
+            document.body.appendChild(script);
+          } else {
+            initializeRazorpay(response.data);
+          }
         }
       }
+
+      // const paymentRequest = {
+      //   amount: fees.totalAmount, // Include platform fee in total amount
+      //   currency: "INR",
+      //   appointmentData: {
+      //     ...formData,
+      //     doctorId: doctor._id,
+      //     slotId: selectedSlot._id,
+      //   },
+      // };
+
+      // console.log("paymentRequest:", paymentRequest);
+      // const response = await api.post("/payments/create-order", paymentRequest);
+
+      // if (response.data.success) {
+      //   if (!(window as any).Razorpay) {
+      //     const script = document.createElement("script");
+      //     script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      //     script.async = true;
+      //     script.onload = () => initializeRazorpay(response.data);
+      //     document.body.appendChild(script);
+      //   } else {
+      //     initializeRazorpay(response.data);
+      //   }
+      // }
     } catch (error: any) {
       console.error("Payment error:", error);
       setIsProcessing(false);
@@ -305,6 +398,8 @@ const AppointmentVerification: React.FC = () => {
 
     return "Invalid Time";
   };
+
+  console.log('walletBalance' , walletBalance)
 
   return (
     <div className="bg-gray-100">
@@ -558,6 +653,78 @@ const AppointmentVerification: React.FC = () => {
                     }
                     className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-300"
                   />
+                </div>
+              </div>
+
+              <div className="mt-6 bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                <h3 className="text-lg font-medium text-gray-800 mb-4">
+                  Payment Method
+                </h3>
+
+                <div className="space-y-4">
+                  <div
+                    className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                      paymentMethod === "razorpay"
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-blue-300"
+                    }`}
+                    onClick={() => setPaymentMethod("razorpay")}
+                  >
+                    <div className="flex items-start">
+                      <div
+                        className={`w-5 h-5 rounded-full border mt-1 mr-3 flex-shrink-0 ${
+                          paymentMethod === "razorpay"
+                            ? "border-blue-500 bg-blue-500"
+                            : "border-gray-300"
+                        }`}
+                      ></div>
+                      <div>
+                        <h4 className="font-medium text-gray-800">
+                          Pay with Razorpay
+                        </h4>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Credit/Debit Card, UPI, Net Banking
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                      paymentMethod === "wallet"
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-blue-300"
+                    }`}
+                    onClick={() => setPaymentMethod("wallet")}
+                  >
+                    <div className="flex items-start">
+                      <div
+                        className={`w-5 h-5 rounded-full border mt-1 mr-3 flex-shrink-0 ${
+                          paymentMethod === "wallet"
+                            ? "border-blue-500 bg-blue-500"
+                            : "border-gray-300"
+                        }`}
+                      ></div>
+                      <div>
+                        <h4 className="font-medium text-gray-800">
+                          Pay with Wallet
+                        </h4>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Available balance:{" "}
+                          {isWalletLoading
+                            ? "Loading..."
+                            : `${walletBalance} INR`}
+                        </p>
+                        {paymentMethod === "wallet" &&
+                          walletBalance < fees.totalAmount && (
+                            <p className="text-sm text-red-500 mt-2">
+                              Insufficient wallet balance. Please choose another
+                              payment method.
+                            </p>
+                          )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 

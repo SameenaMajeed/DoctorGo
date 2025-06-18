@@ -44,5 +44,38 @@ export class WalletController {
     }
   }
 
+  async getWalletBalance(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.data?.id;
+      if (!userId)
+        throw new AppError(
+          HttpStatus.Unauthorized,
+          MessageConstants.UNAUTHORIZED
+        );
 
+      const wallet = await this._walletRepo.getWalletByUserId(userId);
+      if (!wallet) {
+        // If wallet doesn't exist, create one with zero balance
+        const newWallet = await this._walletRepo.createWallet(userId);
+        sendResponse(res, HttpStatus.OK, MessageConstants.SUCCESS, {
+          balance: 0,
+        });
+        return;
+      }
+
+      sendResponse(res, HttpStatus.OK, MessageConstants.SUCCESS, {
+        balance: wallet.balance,
+      });
+    } catch (error) {
+      if (error instanceof AppError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(
+          res,
+          HttpStatus.InternalServerError,
+          MessageConstants.INTERNAL_SERVER_ERROR
+        );
+      }
+    }
+  }
 }

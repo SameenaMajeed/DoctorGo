@@ -146,6 +146,7 @@ export class BookingController {
 
   async createBooking(req: Request, res: Response): Promise<void> {
     try {
+      const bookingData = req.body;
       const userId = req.data?.id;
 
       if (!userId)
@@ -154,28 +155,30 @@ export class BookingController {
           MessageConstants.UNAUTHORIZED
         );
 
-      const { paymentId, platformFee, ...bookingDetails } = req.body;
-      console.log();
+      // Add user ID to booking data if not already set
+      bookingData.user_id = bookingData.user_id || userId;
 
-      if (!paymentId) {
-        throw new AppError(
-          HttpStatus.BadRequest,
-          "Payment ID is required for booking."
-        );
-      }
+      // const { paymentId, platformFee, ...bookingDetails } = req.body;
 
-      const bookingData = {
-        ...bookingDetails,
-        is_paid: true, // Mark as paid
-        paymentMethod: "razorpay",
-        paymentId, // Razorpay payment ID
-        platformFee: platformFee || 0,
-        totalAmount: (bookingDetails.ticketPrice || 0) + (platformFee || 0),
-        paymentBreakdown: {
-          doctorFee: bookingDetails.ticketPrice,
-          platformFee: platformFee || 0,
-        },
-      };
+      // if (!paymentId) {
+      //   throw new AppError(
+      //     HttpStatus.BadRequest,
+      //     "Payment ID is required for booking."
+      //   );
+      // }
+
+      // const bookingData = {
+      //   ...bookingDetails,
+      //   is_paid: true, // Mark as paid
+      //   paymentMethod: "razorpay",
+      //   paymentId, // Razorpay payment ID
+      //   platformFee: platformFee || 0,
+      //   totalAmount: (bookingDetails.ticketPrice || 0) + (platformFee || 0),
+      //   paymentBreakdown: {
+      //     doctorFee: bookingDetails.ticketPrice,
+      //     platformFee: platformFee || 0,
+      //   },
+      // };
 
       const booking = await this.bookingService.bookAppointment(bookingData);
       console.log("booking:", booking);

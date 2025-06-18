@@ -19,10 +19,10 @@ export interface IBooking extends Document {
   is_paid: boolean;
   status: AppointmentStatus;
   paymentId?: string;
-  paymentMethod?: "razorpay"; // | 'wallet';
+  paymentMethod?: "razorpay" | 'wallet';
   ticketPrice: number;
   platformFee: number;
-  totalAmount: number;
+  totalAmount: number ;
   paymentBreakdown: {
     doctorFee: number;
     platformFee: number;
@@ -64,7 +64,7 @@ const BookingSchema: Schema = new Schema<IBooking>(
       default: AppointmentStatus.PAYMENT_PENDING,
     },
     paymentId: { type: String },
-    paymentMethod: { type: String, enum: ["razorpay"] },
+    paymentMethod: { type: String, enum: ["razorpay" , "wallet"] },
     ticketPrice: { type: Number, required: true },
     platformFee: { type: Number, required: true },
     totalAmount: { type: Number, required: true },

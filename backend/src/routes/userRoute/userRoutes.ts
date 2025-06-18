@@ -257,4 +257,10 @@ userRoute.get("/wallet",
   (req, res) => walletController.getWallet(req, res)
 )
 
+userRoute.get("/wallet/balance",
+  authenticateToken("user"),
+  (req, res) => walletController.getWalletBalance(req, res)
+)
+
+
 export default userRoute;
