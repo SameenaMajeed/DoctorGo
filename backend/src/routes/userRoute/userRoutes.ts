@@ -257,6 +257,4 @@ userRoute.get("/wallet",
   (req, res) => walletController.getWallet(req, res)
 )
 
-
-
 export default userRoute;
