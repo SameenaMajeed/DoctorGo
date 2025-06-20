@@ -276,4 +276,20 @@ export default class SlotRepository implements ISlotRepository {
   async countSlots(query: any): Promise<number> {
     return await SlotModel.countDocuments(query);
   }
+
+  async decrementBookedCount(
+    slotId: string,
+  ): Promise<ISlot | null> {
+    try {
+      const result = await SlotModel.findByIdAndUpdate(
+        slotId,
+        { $inc: { bookedCount: -1 } },
+        { new: true}
+      );
+      return result;
+    } catch (error) {
+      console.error("Error inside decrementBookedCount:", error);
+      throw error;
+    }
+  }
 }

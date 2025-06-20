@@ -238,6 +238,7 @@ export default class SlotController {
       }
 
       const availability = await this.slotService.checkSlotAvailability(slotId);
+      console.log('availability :' , availability )
 
       sendResponse(
         res,

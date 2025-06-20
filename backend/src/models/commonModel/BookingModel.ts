@@ -1,4 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { IUser } from "../userModel/userModel";
+import { IDoctor } from "../doctorMpdel/DoctorModel";
 
 export enum AppointmentStatus {
   PENDING = "pending",
@@ -12,7 +14,7 @@ export enum AppointmentStatus {
 
 export interface IBooking extends Document {
   _id: mongoose.Types.ObjectId;
-  doctor_id: mongoose.Types.ObjectId;
+  doctor_id: mongoose.Types.ObjectId ;
   user_id: mongoose.Types.ObjectId;
   session: string;
   modeOfAppointment: "online" | "offline";

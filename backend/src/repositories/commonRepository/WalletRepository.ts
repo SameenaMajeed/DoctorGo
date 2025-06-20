@@ -46,7 +46,6 @@ export class WalletRepository
   ): Promise<IWallet> {
     try {
       let wallet = await Wallet.findOne({ user_id: userId });
-      console.log(wallet);
 
       if (!wallet) {
         wallet = new Wallet({ user_id: userId, balance: 0 });
@@ -65,7 +64,6 @@ export class WalletRepository
 
       await wallet.save();
       // await session.commitTransaction();
-      console.log(" from repo", wallet);
       return wallet;
     } catch (error) {
       // await session.abortTransaction();

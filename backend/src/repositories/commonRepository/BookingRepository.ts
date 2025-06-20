@@ -38,6 +38,7 @@ export class BookingRepository
     try {
       let doctor = await Booking.findById(id)
         .populate("doctor_id", "name")
+        .populate('user_id', 'name')
         .exec();
 
       console.log(doctor);

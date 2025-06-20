@@ -8,6 +8,7 @@ import { ISlot } from "../../types/Slot";
 import { useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
 import { IDoctor } from "../../Types";
+import slotApi from "../../axios/SlotInstance";
 
 const AppointmentVerification: React.FC = () => {
   const location = useLocation();
@@ -125,6 +126,17 @@ const AppointmentVerification: React.FC = () => {
     }
 
     try {
+
+       // First check slot availability
+        const slotAvailability = await slotApi.get(`/time-slots/${selectedSlot._id}/availability`);
+        console.log('slotAvailability:',slotAvailability)
+        
+        if (!slotAvailability.data.data.available) {
+            toast.error("This slot is now fully booked. Please select another time.");
+            navigate(-1); // Go back to slot selection
+            return;
+        }
+
       // Check if user already has a booking for this slot
       const bookingCheckResponse = await api.get(
         `/bookings/check?userId=${userId}&slotId=${selectedSlot._id}`

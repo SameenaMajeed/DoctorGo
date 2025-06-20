@@ -18,6 +18,7 @@ import { Server } from "socket.io";
 import { io } from "../../server";
 import { INotificationRepository } from "../../interfaces/Notification/INotificationRepositoryInterface";
 import { IWalletRepositoryInterface } from "../../interfaces/wallet/IWalletRepositoryInterface";
+import { IUser } from "../../models/userModel/userModel";
 
 export class BookingService implements IBookingService {
   constructor(
@@ -235,16 +236,6 @@ export class BookingService implements IBookingService {
           MessageConstants.INVALID_PATIENT
         );
 
-      const slot = await this._slotRepo.findSlotById(slotId.toString());
-      if (!slot) throw new AppError(HttpStatus.BadRequest, "Invalid slot ID.");
-
-      if (slot.bookedCount >= slot.maxPatients) {
-        throw new AppError(
-          HttpStatus.BadRequest,
-          "No available slots for the selected time."
-        );
-      }
-
       // Handle wallet payment deduction if payment method is wallet
       if (bookingData.paymentMethod === "wallet") {
         if (!bookingData.totalAmount) {
@@ -257,8 +248,6 @@ export class BookingService implements IBookingService {
         const wallet = await this._walletRepo.getWalletByUserId(
           patientId.toString()
         );
-
-        console.log('hloo')
 
         if (!wallet || wallet.balance < bookingData.totalAmount) {
           throw new AppError(
@@ -292,7 +281,7 @@ export class BookingService implements IBookingService {
         status: AppointmentStatus.CONFIRMED,
       });
 
-       console.log('booking from service' , booking)
+      console.log("booking from service", booking);
 
       // Save and emit patient notification using repository
       const patientNotification =
@@ -383,6 +372,7 @@ export class BookingService implements IBookingService {
           HttpStatus.NotFound,
           MessageConstants.BOOKING_NOT_FOUND
         );
+
       if (booking.status === AppointmentStatus.CANCELLED)
         throw new AppError(
           HttpStatus.BadRequest,
@@ -394,27 +384,103 @@ export class BookingService implements IBookingService {
         AppointmentStatus.CANCELLED
       );
 
-      console.log("updatedBooking:", updatedBooking);
       if (!updatedBooking)
         throw new AppError(
           HttpStatus.InternalServerError,
           MessageConstants.INTERNAL_SERVER_ERROR
         );
-      console.log("hii");
+
+      const updatedSlot = await this._slotRepo.decrementBookedCount(
+        updatedBooking.slot_id.toString()
+      );
+
+      if (!updatedSlot)
+        throw new AppError(
+          HttpStatus.InternalServerError,
+          "Failed to update slot patient count"
+        );
+
+      const populatedBooking = await this._bookingRepo.findById(id);
+
+      if (!populatedBooking)
+        throw new AppError(
+          HttpStatus.InternalServerError,
+          MessageConstants.INTERNAL_SERVER_ERROR
+        );
+
+      // Patient notification about cancellation
+      const patientNotification =
+        await this._notificationRepo.createNotification({
+          recipientId: updatedBooking.user_id._id.toString(),
+          recipientType: "user",
+          type: "APPOINTMENT_CANCELLED",
+          title: "Appointment Cancelled",
+          message: `Your appointment #${updatedBooking._id} has been cancelled`,
+          metadata: { link: "/user/appointments" },
+        });
+
+      // Doctor notification about cancellation
+      const doctorNotification =
+        await this._notificationRepo.createNotification({
+          recipientId: updatedBooking.doctor_id._id.toString(),
+          recipientType: "doctor",
+          type: "APPOINTMENT_CANCELLED",
+          title: "Appointment Cancelled",
+          message: `Appointment #${updatedBooking._id} has been cancelled`,
+          metadata: { link: "/doctor/appointments" },
+        });
+
+      // Emit real-time notifications
+      io.to(`patient_${updatedBooking.user_id._id}`).emit(
+        "receiveNotification",
+        {
+          title: patientNotification.title,
+          message: patientNotification.message,
+          type: patientNotification.type,
+          link: patientNotification.link,
+          timestamp: patientNotification.createdAt,
+        }
+      );
+
+      io.to(`doctor_${updatedBooking.doctor_id._id}`).emit("receiveNotification", {
+        title: doctorNotification.title,
+        message: doctorNotification.message,
+        type: doctorNotification.type,
+        link: doctorNotification.link,
+        timestamp: doctorNotification.createdAt
+      });
+
       // If payment was made, refund to wallet
       if (updatedBooking.is_paid) {
-        console.log("entered");
         const wallet = await this._walletRepo.addCredit(
           updatedBooking.user_id.toString(),
           updatedBooking.ticketPrice,
           `Refund for cancelled booking #${updatedBooking._id}`,
           updatedBooking._id.toString()
         );
-
-        console.log("wallet", wallet);
       }
 
-      console.log("hloo");
+      // Refund notification
+      const refundNotification =
+        await this._notificationRepo.createNotification({
+          recipientId: updatedBooking.user_id._id.toString(),
+          recipientType: "user",
+          type: "WALLET_REFUND",
+          title: "Refund Processed",
+          message: `Amount of ${updatedBooking.ticketPrice} has been credited to your wallet for cancelled booking`,
+          metadata: { link: "/wallet" },
+        });
+
+      io.to(`patient_${updatedBooking.user_id._id}`).emit(
+        "receiveNotification",
+        {
+          title: refundNotification.title,
+          message: refundNotification.message,
+          type: refundNotification.type,
+          link: refundNotification.link,
+          timestamp: refundNotification.createdAt,
+        }
+      );
 
       await session.commitTransaction();
       return updatedBooking;
@@ -512,6 +578,7 @@ export class BookingService implements IBookingService {
 
   async createFailedBooking(bookingData: Partial<IBooking>): Promise<IBooking> {
     try {
+      
       const doctorId = new Types.ObjectId(bookingData.doctor_id);
       const patientId = new Types.ObjectId(bookingData.user_id);
       const slotId = new Types.ObjectId(bookingData.slot_id);
@@ -797,13 +864,11 @@ export class BookingService implements IBookingService {
     page: number = 1,
     limit: number = 10
   ): Promise<{ patients: IBooking[]; total: number }> {
-    console.log("from service", doctorId);
     const { patients, total } = await this._bookingRepo.getPatientsForDoctor(
       doctorId,
       page,
       limit
     );
-    console.log("patient from service", patients);
     return { patients, total };
   }
 

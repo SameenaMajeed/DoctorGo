@@ -40,4 +40,8 @@ export interface ISlotRepository {
 
   findSlots(query: any): Promise<ISlot[]>;
   countSlots(query: any): Promise<number>;
+  decrementBookedCount(
+    slotId: string,
+    session?: mongoose.ClientSession
+  ): Promise<ISlot | null>
 }
