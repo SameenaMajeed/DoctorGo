@@ -21,6 +21,7 @@ export interface IDoctor extends Document {
   ticketPrice: number;
   extraCharge: number;
   experience: number;
+  isOnline : boolean;
 }
 
 const DoctorSchema: Schema = new Schema<IDoctor>(
@@ -48,6 +49,7 @@ const DoctorSchema: Schema = new Schema<IDoctor>(
     blockReason: { type: String },
     submittedAt: { type: Date, default: Date.now },
     verifiedAt: { type: Date },
+    isOnline: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

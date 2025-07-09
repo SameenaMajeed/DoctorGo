@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import adminApi from '../../axios/AdminInstance';
 import Pagination from '../../Pagination/Pagination';
 import toast from 'react-hot-toast';
 import { fetchPendingDoctors, updateDoctorStatus } from '../../Api/AdminApis';
@@ -16,7 +15,7 @@ interface Doctor {
 
 const ApproveDoctors: React.FC = () => {
   const [pendingDoctors, setPendingDoctors] = useState<Doctor[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState<string | null>(null);

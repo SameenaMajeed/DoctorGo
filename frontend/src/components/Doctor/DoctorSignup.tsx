@@ -62,7 +62,7 @@ const DoctorSignupForm: React.FC = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error } = useSelector((state: RootState) => state.doctor);
+  const { error } = useSelector((state: RootState) => state.doctor);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [formData, setFormData] = useState<FormData | null>(null);
 

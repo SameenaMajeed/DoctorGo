@@ -403,6 +403,7 @@ export class Usercontroller {
         "Doctors fetched successfully",
         result.doctors
       );
+      console.log('result : ',result)
     } catch (error: any) {
       sendError(res, HttpStatus.InternalServerError, error.message);
     }

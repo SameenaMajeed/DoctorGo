@@ -8,6 +8,7 @@ import Booking, {
 } from "../../models/commonModel/BookingModel";
 import { AppError } from "../../utils/AppError";
 import { BaseRepository } from "./BaseRepository";
+import { PaymentStatus } from "../../types/PaymentType";
 
 export class BookingRepository
   extends BaseRepository<IBooking>
@@ -169,6 +170,7 @@ export class BookingRepository
           "name specialization profilePicture qualification"
         )
         .populate("slot_id", "startTime endTime")
+        .sort({createdAt : -1})
         .exec();
     } catch (error) {
       console.error("Error in findByUserId:", error);
@@ -369,5 +371,52 @@ async findTodaysAppointments(doctorId: string, startOfDay: Date, endOfDay: Date)
     status: { $ne: 'cancelled' }
   }).sort({ appointmentDate: 1 });
 }
+
+async findPaymentsByUser(
+  userId: string,
+  skip: number,
+  limit: number,
+  status?: string
+): Promise<IBooking[]> {
+  try {
+    const query: any = { user_id: new Types.ObjectId(userId), is_paid: true };
+
+    // ✅ Only add status filter if provided
+    if (status && status !== "all") {
+      query.status = status;
+    }
+
+    console.log("🟡 Final Query:", query);
+
+    return await this.model
+      .find(query)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+  } catch (err) {
+    console.error("🔥 Error in findPaymentsByUser:", err);
+    throw err;
+  }
+}
+
+
+async countUserPayments(userId: string, status?: string): Promise<number> {
+  try {
+    const query: any = { user_id: new Types.ObjectId(userId), is_paid: true };
+
+    // ✅ Only add status filter if not "all"
+    if (status && status !== "all") {
+      query.status = status;
+    }
+
+    return await this.model.countDocuments(query);
+  } catch (err) {
+    console.error("🔥 Error in countUserPayments:", err);
+    throw err;
+  }
+}
+
+
+
 
 }

@@ -10,7 +10,7 @@ import ForgotPasswordModel from "../CommonComponents/ForgotPasswordModel";
 import {getAuth , signInWithPopup , GoogleAuthProvider} from "firebase/auth"
 import App from "../../FirebaseAuthentication/config";
 import { toast } from "react-hot-toast";
-import { IGoogleSignInResponse, ILoginResponse } from "../../types/auth";
+import { IGoogleSignInResponse} from "../../types/auth";
 import { loginUser } from "../../Api/UserApis";
 
 const LoginForm: React.FC = () => {

@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import api from '../../axios/UserInstance';
-import {
-  setLoading,
-  setError,
-  setOtpSent,
-  setOtpVerified,
-  setOtpExpired,
-} from '../../slice/Otp/otpSlice';
 import { resendOtp, verifyOtp } from '../../Api/OtpApis';
 
 
@@ -45,7 +37,7 @@ const OtpModal: React.FC<OtpModalProps> = ({
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
 
-      const { success, message, expired } = await verifyOtp(email, otp, dispatch);
+      const { success, message} = await verifyOtp(email, otp, dispatch);
     
     if (success) {
       onSuccess(message);

@@ -15,6 +15,7 @@ export default interface IPrescriptionRepository {
     searchTerm: string
   ): Promise<{ prescriptions: IPrescription[]; total: number }>;
 
+
   // user
   getPrescriptionsByUserId(userId: Types.ObjectId): Promise<IPrescription[]>;
   getPrescriptionById(

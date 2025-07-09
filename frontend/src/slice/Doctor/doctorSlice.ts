@@ -20,6 +20,7 @@ interface Doctor {
   ticketPrice?: number,
   extraCharge ?: number,
   bio ?: string,
+  isOnline : boolean;
   [key: string]: any;
 }
 

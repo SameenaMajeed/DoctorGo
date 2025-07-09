@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { FaStethoscope } from "react-icons/fa";
 
 const Page404 = () => {

@@ -15,4 +15,5 @@ export interface INotificationRepository {
   ): Promise<INotification[]>;
   getUnreadCount(recipientId: string): Promise<number>;
   markAsRead(notificationId: string): Promise<INotification | null>;
+  markAllAsRead(recipientId: string, recipientType: string): Promise<void>
 }

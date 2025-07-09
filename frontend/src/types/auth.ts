@@ -90,12 +90,12 @@ export interface IUpdateProfileResponse {
 }
 
 
-type BookingResponse = {
-  success: boolean;
-  message: string;
-  razorpayOrder?: any; // Replace with proper Razorpay order type
-  redirect?: boolean;
-};
+// type BookingResponse = {
+//   success: boolean;
+//   message: string;
+//   razorpayOrder?: any; // Replace with proper Razorpay order type
+//   redirect?: boolean;
+// };
 
 export interface IReviewResponse {
   data: {

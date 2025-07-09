@@ -19,4 +19,9 @@ export class NotificationService {
   ): Promise<INotification | null> {
     return this.notificationRepository.markAsRead(notificationId);
   }
+
+  async markAllNotificationsAsRead(recipientId: string, recipientType: string): Promise<void> {
+    await this.notificationRepository.markAllAsRead(recipientId, recipientType);
+  }
+
 }

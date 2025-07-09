@@ -67,33 +67,40 @@ export const assets = {
 
 type Speciality = {
     speciality: string;
-    image:string | undefined; 
+    image:string | undefined;
+    color : string | undefined 
   };
 
 export const specialityData: Speciality[] = [
     {
       speciality: 'General physician',
-      image: General_physician
+      image: General_physician,
+      color: "from-blue-400 to-blue-600"
     },
     {
       speciality: 'Gynecologist',
-      image: Gynecologist
+      image: Gynecologist,
+      color: "from-blue-400 to-blue-600"
     },
     {
       speciality: 'Dermatologist',
-      image: Dermatologist
+      image: Dermatologist,
+      color: "from-blue-400 to-blue-600"
     },
     {
       speciality: 'Pediatricians',
-      image: Pediatricians
+      image: Pediatricians,
+      color: "from-blue-400 to-blue-600"
     },
     {
       speciality: 'Neurologist',
-      image: Neurologist
+      image: Neurologist,
+      color: "from-blue-400 to-blue-600"
     },
     {
       speciality: 'Gastroenterologist',
-      image: Gastroenterologist
+      image: Gastroenterologist,
+      color: "from-blue-400 to-blue-600"
     },
   ];
 

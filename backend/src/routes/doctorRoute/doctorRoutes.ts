@@ -55,7 +55,7 @@ const prescriptionService = new PrescriptionService(
   userRepository
 );
 
-const paymentService = new PaymentService();
+const paymentService = new PaymentService(bookingRepository);
 
 const bookingController = new BookingController(bookingService, paymentService);
 
@@ -214,4 +214,12 @@ doctorRoute.patch(
   blockedDoctorMiddleware,
   (req, res) => notificationController.markAsRead(req, res)
 );
+
+doctorRoute.patch('/notifications/mark-all-read' ,authenticateToken("doctor"),
+  blockedDoctorMiddleware,
+  (req, res) => notificationController.markAllAsRead(req, res))
+
+// ....................online status...........................
+doctorRoute.put("/:id/status" ,(req, res) => doctorController.getDoctorStatus(req , res))
+
 export default doctorRoute;

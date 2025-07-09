@@ -5,7 +5,7 @@ import { IDoctor } from "../doctorMpdel/DoctorModel";
 export enum AppointmentStatus {
   PENDING = "pending",
   CONFIRMED = "confirmed",
-  PAYMENT_FAILED = "payment_failed",
+  PAYMENT_FAILED = "failed",
   CANCELLED = "cancelled",
   PAYMENT_PENDING = "payment_pending",
   EXPIRED = "expired",

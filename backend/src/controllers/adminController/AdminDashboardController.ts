@@ -35,7 +35,7 @@ export class AdminDashboardController {
 
   async getDashboardData(req: Request, res: Response): Promise<void> {
     try {
-      const { startDate, endDate, filter, doctorId } = req.query;
+      const { startDate, endDate, filter, doctorId, bookingId } = req.query;
 
       // Authorization check
       if (!req.data?.role || req.data.role !== "admin") {
@@ -69,6 +69,7 @@ export class AdminDashboardController {
         endDateObj,
         filterValue,
         doctorId as string,
+        bookingId as string
       );
 
       sendResponse(

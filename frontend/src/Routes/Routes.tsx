@@ -25,9 +25,9 @@ import AppointmentVerification from "../components/User/AppointmentVerification"
 import PaymentSuccess from "../components/User/PaymentSuccess.tsx";
 import CreateSlot from "../components/Doctor/Slot/CreateSlot.tsx";
 import ManageSlots from "../components/Doctor/Slot/ManageSlots.tsx";
-import SlotCalendar from "../components/Doctor/Slot/SlotCalendar.tsx";
-import EmergencyBlock from "../components/Doctor/Slot/EmergencyBlock.tsx";
-import TimeSlots from "../components/Doctor/Slot/TimeSlot.tsx";
+// import SlotCalendar from "../components/Doctor/Slot/SlotCalendar.tsx";
+// import EmergencyBlock from "../components/Doctor/Slot/EmergencyBlock.tsx";
+// import TimeSlots from "../components/Doctor/Slot/TimeSlot.tsx";
 import AppointmentsList from "../components/User/AppointmentList.tsx";
 import Appointments from "../components/Doctor/Appointments.tsx";
 import EditSlot from "../components/Doctor/Slot/EditSlot.tsx";
@@ -40,8 +40,6 @@ import PatientDashboard from "../components/Doctor/PatientDashboard.tsx";
 import Page404 from "../pages/Page404.tsx";
 import NewRecord from "../components/Doctor/NewRecord.tsx";
 import ChatPage from "../components/Doctor/ChatPage.tsx";
-import PrecipitationList from "../components/User/PrecipitationList.tsx";
-// import ReviewForm from "../components/User/ReviewForm.tsx";
 import DoctorReviews from "../components/Doctor/DoctorReviews.tsx";
 import AboutPage from "../components/User/Home/AboutPage.tsx";
 import ContactPage from "../components/User/Home/ContactPage.tsx";
@@ -51,6 +49,7 @@ import BookingsPage from "../components/Admin/BookingsPage.tsx";
 import PaymentsPage from "../components/Admin/PaymentsPage.tsx";
 import PrescriptionView from "../components/User/PrescriptionView.tsx";
 import WalletPage from "../components/User/WalletPage.tsx";
+import PaymentHistory from "../components/User/PaymentHistory.tsx";
 
 export const routes = (
   <>
@@ -84,9 +83,9 @@ export const routes = (
         <Route path="/my-appointments" element={<AppointmentsList />} />
         <Route path="/user/video-call" element={<VideoCall />} />
         <Route path="/my-chats" element={<Chat />} />
-        <Route path="/prescriptionDownload" element={<PrecipitationList />} />
         <Route path="/prescription/:appointmentId" element={<PrescriptionView />} />
         <Route path="/wallet" element={<WalletPage/>}/>
+        <Route path='/paymentHistory' element={<PaymentHistory/>}/>
       </Route>
     </Route>
 
@@ -95,13 +94,13 @@ export const routes = (
       <Route path="/doctor/home" element={<DoctorDashboard />} />
       <Route element={<Layout />}>
         <Route path="/doctor/profile" element={<Profile />} />
-        <Route path="/doctor/time-slots" element={<TimeSlots />} />
+        {/* <Route path="/doctor/time-slots" element={<TimeSlots />} /> */}
         <Route path="/doctor/slots" element={<ManageSlots />} />
         <Route path="/doctor/video-call" element={<VideoCall />} />
 
         <Route path="/doctor/slots/create" element={<CreateSlot />} />
         <Route path="/doctor/time-slots/:slotId" element={<EditSlot />} />
-        <Route path="/doctor/slots/calendar" element={<SlotCalendar />} />
+        {/* <Route path="/doctor/slots/calendar" element={<SlotCalendar />} /> */}
         <Route
           path="/doctor/patient-records/:userId"
           element={<MedicalRecord />}
@@ -113,10 +112,10 @@ export const routes = (
         />
         <Route path="/myChats" element={<ChatPage />} />
         <Route path="/doctor/reviews/:doctorId" element={<DoctorReviews />} />
-        <Route
+        {/* <Route
           path="/doctor/slots/emergency-block"
           element={<EmergencyBlock />}
-        />
+        /> */}
         <Route
           path="/doctor/:doctorId/appointments"
           element={<Appointments />}

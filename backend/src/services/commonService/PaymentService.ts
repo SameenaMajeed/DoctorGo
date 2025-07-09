@@ -4,6 +4,9 @@ import { IPaymentService } from "../../interfaces/Payment/PaymentServiceInterfac
 import { AppError } from "../../utils/AppError";
 import { HttpStatus } from "../../constants/Httpstatus";
 import { MessageConstants } from "../../constants/MessageConstants";
+import { IBookingRepository } from "../../interfaces/Booking/BookingRepositoryInterface";
+import { IBooking } from "../../models/commonModel/BookingModel";
+import { PaymentStatus } from "../../types/PaymentType";
 
 const { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } = process.env;
 
@@ -13,6 +16,7 @@ const razorpayInstance = new Razorpay({
 });
 
 export class PaymentService implements IPaymentService {
+  constructor(private bookingRepo: IBookingRepository) {}
   async createOrder(amount: number, currency: string): Promise<any> {
     try {
       const options = {
@@ -21,11 +25,14 @@ export class PaymentService implements IPaymentService {
         receipt: `Order_${Date.now()}`,
       };
       const order = await razorpayInstance.orders.create(options);
-      console.log('options:',options)
+      console.log("options:", options);
       return order;
     } catch (error) {
       console.error("Error creating Razorpay order:", error);
-      throw new AppError(HttpStatus.InternalServerError, MessageConstants.INTERNAL_SERVER_ERROR);
+      throw new AppError(
+        HttpStatus.InternalServerError,
+        MessageConstants.INTERNAL_SERVER_ERROR
+      );
     }
   }
   // async createOrder(amount: number, currency: string): Promise<any> {
@@ -101,5 +108,30 @@ export class PaymentService implements IPaymentService {
       throw error;
     }
   }
-  
+
+async getUserPayments(
+  userId: string,
+  page: number,
+  limit: number,
+  status?: PaymentStatus // Only accept valid payment statuses or undefined
+): Promise<{ payments: IBooking[]; totalPages: number }> {
+  const skip = (page - 1) * limit;
+
+  try {
+    const [payments, total] = await Promise.all([
+      this.bookingRepo.findPaymentsByUser(userId, skip, limit, status),
+      this.bookingRepo.countUserPayments(userId, status),
+    ]);
+
+    console.log('data', payments,total)
+
+    return {
+      payments,
+      totalPages: Math.ceil(total / limit),
+    };
+  } catch (err) {
+    console.error("Error in get UserPayments Service:", err);
+    throw err;
+  }
+}
 }

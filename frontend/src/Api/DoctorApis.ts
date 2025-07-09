@@ -94,6 +94,7 @@ export const updateAppointmentStatus = async (
       }
   
       const response = await doctorApi.put(`/appointments/${appointmentId}/status`, { status });
+      console.log(response)
   
       return {
         success: true,

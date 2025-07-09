@@ -30,7 +30,7 @@ const DoctorList: React.FC = () => {
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / limit);
 
-  const handleBlockedDoctors = async (doctorId: string, isBlocked: boolean) => {
+  const handleBlockedDoctors = async (doctorId: string, _isBlocked: boolean) => {
     setBlockingDoctorId(doctorId);
     setShowBlocking(true);
   }

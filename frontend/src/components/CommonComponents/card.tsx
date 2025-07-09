@@ -1,6 +1,4 @@
 import React from "react";
-// import { Button } from '@/components/ui/button';
-import { Eye, Trash2 } from "lucide-react";
 
 interface CardProps {
   children: React.ReactNode;
@@ -30,27 +28,26 @@ export const CardContent: React.FC<CardContentProps> = ({
 };
 
 interface CardHeaderProps {
-  title: string;
   subtitle?: React.ReactNode;
   className?: string;
+  children?: React.ReactNode; // only if you want to allow children
 }
 
 export const CardHeader: React.FC<CardHeaderProps> = ({
-  title,
   subtitle,
   className = "",
+  children, // optional usage
 }) => {
   return (
     <div className={`mb-6 ${className}`}>
-      <h1 className="text-3xl font-bold text-gray-800 border-b pb-2">
-        {title}
-      </h1>
       {subtitle && (
         <div className="mt-4 space-y-1 text-gray-600">{subtitle}</div>
       )}
+      {children}
     </div>
   );
 };
+
 
 interface RecordCardProps {
   date: string;
@@ -71,8 +68,6 @@ export const RecordCard: React.FC<RecordCardProps> = ({
   diagnosis,
   treatment,
   prescription,
-  onView,
-  onDelete,
   className = "",
 }) => {
   return (

@@ -1,6 +1,6 @@
 import React from "react";
 
-const SelectInput = React.forwardRef(({ label, value, onChange, options, id, error }: any, ref) => (
+const SelectInput = React.forwardRef(({ label, value, onChange, options, id, error }: any) => (
   <div>
     <label htmlFor={id} className="block text-sm font-medium text-gray-700">{label}</label>
     <select

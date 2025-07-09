@@ -45,7 +45,7 @@ const bookingService = new BookingService(
   walletRepository
 );
 
-const paymentService = new PaymentService();
+const paymentService = new PaymentService(bookingRepository);
 
 const adminDashboardRepository = new AdminDashboardRepository();
 const adminDashboardService = new AdminDashboardService(

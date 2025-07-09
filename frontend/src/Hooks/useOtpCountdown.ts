@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 
 const useOtpCountdown = (initialCount = 60) => {
-  const [countdown2, setCountdown] = useState(initialCount);
+  const [countdown, setCountdown] = useState(initialCount);
   const [isCounting, setIsCounting] = useState(false);
 
   useEffect(() => {

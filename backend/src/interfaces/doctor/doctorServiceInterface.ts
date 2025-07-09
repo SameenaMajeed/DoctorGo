@@ -24,4 +24,5 @@ export interface IDoctorService {
         page?: number, 
         limit?: number 
       ): Promise<PendingVerificationsResult>
+      toggleDoctorOnlineStatus(id: string, isOnline: boolean): Promise<IDoctor | null>;
 }

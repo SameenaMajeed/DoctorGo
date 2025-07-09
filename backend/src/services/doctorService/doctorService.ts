@@ -258,6 +258,11 @@ export class DoctorService implements IDoctorService {
       count: await this.doctorRepository.countAll({ verificationStatus: 'pending' }),
     };
   }
+
+  async toggleDoctorOnlineStatus(id: string, isOnline: boolean): Promise<IDoctor | null> {
+    return await this.doctorRepository.updateOnlineStatus(id, isOnline);
+  }
+
 }
 
 // import bcrypt from "bcrypt";

@@ -84,5 +84,6 @@ export const MessageConstants = {
   CHECK_BOOKING_FAILED: "Failed to check booking.",
   INVALID_ID: "Invalid ID provided.",
   WALLET_NOT_FOUND : 'Wallet Amount not fount',
-  INSUFFICIENT_BALANCE : 'Balance is insufficient in your wallet'
+  INSUFFICIENT_BALANCE : 'Balance is insufficient in your wallet',
+  PRESCRIPTION_NOT_FOUND : 'Prescription not found'
 };

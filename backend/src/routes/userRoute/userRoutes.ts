@@ -9,8 +9,8 @@ import { DoctorRepository } from "../../repositories/doctorRepository/doctorRepo
 import { BookingService } from "../../services/commonService/BookingService";
 import { BookingRepository } from "../../repositories/commonRepository/BookingRepository";
 import { BookingController } from "../../controllers/commonController/BookingController";
-import { DoctorController } from "../../controllers/doctorController/doctorController";
-import { DoctorService } from "../../services/doctorService/doctorService";
+// import { DoctorController } from "../../controllers/doctorController/doctorController";
+// import { DoctorService } from "../../services/doctorService/doctorService";
 import { PaymentService } from "../../services/commonService/PaymentService";
 import SlotRepository from "../../repositories/commonRepository/SlotRepository";
 import upload from "../../middlewares/multer";
@@ -59,7 +59,7 @@ const prescriptionService = new PrescriptionService(
 
 const reviewService = new ReviewService(reviewRepository , bookingRepository)
 
-const paymentService = new PaymentService();
+const paymentService = new PaymentService(bookingRepository);
 // const doctorService = new DoctorService(doctorRepository, otpRepository);
 const notificationService = new NotificationService(notificationRepository);
 
@@ -261,6 +261,8 @@ userRoute.get("/wallet/balance",
   authenticateToken("user"),
   (req, res) => walletController.getWalletBalance(req, res)
 )
+
+userRoute.get("/payments/history", authenticateToken("user"), bookingController.getUserPayments);
 
 
 export default userRoute;

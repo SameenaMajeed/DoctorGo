@@ -187,10 +187,12 @@ export const updateDoctorStatus = async (
       blockReason: isBlocked ? blockReason : undefined,
     });
 
+    console.log(response)
+
     return {
       success: true,
       message: `Doctor ${isBlocked ? 'blocked' : 'approved'} successfully!`,
-      shouldRemove: true, // Indicates this doctor should be removed from the list
+      shouldRemove: true,
     };
   } catch (error) {
     const axiosError = error as IAxiosError;

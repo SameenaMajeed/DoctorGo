@@ -11,17 +11,17 @@ interface DailyRevenueData {
     hours: number;
   }
   
-  interface BookingStatus {
-    name: string;
-    value: number;
-    color: string;
-  }
+  // interface BookingStatus {
+  //   name: string;
+  //   value: number;
+  //   color: string;
+  // }
   
-  interface Appointment {
-    id: string;
-    doctorName: string;
-    bookingDate: string;
-  }
+  // interface Appointment {
+  //   id: string;
+  //   doctorName: string;
+  //   bookingDate: string;
+  // }
 
 const AdminCharts :React.FC = () => {
 

@@ -17,7 +17,7 @@ export class NotificationRepository implements INotificationRepository{
 
 
   async findByRecipient(recipientId: string, recipientType: string): Promise<INotification[]> {
-    return Notification.find({ recipientId, recipientType ,read: false}).sort({ createdAt : -1 });
+    return Notification.find({ recipientId, recipientType}).sort({ createdAt : -1 });
   }
 
   // Add other notification-related methods as needed
@@ -35,4 +35,12 @@ export class NotificationRepository implements INotificationRepository{
       { new: true }
     );
   }
+
+  async markAllAsRead(recipientId: string, recipientType: string): Promise<void> {
+    await Notification.updateMany(
+      { recipientId, recipientType, read: false },
+      { $set: { read: true } }
+    );
+  }
+
 }

@@ -280,6 +280,36 @@ export class DoctorController {
     }
   }
 
+  async getDoctorStatus(req: Request, res: Response): Promise<void> {
+    try {
+      const { isOnline } = req.body;
+
+      console.log("isOnline from body:", isOnline);
+      console.log('req.params.id:',req.params.id)
+
+      const result = await this.doctorService.toggleDoctorOnlineStatus(
+        req.params.id,
+        isOnline
+      );
+
+      console.log("Result from DB:", result);
+
+      sendResponse(
+        res,
+        HttpStatus.OK,
+        "Status Changed Successfully",
+        { result }
+      );
+    } catch (error: any) {
+      sendError(
+        res,
+        HttpStatus.InternalServerError,
+        MessageConstants.INTERNAL_SERVER_ERROR,
+        error.message
+      );
+    }
+  }
+
   // async fetchDoctor(req : Request ,res: Response):Promise<void>{
   //   try {
   //     const { doctorId } = req.params;

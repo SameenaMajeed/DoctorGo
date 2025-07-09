@@ -26,19 +26,6 @@ export default class prescriptionRepository
       .exec();
   }
 
-  // async findById(id: string): Promise<IPrescription | null> {
-  //   console.log(`Searching for doctor with id: ${id}`);
-  //   if (!mongoose.Types.ObjectId.isValid(id)) {
-  //     return null;
-  //   }
-  //   const uid =  await PrescriptionModel.findById(id).lean();
-  //   console.log('getted id :' , uid)
-  //   return uid
-  // }
-  // async findById(id: string): Promise<IPrescription | null> {
-  //   // Use the base method and pass the fields to populate
-  //   return this.findById(id);
-  // }
 
   async findPrescriptions(
     doctorId: string,
@@ -75,6 +62,7 @@ export default class prescriptionRepository
 
     return { prescriptions, total };
   }
+
 
   // userside:
   // Fetch all prescriptions for a user

@@ -1,6 +1,6 @@
 import React from "react";
 
-const TextArea = React.forwardRef(({ label, value, onChange, id, error, placeholder }: any, ref) => (
+const TextArea = React.forwardRef(({ label, value, onChange, id, error, placeholder }: any) => (
   <div>
     <label htmlFor={id} className="block text-sm font-medium text-gray-700">{label}</label>
     <textarea

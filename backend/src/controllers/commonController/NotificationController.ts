@@ -21,7 +21,7 @@ export class NotificationController {
         recipientId as string,
         recipientType as string
       );
-      
+
       sendResponse(res, HttpStatus.OK, "Notification fetched succesfully", {
         notifications,
       });
@@ -41,15 +41,45 @@ export class NotificationController {
   async markAsRead(req: Request, res: Response): Promise<void> {
     try {
       const { notificationId } = req.params;
-      console.log('notificationId:',notificationId)
+      console.log("notificationId:", notificationId);
       const notification =
         await this.notificationService.markNotificationAsRead(notificationId);
       if (!notification) {
         throw new AppError(HttpStatus.Unauthorized, "Notification not found");
       }
-      sendResponse(res, HttpStatus.OK, "Booking check completed", {
+      sendResponse(res, HttpStatus.OK, "Mark as read", {
         notification,
       });
+    } catch (error) {
+      if (error instanceof AppError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(
+          res,
+          HttpStatus.InternalServerError,
+          MessageConstants.INTERNAL_SERVER_ERROR
+        );
+      }
+    }
+  }
+
+  async markAllAsRead(req: Request, res: Response): Promise<void> {
+    try {
+      const { recipientId, recipientType } = req.body;
+
+      if (!recipientId || !recipientType) {
+        throw new AppError(
+          HttpStatus.Unauthorized,
+          MessageConstants.UNAUTHORIZED
+        );
+      }
+
+      const result = await this.notificationService.markAllNotificationsAsRead(recipientId, recipientType);
+
+      sendResponse(res, HttpStatus.OK, "Marked All as read", {
+        result,
+      });
+
     } catch (error) {
       if (error instanceof AppError) {
         sendError(res, error.status, error.message);

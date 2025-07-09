@@ -1,11 +1,11 @@
 import toast from "react-hot-toast";
 import slotApi from "../axios/SlotInstance";
-import { Slot, SlotData } from "../types/Slot";
+import { ISlot, ISlotData } from "../types/Slot";
 
 // Slot API methods
-export const createSlot = async (slotData: SlotData): Promise<Slot | Slot[]> => {
+export const createSlot = async (slotData: ISlotData): Promise<ISlot | ISlot[]> => {
   try {
-    const response = await slotApi.post<Slot | Slot[]>('/create', slotData); // Adjust endpoint
+    const response = await slotApi.post<ISlot | ISlot[]>('/create', slotData); // Adjust endpoint
     toast.success('Slot created successfully!');
     return response.data;
   } catch (error: any) {
@@ -14,9 +14,9 @@ export const createSlot = async (slotData: SlotData): Promise<Slot | Slot[]> => 
   }
 };
 
-export const getAvailableSlots = async (doctorId: string): Promise<Slot[]> => {
+export const getAvailableSlots = async (doctorId: string): Promise<ISlot[]> => {
   try {
-    const response = await slotApi.get<Slot[]>(`/${doctorId}`); // Adjust endpoint
+    const response = await slotApi.get<ISlot[]>(`/${doctorId}`); // Adjust endpoint
     return response.data;
   } catch (error: any) {
     console.error('Error fetching available slots:', error);
@@ -24,9 +24,9 @@ export const getAvailableSlots = async (doctorId: string): Promise<Slot[]> => {
   }
 };
 
-export const bookSlot = async (slotId: string): Promise<Slot> => {
+export const bookSlot = async (slotId: string): Promise<ISlot> => {
   try {
-    const response = await slotApi.put<Slot>(`/${slotId}/book`); // Adjust endpoint
+    const response = await slotApi.put<ISlot>(`/${slotId}/book`); // Adjust endpoint
     toast.success('Slot booked successfully!');
     return response.data;
   } catch (error: any) {

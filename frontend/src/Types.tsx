@@ -14,7 +14,7 @@ export interface IDoctor {
   refreshToken ?:string,
   ticketPrice : number,
   isOnline : boolean,
-  rating?: number;
+  averageRating: number;
   reviewsCount?: number;
   extraCharge?: number; 
   bio?: string;
@@ -150,4 +150,92 @@ export interface Transaction {
   description: string;
   booking_id?: string;
   createdAt: Date;
+}
+
+export enum AppointmentStatus {
+  PENDING = "pending",
+  CONFIRMED = "confirmed",
+  PAYMENT_FAILED = "payment_failed",
+  CANCELLED = "cancelled",
+  PAYMENT_PENDING = "payment_pending",
+  EXPIRED = "expired",
+  COMPLETED = "completed",
+}
+
+export interface IBooking {
+  createdAt: string;
+  _id: string;
+  doctor_id: {
+    _id: string;
+    name: string;
+    specialty: string;
+  };
+  user_id: {
+    _id: string;
+    name: string;
+  };
+  ticketPrice: number;
+  discount?: number;
+  status: AppointmentStatus;
+  appointmentDate: string;
+}
+
+
+export interface IDashboardSummary {
+  totalRevenue: number;
+  totalBookings: number;
+  activeDoctors: number;
+  activePatients: number;
+  adminShare: number;
+}
+
+export interface IBookingStats {
+  pending: number;
+  confirmed: number;
+  completed: number;
+  cancelled: number;
+}
+
+export interface ITrend {
+  date: string;
+  count: number;
+  revenue: number;
+}
+
+export interface ISpecialtyActivity {
+  _id: string;
+  name: string;
+  bookings: number;
+}
+
+export interface ITopDoctor {
+  _id: string;
+  name: string;
+  revenue: number;
+  bookings: number;
+}
+
+export interface IPatientGrowth {
+  date: string;
+  count: number;
+}
+
+export interface IDashboardData {
+  overview: IDashboardSummary;
+  bookingStats: IBookingStats;
+  bookingTrends: ITrend[];
+  topDoctors: ITopDoctor[];
+  specialtyActivity: ISpecialtyActivity[];
+  pendingApprovals: number;
+  topPatients: IPatient[];
+  patientGrowth: IPatientGrowth[];
+  recentBookings?: IBooking[];
+  platformFreeTotal: number;
+}
+
+export interface IPatient {
+  _id: string;
+  name: string;
+  totalBookings: number;
+  totalSpent: number;
 }

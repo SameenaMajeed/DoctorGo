@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-
 const Toast = ({ message, type }: { message: string; type: "success" | "error" }) => {
   return (
     <div

@@ -122,17 +122,58 @@ export class DoctorRepository implements IDoctorRepository {
     });
   }
 
-  async findAllDoctor(): Promise<IDoctor[]> {
-    try {
-      return await DoctorModel.find().exec();
-    } catch (error) {
-      console.error("Error in findAll:", error);
-      throw new AppError(
-        HttpStatus.InternalServerError,
-        MessageConstants.INTERNAL_SERVER_ERROR
-      );
-    }
+  async findAllDoctor(): Promise<any[]> {
+  try {
+    const doctors = await DoctorModel.aggregate([
+      {
+        $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "doctor_id",
+          as: "reviews",
+        },
+      },
+      {
+        $addFields: {
+          averageRating: {
+            $cond: [
+              { $gt: [{ $size: "$reviews" }, 0] },
+              { $avg: "$reviews.rating" },
+              null,
+            ],
+          },
+        },
+      },
+      {
+        $project: {
+          password: 0, // exclude sensitive fields if needed
+          __v: 0,
+        },
+      },
+    ]);
+
+    return doctors;
+  } catch (error) {
+    console.error("Error in findAllDoctor:", error);
+    throw new AppError(
+      HttpStatus.InternalServerError,
+      MessageConstants.INTERNAL_SERVER_ERROR
+    );
   }
+}
+
+
+  // async findAllDoctor(): Promise<IDoctor[]> {
+  //   try {
+  //     return await DoctorModel.find().exec();
+  //   } catch (error) {
+  //     console.error("Error in findAll:", error);
+  //     throw new AppError(
+  //       HttpStatus.InternalServerError,
+  //       MessageConstants.INTERNAL_SERVER_ERROR
+  //     );
+  //   }
+  // }
 
   //get doctor data with id
   async getDoctorDataWithId(id: string): Promise<IDoctor | null> {
@@ -145,6 +186,14 @@ export class DoctorRepository implements IDoctorRepository {
       console.log(error.message);
       return null;
     }
+  }
+
+  async updateOnlineStatus(id: string, isOnline: boolean): Promise<IDoctor | null> {
+    return await DoctorModel.findByIdAndUpdate(
+      id,
+      { isOnline },
+      { new: true }
+    );
   }
 
 }

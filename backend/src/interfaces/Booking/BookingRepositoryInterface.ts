@@ -74,5 +74,18 @@ export interface IBookingRepository {
 
   find(query: any): Promise<IBooking[]>;
 
-  countAppointments(filter: any): Promise<number>
-findTodaysAppointments(doctorId: string, startOfDay: Date, endOfDay: Date): Promise<IBooking[]>}
+  countAppointments(filter: any): Promise<number>;
+  findTodaysAppointments(
+    doctorId: string,
+    startOfDay: Date,
+    endOfDay: Date
+  ): Promise<IBooking[]>;
+  findPaymentsByUser(
+    userId: string,
+    skip: number,
+    limit: number,
+    status?: string
+  ): Promise<IBooking[]>;
+
+  countUserPayments(userId: string, status?: string): Promise<number>;
+}

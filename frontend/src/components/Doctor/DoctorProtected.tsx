@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
 
 const ApprovedDoctorRoute: React.FC = () => {
-  const { isAuthenticated, doctor } = useSelector((state: RootState) => state.doctor);
+  const { isAuthenticated} = useSelector((state: RootState) => state.doctor);
 
   // If not authenticated, redirect to login
   if (!isAuthenticated) {

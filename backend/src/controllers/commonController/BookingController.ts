@@ -540,4 +540,47 @@ export class BookingController {
       }
     }
   }
+
+  // payment History
+  async getUserPayments(req: Request, res: Response) {
+    try {
+      const userId = req.data?.id;
+      if (!userId) {
+        throw new AppError(
+          HttpStatus.Unauthorized,
+          MessageConstants.UNAUTHORIZED
+        );
+      }
+
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 5;
+      const status = req.query.status as string;
+
+      // Only pass status to service if it's not "all" or undefined
+      const filteredStatus = status === "all" ? undefined : status;
+      console.log(filteredStatus)
+
+      const result = await this.paymentService.getUserPayments(
+        userId,
+        page,
+        limit,
+        filteredStatus
+      );
+
+      sendResponse(res, HttpStatus.OK, "Payment History Fetched successfully", {
+        payments: result.payments,
+        totalPages: result.totalPages,
+      });
+    } catch (error) {
+      if (error instanceof AppError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(
+          res,
+          HttpStatus.InternalServerError,
+          MessageConstants.INTERNAL_SERVER_ERROR
+        );
+      }
+    }
+  }
 }

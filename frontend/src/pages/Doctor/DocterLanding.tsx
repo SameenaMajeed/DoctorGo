@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import Footer from "../../components/CommonComponents/Footer";
 import { useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
-import { ArrowLeft } from "lucide-react";
 
 const DoctorLanding: React.FC = () => {
   const navigate = useNavigate();

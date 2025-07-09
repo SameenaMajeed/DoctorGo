@@ -4,10 +4,7 @@ import {
   Users,
   Stethoscope,
   CalendarCheck,
-  CheckCircle,
-  BarChart,
   CreditCard,
-  FileText,
   LogOut,
 } from "lucide-react";
 import SidebarItem from "./SidebarItem";

@@ -1,6 +1,6 @@
 import { useState, FormEvent } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../slice/Store/Store";
+// import { useSelector } from "react-redux";
+// import { RootState } from "../../slice/Store/Store";
 import { IReviewFormData } from "../../Types";
 import { FaStar } from "react-icons/fa";
 import api from "../../axios/UserInstance";
@@ -26,8 +26,8 @@ const ReviewForm: React.FC<IReviewFormProps> = ({
   onClose,
   existingReview,
 }) => {
-  const user = useSelector((state: RootState) => state.user.user);
-  const token = useSelector((state: RootState) => state.user.user?.accessToken);
+  // const user = useSelector((state: RootState) => state.user.user);
+  // const token = useSelector((state: RootState) => state.user.user?.accessToken);
   const [formData, setFormData] = useState<IReviewFormData>({
     doctor_id: doctorId,
     rating: existingReview?.rating || 0,

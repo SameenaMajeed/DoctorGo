@@ -32,7 +32,7 @@ const DoctorLogin: React.FC = () => {
       console.log(response.status);
 
       if (response.status === 200) {
-        const { doctor, role, accessToken, refreshToken } = response.data.data;
+        const {  role, accessToken, refreshToken } = response.data.data;
         dispatch(
           setDoctor({
             doctor: response.data.data,

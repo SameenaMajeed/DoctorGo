@@ -29,7 +29,7 @@ const UserList: React.FC = () => {
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / limit);
 
-  const handleBlockUser = async (userId: string, isBlocked: boolean) => {
+  const handleBlockUser = async (userId: string, _isBlocked: boolean) => {
     setBlockingUserId(userId);
     setShowBlocking(true);
   };
