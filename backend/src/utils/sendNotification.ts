@@ -1,5 +1,5 @@
-import NotificationModel from "../models/commonModel/NotificationModel";
 import { Server } from "socket.io";
+import { Notification } from "../models/commonModel/NotificationModel";
 
 export const sendNotification = async (
   io: Server,
@@ -12,7 +12,7 @@ export const sendNotification = async (
 ) => {
   const room = `${recipientRole}_${recipientId}`;
 
-  const notification = await new NotificationModel({
+  const notification = await new Notification({
     recipientId,
     recipientRole,
     type,
