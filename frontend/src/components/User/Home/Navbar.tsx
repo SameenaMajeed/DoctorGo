@@ -18,6 +18,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate()
   const user = useSelector((state: RootState) => state.user.user)
   const [showMenu, setShowMenu] = useState(false)
+  const [showMobileDropdown, setShowMobileDropdown] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
   useEffect(() => {
@@ -109,9 +110,110 @@ const Navbar: React.FC = () => {
           </NavLink>
         </motion.div>
 
+        {/* Mobile Account Section - Always Visible */}
+        <div className="md:hidden flex items-center space-x-3">
+          {user ? (
+            <>
+              {/* Mobile Notification Bell */}
+              <motion.div className="relative" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                <NotificationBell />
+              </motion.div>
+
+              {/* Mobile User Profile */}
+              <div className="relative">
+                <motion.div
+                  className="flex items-center gap-2 cursor-pointer"
+                  onClick={() => setShowMobileDropdown(!showMobileDropdown)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {user.profilePicture ? (
+                    <img
+                      src={user.profilePicture || "/placeholder.svg"}
+                      alt={user.name}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                      <User size={16} className="text-blue-600" />
+                    </div>
+                  )}
+                  <motion.img
+                    className="w-2"
+                    src={assets.dropdown_icon}
+                    alt="Dropdown"
+                    animate={{ rotate: showMobileDropdown ? 180 : 0 }}
+                  />
+                </motion.div>
+
+                {/* Mobile User Dropdown */}
+                <AnimatePresence>
+                  {showMobileDropdown && (
+                    <motion.div
+                      variants={dropdownVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      className="absolute top-12 right-0 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50"
+                    >
+                      <div className="px-4 py-2 border-b border-gray-100">
+                        <p className="text-sm font-medium text-gray-800">Hello, {user.name}</p>
+                      </div>
+                      {[
+                        { label: "My Profile", path: "/my-profile" },
+                        { label: "My Appointments", path: "/my-appointments" },
+                        { label: "Conversation", path: "/my-chats" },
+                        { label: "Wallet", path: "/wallet" },
+                        { label: "Logout", action: handleLogout },
+                      ].map((item, index) => (
+                        <motion.div
+                          key={index}
+                          className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 cursor-pointer transition-colors"
+                          onClick={() => {
+                            if (item.action) {
+                              item.action()
+                            } else {
+                              navigate(item.path!)
+                            }
+                            setShowMobileDropdown(false)
+                          }}
+                          whileHover={{ x: 5 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          {item.label}
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </>
+          ) : (
+            /* Mobile Login/Register Buttons */
+            <div className="flex items-center space-x-2">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <NavLink
+                  to="/signup"
+                  className="text-xs text-[#8b5d3b] hover:bg-[#2c2420] hover:text-white py-1.5 px-3 rounded-full transition-colors border border-[#8b5d3b]"
+                >
+                  Register
+                </NavLink>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <button
+                  onClick={() => navigate("/login")}
+                  className="text-xs bg-[#8b5d3b] text-white hover:bg-[#6d4a2f] py-1.5 px-3 rounded-full transition-colors shadow-md"
+                >
+                  Login
+                </button>
+              </motion.div>
+            </div>
+          )}
+        </div>
+
         {/* Mobile Menu Toggle */}
         <motion.button
-          className="md:hidden text-gray-800 p-2 rounded-full hover:bg-gray-100"
+          className="md:hidden text-gray-800 p-2 rounded-full hover:bg-gray-100 ml-2"
           onClick={() => setShowMenu(!showMenu)}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -153,91 +255,6 @@ const Navbar: React.FC = () => {
                   </NavLink>
                 </motion.li>
               ))}
-
-              {/* Mobile Account Section */}
-              <motion.li variants={menuItemVariants} className="list-none md:hidden">
-                {user ? (
-                  <div className="px-6 py-2">
-                    {/* Mobile User Info */}
-                    <div className="flex items-center gap-3 py-3 border-t border-gray-200">
-                      {user.profilePicture ? (
-                        <motion.img
-                          src={user.profilePicture}
-                          alt={user.name}
-                          className="w-10 h-10 rounded-full object-cover"
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                        />
-                      ) : (
-                        <motion.div
-                          className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center"
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          <User size={20} className="text-blue-600" />
-                        </motion.div>
-                      )}
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-800">Hello, {user.name}</p>
-                      </div>
-                      <motion.div className="relative" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                        <NotificationBell />
-                      </motion.div>
-                    </div>
-
-                    {/* Mobile Menu Items */}
-                    <div className="space-y-1">
-                      {[
-                        { label: "My Profile", path: "/my-profile" },
-                        { label: "My Appointments", path: "/my-appointments" },
-                        { label: "Conversation", path: "/my-chats" },
-                        { label: "Wallet", path: "/wallet" },
-                        { label: "Logout", action: handleLogout },
-                      ].map((item, index) => (
-                        <motion.div
-                          key={index}
-                          className="block py-2 px-3 text-gray-600 hover:bg-gray-100 rounded-md cursor-pointer transition-colors"
-                          onClick={() => {
-                            if (item.action) {
-                              item.action()
-                            } else {
-                              navigate(item.path!)
-                            }
-                            setShowMenu(false)
-                          }}
-                          whileHover={{ x: 5 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          {item.label}
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="px-6 py-4 border-t border-gray-200 space-y-3">
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <NavLink
-                        to="/signup"
-                        className="block text-center text-sm text-[#8b5d3b] hover:bg-[#2c2420] hover:text-white py-2 px-4 rounded-full transition-colors border border-[#8b5d3b]"
-                        onClick={() => setShowMenu(false)}
-                      >
-                        Register
-                      </NavLink>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <button
-                        onClick={() => {
-                          navigate("/login")
-                          setShowMenu(false)
-                        }}
-                        className="w-full text-sm bg-[#8b5d3b] text-white hover:bg-[#6d4a2f] py-2 px-4 rounded-full transition-colors shadow-md"
-                      >
-                        Login
-                      </button>
-                    </motion.div>
-                  </div>
-                )}
-              </motion.li>
             </motion.ul>
           )}
         </AnimatePresence>
@@ -342,6 +359,7 @@ const Navbar: React.FC = () => {
 }
 
 export default Navbar
+
 
 
 
