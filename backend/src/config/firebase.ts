@@ -14,7 +14,7 @@ interface Serviceaccount {
   token_uri: string;
   auth_provider_x509_cert_url: string;
   client_x509_cert_url: string;
-  universedomain : string;
+  universe_domain : string;
 }
 
 const serviceAccount: Serviceaccount = {
