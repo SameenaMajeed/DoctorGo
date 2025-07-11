@@ -45,6 +45,8 @@ app.use(morgan('dev'));
 
 console.log('Server is starting...');
 
+
+
 // Routes
 app.use('/api/users', userRoute);
 app.use('/api/users/otp', otpRoute);
