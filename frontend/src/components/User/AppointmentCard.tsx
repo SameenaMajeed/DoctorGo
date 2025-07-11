@@ -493,7 +493,7 @@ const AppointmentCard: React.FC<IAppointmentCardProps> = ({
         `/appointments/${appointment._id}/cancel`
       );
 
-      console.log(response);
+      console.log(response.data.data);
       if (response.status === 200) {
         onCancel(appointment._id);
         toast.update(toastId, {
