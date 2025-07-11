@@ -51,14 +51,14 @@ app.use('/api/doctor', doctorRoute);
 app.use('/api/admin' , adminRoute)
 app.use('/api/slots',slotRoute)
 
-// Catch-all route for 404
-app.use('*', (req, res) => {
-    res.status(404).json({ message: 'Endpoint not found' });
-});
-
 // Test route to verify server is running
 app.get("/", (req, res) => {
     res.send("Server is running!");
+});
+
+// Catch-all route for 404
+app.use('*', (req, res) => {
+    res.status(404).json({ message: 'Endpoint not found' });
 });
 
 app.set("io", io);
