@@ -30,6 +30,7 @@ const VideoCall: React.FC = () => {
   const [isAudioMuted, setIsAudioMuted] = useState(false)
   const [isVideoOff, setIsVideoOff] = useState(false)
   const [callDuration, setCallDuration] = useState(0)
+  const [remoteStreamReceived, setRemoteStreamReceived] = useState(false)
 
   const queryParams = new URLSearchParams(location.search)
   const roomId = queryParams.get("roomId")
@@ -53,7 +54,9 @@ const VideoCall: React.FC = () => {
         const constraints = { video: true, audio: true }
         const stream = await navigator.mediaDevices.getUserMedia(constraints)
         localStreamRef.current = stream
-        if (localVideoRef.current) localVideoRef.current.srcObject = stream
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = stream
+        }
         setupPeerConnection(stream)
       } catch (err: any) {
         console.error("Media access error:", err)
@@ -65,15 +68,21 @@ const VideoCall: React.FC = () => {
 
     const setupPeerConnection = (stream: MediaStream) => {
       const config: RTCConfiguration = {
-        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:stun1.l.google.com:19302" }],
       }
       const peer = new RTCPeerConnection(config)
       peerConnectionRef.current = peer
 
-      stream.getTracks().forEach((track) => peer.addTrack(track, stream))
+      // Add local stream tracks to peer connection
+      stream.getTracks().forEach((track) => {
+        console.log("Adding track:", track.kind)
+        peer.addTrack(track, stream)
+      })
 
+      // Handle ICE candidates
       peer.onicecandidate = (event) => {
         if (event.candidate) {
+          console.log("Sending ICE candidate")
           socket.emit("signal", {
             roomId,
             senderRole: userRole,
@@ -82,78 +91,112 @@ const VideoCall: React.FC = () => {
         }
       }
 
+      // Handle remote stream
       peer.ontrack = (event) => {
+        console.log("Received remote track:", event.track.kind)
         const [remoteStream] = event.streams
-        if (remoteVideoRef.current) {
+        if (remoteVideoRef.current && remoteStream) {
+          console.log("Setting remote stream")
           remoteVideoRef.current.srcObject = remoteStream
+          setRemoteStreamReceived(true)
         }
       }
 
+      // Handle connection state changes
       peer.oniceconnectionstatechange = () => {
         console.log("ICE Connection State:", peer.iceConnectionState)
-        if (peer.iceConnectionState === "connected") {
+        if (peer.iceConnectionState === "connected" || peer.iceConnectionState === "completed") {
           setConnected(true)
           dispatch(setVideoCallStatus("connected"))
-        } else if (peer.iceConnectionState === "disconnected") {
+        } else if (peer.iceConnectionState === "disconnected" || peer.iceConnectionState === "failed") {
           setConnected(false)
+          setRemoteStreamReceived(false)
           toast.error("Connection lost")
         }
       }
 
+      // Handle signaling data
       socket.on("signal", async (data) => {
+        console.log("Received signal:", data.signalData)
         if (data.senderRole === userRole) return
-        if (data.signalData.sdp) {
-          await peer.setRemoteDescription(new RTCSessionDescription(data.signalData.sdp))
-          if (data.signalData.sdp.type === "offer") {
-            const answer = await peer.createAnswer()
-            await peer.setLocalDescription(answer)
-            socket.emit("signal", {
-              roomId,
-              senderRole: userRole,
-              signalData: { sdp: answer },
-            })
-          }
-        } else if (data.signalData.candidate) {
-          try {
+
+        try {
+          if (data.signalData.sdp) {
+            console.log("Received SDP:", data.signalData.sdp.type)
+            await peer.setRemoteDescription(new RTCSessionDescription(data.signalData.sdp))
+
+            if (data.signalData.sdp.type === "offer") {
+              console.log("Creating answer")
+              const answer = await peer.createAnswer()
+              await peer.setLocalDescription(answer)
+              socket.emit("signal", {
+                roomId,
+                senderRole: userRole,
+                signalData: { sdp: answer },
+              })
+            }
+          } else if (data.signalData.candidate) {
+            console.log("Adding ICE candidate")
             await peer.addIceCandidate(new RTCIceCandidate(data.signalData.candidate))
-          } catch (e) {
-            console.error("Error adding ICE candidate", e)
           }
+        } catch (error) {
+          console.error("Error handling signal:", error)
         }
       })
 
-      const createOffer = async () => {
-        const offer = await peer.createOffer()
-        await peer.setLocalDescription(offer)
-        socket.emit("signal", {
-          roomId,
-          senderRole: userRole,
-          signalData: { sdp: offer },
-        })
+      // Handle negotiation needed - both sides can initiate
+      peer.onnegotiationneeded = async () => {
+        try {
+          console.log("Negotiation needed, creating offer")
+          const offer = await peer.createOffer()
+          await peer.setLocalDescription(offer)
+          socket.emit("signal", {
+            roomId,
+            senderRole: userRole,
+            signalData: { sdp: offer },
+          })
+        } catch (error) {
+          console.error("Error creating offer:", error)
+        }
       }
 
-      if (userRole === "doctor") {
-        peer.onnegotiationneeded = () => createOffer()
-      } else {
-        setTimeout(() => {
-          if (peer.signalingState === "stable" && !peer.remoteDescription) {
-            createOffer()
-          }
-        }, 1500)
-      }
-
+      // Join the video call room
       socket.emit("joinVideoCall", { roomId, bookingId })
+
+      // Additional fallback for offer creation
+      setTimeout(async () => {
+        if (peer.signalingState === "stable" && !peer.remoteDescription) {
+          console.log("Fallback: Creating offer after timeout")
+          try {
+            const offer = await peer.createOffer()
+            await peer.setLocalDescription(offer)
+            socket.emit("signal", {
+              roomId,
+              senderRole: userRole,
+              signalData: { sdp: offer },
+            })
+          } catch (error) {
+            console.error("Error creating fallback offer:", error)
+          }
+        }
+      }, 2000)
     }
 
     setupMedia()
 
     return () => {
-      peerConnectionRef.current?.close()
-      peerConnectionRef.current = null
-      localStreamRef.current?.getTracks().forEach((track) => track.stop())
-      localStreamRef.current = null
-      socketRef.current?.disconnect()
-      socketRef.current = null
+      if (peerConnectionRef.current) {
+        peerConnectionRef.current.close()
+        peerConnectionRef.current = null
+      }
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach((track) => track.stop())
+        localStreamRef.current = null
+      }
+      if (socketRef.current) {
+        socketRef.current.disconnect()
+        socketRef.current = null
+      }
     }
   }, [accessToken, bookingId, dispatch, navigate, roomId, userRole])
 
@@ -318,25 +361,29 @@ const VideoCall: React.FC = () => {
                   ref={remoteVideoRef}
                   autoPlay
                   playsInline
-                  className="w-full h-full object-cover rounded-3xl"
+                  className={`w-full h-full object-cover rounded-3xl ${remoteStreamReceived ? "block" : "hidden"}`}
                   aria-label="Remote video feed"
                 />
-                {/* Waiting State */}
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-3xl">
-                  <div className="text-center">
-                    <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mb-6 mx-auto shadow-2xl animate-pulse">
-                      <Users className="w-10 h-10 text-white" />
-                    </div>
-                    <p className="text-gray-300 text-lg font-medium">Waiting for connection...</p>
-                    <div className="flex justify-center mt-4">
-                      <div className="flex space-x-2">
-                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-75"></div>
-                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-150"></div>
+                {/* Waiting State - Only show when no remote stream */}
+                {!remoteStreamReceived && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-3xl">
+                    <div className="text-center">
+                      <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mb-6 mx-auto shadow-2xl animate-pulse">
+                        <Users className="w-10 h-10 text-white" />
+                      </div>
+                      <p className="text-gray-300 text-lg font-medium">
+                        {connected ? "Waiting for video..." : "Waiting for connection..."}
+                      </p>
+                      <div className="flex justify-center mt-4">
+                        <div className="flex space-x-2">
+                          <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-75"></div>
+                          <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-150"></div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
