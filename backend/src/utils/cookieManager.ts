@@ -18,7 +18,7 @@ export class CookieManager {
       sameSite?: "strict" | "lax" | "none";
     }
   ): void {
-    const secure = options?.secure ?? process.env.NODE_ENV === "production";
+    const secure = options?.secure ?? true ;
     res.cookie("accessToken", tokens.accessToken, {
       httpOnly: true,
       secure,

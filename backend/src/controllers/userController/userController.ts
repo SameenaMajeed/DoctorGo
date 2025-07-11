@@ -69,7 +69,7 @@ export class Usercontroller {
 
       console.log("user:", user);
 
-      CookieManager.setAuthCookies(res, { accessToken, refreshToken },{ secure: true });
+      CookieManager.setAuthCookies(res, { accessToken, refreshToken });
 
       sendResponse(res, HttpStatus.OK, MessageConstants.LOGIN_SUCCESS, {
         user: {
