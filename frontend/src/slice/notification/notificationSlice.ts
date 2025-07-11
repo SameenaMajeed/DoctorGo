@@ -35,7 +35,7 @@ let socket: Socket | null = null;
 export const initializeSocket = createAsyncThunk(
   "notifications/initializeSocket",
   async (_, { dispatch }) => {
-    socket = io("http://localhost:5000", {
+    socket = io(process.env.VITE_Base_Url, {
       auth: { token: localStorage.getItem("token") || "" },
     });
 
