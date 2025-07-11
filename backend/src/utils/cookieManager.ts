@@ -22,13 +22,13 @@ export class CookieManager {
     res.cookie("accessToken", tokens.accessToken, {
       httpOnly: true,
       secure,
-      sameSite: options?.sameSite ?? "strict",
+      sameSite: options?.sameSite ?? "none",
       maxAge: options?.accessTokenMaxAge ?? 30 * 60 * 1000, // default: 10 minutes
     });
     res.cookie("refreshToken", tokens.refreshToken, {
       httpOnly: true,
       secure,
-      sameSite: options?.sameSite ?? "strict",
+      sameSite: options?.sameSite ?? "none",
       maxAge: options?.refreshTokenMaxAge ?? 7 * 24 * 60 * 60 * 1000, // default: 7 days
     });
   }
@@ -47,12 +47,12 @@ export class CookieManager {
     res.clearCookie("accessToken", {
       httpOnly: true,
       secure,
-      sameSite: options?.sameSite ?? "strict",
+      sameSite: options?.sameSite ?? "none",
     });
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure,
-      sameSite: options?.sameSite ?? "strict",
+      sameSite: options?.sameSite ?? "none",
     });
   }
 
@@ -64,7 +64,7 @@ export class CookieManager {
     return {
       httpOnly: true,
       secure,
-      sameSite: "strict",
+      sameSite: "none",
       maxAge: 30 * 60 * 1000, // default: 10 minutes
     };
   }
