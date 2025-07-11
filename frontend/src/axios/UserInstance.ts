@@ -57,9 +57,10 @@ api.interceptors.response.use(
       if (status === 401 && !originalRequest._retry) {
         originalRequest._retry = true; // Mark the request as retried to avoid an infinite loop
 
+        const refreshTokenUrl = `${import.meta.env.VITE_Base_Url_User}/refresh-token`;
         try {
           const refreshResponse = await axios.post<TokenResponse>(
-            "http://localhost:5000/api/users/refresh-token",
+            refreshTokenUrl,
             {},
             { withCredentials: true } // Send cookies along with the request
           );

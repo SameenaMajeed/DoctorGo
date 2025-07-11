@@ -12,7 +12,7 @@ interface TokenResponse {
 
 // Set up Axios instance for doctor
 const doctorApi = axios.create({
-  baseURL:import.meta.env.VITE_Base_Url_Doctor,
+  baseURL: import.meta.env.VITE_Base_Url_Doctor,
   headers: {
     "Content-Type": "application/json",
   },
@@ -50,8 +50,8 @@ doctorApi.interceptors.response.use(
 
       if (status === 403) {
         // Handle 403 Forbidden - User might be blocked
-        toast.error("You have been blocked by the admin." ,{});
-        setTimeout(() => logout() , 5000) // Redirect after 5 seconds
+        toast.error("You have been blocked by the admin.", {});
+        setTimeout(() => logout(), 5000); // Redirect after 5 seconds
         return Promise.reject(error);
       }
 
@@ -59,9 +59,13 @@ doctorApi.interceptors.response.use(
       if (status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
 
+        const refreshTokenUrl = `${
+          import.meta.env.VITE_Base_Url_Doctor
+        }/refresh-token`;
+
         try {
           const refreshResponse = await axios.post<TokenResponse>(
-            "http://localhost:5000/api/doctor/refresh-token",
+             refreshTokenUrl ,
             {},
             { withCredentials: true }
           );
@@ -77,7 +81,7 @@ doctorApi.interceptors.response.use(
         }
       }
     }
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
 );
 

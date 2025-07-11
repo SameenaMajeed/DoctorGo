@@ -74,7 +74,7 @@ const NotificationBell = () => {
     fetchNotifications()
 
     // Initialize socket connection
-    socket.current = io(import.meta.env.VITE_Base_Url || "http://localhost:5000", {
+    socket.current = io(import.meta.env.VITE_Base_Url, {
       auth: { token: accessToken, role: userRole },
       query: { isDoctor: isDoctorRoute },
     })

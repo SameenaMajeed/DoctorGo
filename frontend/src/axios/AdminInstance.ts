@@ -60,10 +60,14 @@ adminApi.interceptors.response.use(
 
         originalRequest._retry = true; // Mark the request as retried to avoid an infinite loop
 
+        const refreshTokenUrl = `${
+          import.meta.env.VITE_Base_Url_Admin
+        }/refresh-token`;
+
         try {
           console.log("Sending request to refresh token...");
           const refreshResponse = await axios.post<TokenResponse>(
-            "http://localhost:5000/api/admin/refresh-token",
+            refreshTokenUrl,
             {},
             { withCredentials: true } // Send cookies along with the request
           );

@@ -70,10 +70,12 @@ slotApi.interceptors.response.use(
         console.log('Token expired. Attempting to refresh token...');
         originalRequest._retry = true;
 
+        const refreshTokenUrl = `${import.meta.env.VITE_Base_Url_Doctor}/refresh-token`;
+
         try {
           console.log('Sending request to refresh token...');
           const refreshResponse = await axios.post<TokenResponse>(
-            'http://localhost:5000/api/doctor/refresh-token', // Adjust refresh token endpoint
+            refreshTokenUrl, // Adjust refresh token endpoint
             {},
             { withCredentials: true } // Send refresh token cookie
           );

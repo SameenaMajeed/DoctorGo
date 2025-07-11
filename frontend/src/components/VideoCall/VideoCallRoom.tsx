@@ -42,7 +42,7 @@ const VideoCall: React.FC = () => {
     }
 
     const socket = io(
-      import.meta.env.VITE_Base_Url || "http://localhost:5000",
+      import.meta.env.VITE_Base_Url,
       {
         auth: { token: accessToken, role: userRole },
         query: { bookingId, isDoctor: userRole === "doctor" },
