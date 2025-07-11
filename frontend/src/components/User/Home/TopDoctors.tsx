@@ -22,7 +22,7 @@ const TopDoctors: React.FC = () => {
           message: string;
           success: boolean;
         }>("/doctors");
-        console.log('response',response.data.data)
+        console.log("response", response.data.data);
         if (response.data.success) {
           setDoctors(response.data.data);
         } else {
@@ -54,7 +54,7 @@ const TopDoctors: React.FC = () => {
     <div className="bg-gradient-to-br from-blue-50/80 via-white to-blue-50/80 min-h-screen py-12 md:py-16">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
-        <motion.div 
+        <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -66,7 +66,8 @@ const TopDoctors: React.FC = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.1 }}
           >
-            Our <span className="text-blue-600">Trusted</span> Medical Specialists
+            Our <span className="text-blue-600">Trusted</span> Medical
+            Specialists
           </motion.h1>
           <motion.p
             className="text-lg text-gray-600 max-w-2xl mx-auto"
@@ -74,7 +75,8 @@ const TopDoctors: React.FC = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            Connect with highly qualified doctors dedicated to your health and wellness.
+            Connect with highly qualified doctors dedicated to your health and
+            wellness.
           </motion.p>
 
           {/* Search/Filter Input */}
@@ -152,17 +154,32 @@ const TopDoctors: React.FC = () => {
               </button>
             </div>
           ) : filteredDoctors.length > 0 ? (
-            filteredDoctors.slice(0, 10).map((item, index) => (
-              <motion.div
-                key={item._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.05 * index }}
-                whileHover={{ y: -5 }}
-              >
-                <DoctorCard item={item} handleAppointment={handleAppointment} />
-              </motion.div>
-            ))
+            [...filteredDoctors]
+              .sort((a, b) => {
+                const aRating = a.averageRating ?? 0;
+                const bRating = b.averageRating ?? 0;
+                const aExp = a.experience ?? 0;
+                const bExp = b.experience ?? 0;
+
+                if (bRating !== aRating) return bRating - aRating;
+                return bExp - aExp;
+              })
+              .slice(0, 5)
+              .map((item, index) => (
+                // filteredDoctors.slice(0, 5).map((item, index) => (
+                <motion.div
+                  key={item._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.05 * index }}
+                  whileHover={{ y: -5 }}
+                >
+                  <DoctorCard
+                    item={item}
+                    handleAppointment={handleAppointment}
+                  />
+                </motion.div>
+              ))
           ) : (
             // No results state
             <div className="col-span-full text-center py-12">
@@ -185,7 +202,8 @@ const TopDoctors: React.FC = () => {
                 No doctors found
               </h3>
               <p className="text-gray-600 max-w-md mx-auto">
-                We couldn't find any doctors matching "{filter}". Try another specialty or check back later.
+                We couldn't find any doctors matching "{filter}". Try another
+                specialty or check back later.
               </p>
               <button
                 onClick={() => setFilter("")}
@@ -216,7 +234,7 @@ const TopDoctors: React.FC = () => {
               className="relative px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
               whileHover={{ scale: 1.05 }}
             >
-              <motion.span 
+              <motion.span
                 className="relative z-10 flex items-center gap-2"
                 animate={{ x: isHoveringMore ? 5 : 0 }}
                 transition={{ type: "spring", stiffness: 500 }}

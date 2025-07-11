@@ -1,19 +1,23 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useEffect, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
-import { useNavigate } from "react-router-dom"
-import { useForm, Controller } from "react-hook-form"
-import * as yup from "yup"
-import { yupResolver } from "@hookform/resolvers/yup"
-import { setError, setLoading, setDoctor } from "../../slice/Doctor/doctorSlice"
-import sendOtp from "../../Utils/sentOtp"
-import OtpModal from "../../components/CommonComponents/OtpModal"
-import Navbar from "../CommonComponents/Navbar"
-import Footer from "../CommonComponents/Footer"
-import type { RootState } from "../../slice/Store/Store"
-import doctorApi from "../../axios/DoctorInstance"
+import type React from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useForm, Controller } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import {
+  setError,
+  setLoading,
+  setDoctor,
+} from "../../slice/Doctor/doctorSlice";
+import sendOtp from "../../Utils/sentOtp";
+import OtpModal from "../../components/CommonComponents/OtpModal";
+import Navbar from "../CommonComponents/Navbar";
+import Footer from "../CommonComponents/Footer";
+import type { RootState } from "../../slice/Store/Store";
+import doctorApi from "../../axios/DoctorInstance";
 import {
   User,
   Mail,
@@ -28,11 +32,15 @@ import {
   CheckCircle,
   AlertCircle,
   Users,
-} from "lucide-react"
+} from "lucide-react";
+import { Specialities } from "../../Utils/Specialities";
 
 const validationSchema = yup.object().shape({
   name: yup.string().required("Name is required"),
-  email: yup.string().email("Invalid email format").required("Email is required"),
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
   password: yup.string().required("Password is required"),
   confirmPassword: yup
     .string()
@@ -41,20 +49,30 @@ const validationSchema = yup.object().shape({
   phone: yup.string().required("Mobile number is required"),
   qualification: yup.string().required("Qualification is required"),
   specialization: yup.string().required("Specialization is required"),
-  registrationNumber: yup.string().required("Medical registration number is required"),
+  registrationNumber: yup
+    .string()
+    .required("Medical registration number is required"),
   certificationFile: yup
     .mixed<File>()
     .required("Certificate is required")
-    .test("fileFormat", "Unsupported file format. Only PDF, PNG, and JPG are allowed.", (value: File | undefined) => {
-      if (value) {
-        const supportedFormats = ["application/pdf", "image/png", "image/jpeg"]
-        return supportedFormats.includes(value.type)
+    .test(
+      "fileFormat",
+      "Unsupported file format. Only PDF, PNG, and JPG are allowed.",
+      (value: File | undefined) => {
+        if (value) {
+          const supportedFormats = [
+            "application/pdf",
+            "image/png",
+            "image/jpeg",
+          ];
+          return supportedFormats.includes(value.type);
+        }
+        return false;
       }
-      return false
-    }),
-})
+    ),
+});
 
-type FormData = yup.InferType<typeof validationSchema>
+type FormData = yup.InferType<typeof validationSchema>;
 
 const DoctorSignupForm: React.FC = () => {
   const {
@@ -63,97 +81,102 @@ const DoctorSignupForm: React.FC = () => {
     formState: { errors },
   } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
-  })
+  });
 
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const { error } = useSelector((state: RootState) => state.doctor)
-  const [showOtpModal, setShowOtpModal] = useState(false)
-  const [formData, setFormData] = useState<FormData | null>(null)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { error } = useSelector((state: RootState) => state.doctor);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [formData, setFormData] = useState<FormData | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   useEffect(() => {
     // Clear any existing errors when component mounts
-    dispatch(setError(""))
+    dispatch(setError(""));
 
     // Clear any form-related state if needed
     return () => {
-      dispatch(setError(""))
-    }
-  }, [dispatch])
+      dispatch(setError(""));
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     return () => {
-      dispatch(setError(""))
-    }
-  }, [dispatch])
+      dispatch(setError(""));
+    };
+  }, [dispatch]);
 
   const onSubmit = async (data: FormData) => {
-    setFormData(data)
-    const result = await sendOtp(data.email, dispatch)
+    setFormData(data);
+    const result = await sendOtp(data.email, dispatch);
     if (result.success) {
-      setShowOtpModal(true)
+      setShowOtpModal(true);
     }
-  }
+  };
 
   const completeSingUp = async () => {
-    if (!formData || !formData.certificationFile) return
+    if (!formData || !formData.certificationFile) return;
 
-    const formDataToSend = new FormData()
+    const formDataToSend = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       if (key !== "confirmPassword") {
         if (value instanceof File) {
-          formDataToSend.append(key, value)
+          formDataToSend.append(key, value);
         } else {
-          formDataToSend.append(key, value.toString())
+          formDataToSend.append(key, value.toString());
         }
       }
-    })
+    });
 
     // Set initial approval status to pending
-    formDataToSend.append("isApproved", "false")
-    formDataToSend.append("approvalStatus", "pending")
+    formDataToSend.append("isApproved", "false");
+    formDataToSend.append("approvalStatus", "pending");
 
     try {
-      dispatch(setLoading())
+      dispatch(setLoading());
       const response: any = await doctorApi.post("/signup", formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
-      })
-      console.log("response", response)
+      });
+      console.log("response", response);
 
       dispatch(
         setDoctor({
           ...response.data.doctor,
           isApproved: false,
           approvalStatus: "pending",
-        }),
-      )
+        })
+      );
 
-      setShowOtpModal(false)
+      setShowOtpModal(false);
 
       // Redirect to doctor home page
-      navigate("/doctor/login")
+      navigate("/doctor/login");
     } catch (err: any) {
-      dispatch(setError(err.response?.data?.error || "Signup failed"))
+      dispatch(setError(err.response?.data?.error || "Signup failed"));
     }
-  }
+  };
 
-  const handleFileChange = (file: File | undefined, onChange: (file: File | undefined) => void) => {
+  const handleFileChange = (
+    file: File | undefined,
+    onChange: (file: File | undefined) => void
+  ) => {
     if (file) {
-      setUploadedFile(file)
-      onChange(file)
+      setUploadedFile(file);
+      onChange(file);
     }
-  }
+  };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes"
-    const k = 1024
-    const sizes = ["Bytes", "KB", "MB", "GB"]
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
-  }
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return (
+      Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+    );
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-indigo-50">
@@ -177,7 +200,8 @@ const DoctorSignupForm: React.FC = () => {
                 Join Our Medical Network
               </h1>
               <p className="text-lg text-gray-600 max-w-md">
-                Connect with patients and grow your practice with our comprehensive healthcare platform
+                Connect with patients and grow your practice with our
+                comprehensive healthcare platform
               </p>
             </div>
           </div>
@@ -198,7 +222,9 @@ const DoctorSignupForm: React.FC = () => {
               <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">
                 Create Your Account
               </h2>
-              <p className="text-gray-600">Start your journey with our medical platform</p>
+              <p className="text-gray-600">
+                Start your journey with our medical platform
+              </p>
             </div>
 
             {/* Error Display */}
@@ -228,7 +254,9 @@ const DoctorSignupForm: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Full Name */}
                   <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">Full Name</label>
+                    <label className="block text-sm font-semibold text-gray-700">
+                      Full Name
+                    </label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <Controller
@@ -241,7 +269,9 @@ const DoctorSignupForm: React.FC = () => {
                             {...field}
                             placeholder="Enter your full name"
                             className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
-                              errors.name ? "border-red-300 bg-red-50" : "border-gray-200 hover:border-gray-300"
+                              errors.name
+                                ? "border-red-300 bg-red-50"
+                                : "border-gray-200 hover:border-gray-300"
                             }`}
                           />
                         )}
@@ -257,7 +287,9 @@ const DoctorSignupForm: React.FC = () => {
 
                   {/* Email */}
                   <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">Email Address</label>
+                    <label className="block text-sm font-semibold text-gray-700">
+                      Email Address
+                    </label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <Controller
@@ -271,7 +303,9 @@ const DoctorSignupForm: React.FC = () => {
                             placeholder="Enter your email"
                             value={field.value || ""} // Ensure empty value if undefined
                             className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
-                              errors.email ? "border-red-300 bg-red-50" : "border-gray-200 hover:border-gray-300"
+                              errors.email
+                                ? "border-red-300 bg-red-50"
+                                : "border-gray-200 hover:border-gray-300"
                             }`}
                           />
                         )}
@@ -288,7 +322,9 @@ const DoctorSignupForm: React.FC = () => {
 
                 {/* Phone */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">Phone Number</label>
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Phone Number
+                  </label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <Controller
@@ -301,7 +337,9 @@ const DoctorSignupForm: React.FC = () => {
                           type="text"
                           placeholder="Enter your mobile number"
                           className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
-                            errors.phone ? "border-red-300 bg-red-50" : "border-gray-200 hover:border-gray-300"
+                            errors.phone
+                              ? "border-red-300 bg-red-50"
+                              : "border-gray-200 hover:border-gray-300"
                           }`}
                         />
                       )}
@@ -327,7 +365,9 @@ const DoctorSignupForm: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Qualification */}
                   <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">Qualification</label>
+                    <label className="block text-sm font-semibold text-gray-700">
+                      Qualification
+                    </label>
                     <div className="relative">
                       <GraduationCap className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <Controller
@@ -358,7 +398,9 @@ const DoctorSignupForm: React.FC = () => {
 
                   {/* Specialization */}
                   <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">Specialization</label>
+                    <label className="block text-sm font-semibold text-gray-700">
+                      Specialization
+                    </label>
                     <div className="relative">
                       <Stethoscope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <Controller
@@ -366,16 +408,33 @@ const DoctorSignupForm: React.FC = () => {
                         control={control}
                         defaultValue=""
                         render={({ field }) => (
-                          <input
+                          <select
                             {...field}
-                            type="text"
-                            placeholder="e.g., Cardiology, Pediatrics"
                             className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
                               errors.specialization
                                 ? "border-red-300 bg-red-50"
                                 : "border-gray-200 hover:border-gray-300"
                             }`}
-                          />
+                          >
+                            <option value="" disabled>
+                              Select specialization
+                            </option>
+                            {Specialities.map((spec, idx) => (
+                              <option key={idx} value={spec}>
+                                {spec}
+                              </option>
+                            ))}
+                          </select>
+                          // <input
+                          //   {...field}
+                          //   type="text"
+                          //   placeholder="e.g., Cardiology, Pediatrics"
+                          //   className={`w-full pl-10 pr-4 py-3 border-2 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
+                          //     errors.specialization
+                          //       ? "border-red-300 bg-red-50"
+                          //       : "border-gray-200 hover:border-gray-300"
+                          //   }`}
+                          // />
                         )}
                       />
                     </div>
@@ -390,7 +449,9 @@ const DoctorSignupForm: React.FC = () => {
 
                 {/* Registration Number */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">Medical Registration Number</label>
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Medical Registration Number
+                  </label>
                   <div className="relative">
                     <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <Controller
@@ -421,7 +482,9 @@ const DoctorSignupForm: React.FC = () => {
 
                 {/* Medical Certification File */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">Medical Certification Document</label>
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Medical Certification Document
+                  </label>
                   <Controller
                     name="certificationFile"
                     control={control}
@@ -432,14 +495,19 @@ const DoctorSignupForm: React.FC = () => {
                             errors.certificationFile
                               ? "border-red-300 bg-red-50"
                               : uploadedFile
-                                ? "border-green-300 bg-green-50"
-                                : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+                              ? "border-green-300 bg-green-50"
+                              : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
                           }`}
                         >
                           <input
                             type="file"
                             id="certificate"
-                            onChange={(e) => handleFileChange(e.target.files?.[0], field.onChange)}
+                            onChange={(e) =>
+                              handleFileChange(
+                                e.target.files?.[0],
+                                field.onChange
+                              )
+                            }
                             accept=".pdf,.jpg,.jpeg,.png"
                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                           />
@@ -448,23 +516,32 @@ const DoctorSignupForm: React.FC = () => {
                               <div className="space-y-2">
                                 <CheckCircle className="w-12 h-12 text-green-500 mx-auto" />
                                 <div>
-                                  <p className="font-medium text-green-700">{uploadedFile.name}</p>
-                                  <p className="text-sm text-green-600">{formatFileSize(uploadedFile.size)}</p>
+                                  <p className="font-medium text-green-700">
+                                    {uploadedFile.name}
+                                  </p>
+                                  <p className="text-sm text-green-600">
+                                    {formatFileSize(uploadedFile.size)}
+                                  </p>
                                 </div>
                               </div>
                             ) : (
                               <div className="space-y-2">
                                 <Upload className="w-12 h-12 text-gray-400 mx-auto" />
                                 <div>
-                                  <p className="font-medium text-gray-700">Click to upload your certificate</p>
-                                  <p className="text-sm text-gray-500">PDF, JPG, JPEG, PNG up to 10MB</p>
+                                  <p className="font-medium text-gray-700">
+                                    Click to upload your certificate
+                                  </p>
+                                  <p className="text-sm text-gray-500">
+                                    PDF, JPG, JPEG, PNG up to 10MB
+                                  </p>
                                 </div>
                               </div>
                             )}
                           </div>
                         </div>
                         <p className="text-xs text-gray-500">
-                          Upload your medical license or certification document for verification
+                          Upload your medical license or certification document
+                          for verification
                         </p>
                       </div>
                     )}
@@ -489,7 +566,9 @@ const DoctorSignupForm: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Password */}
                   <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">Password</label>
+                    <label className="block text-sm font-semibold text-gray-700">
+                      Password
+                    </label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <Controller
@@ -502,7 +581,9 @@ const DoctorSignupForm: React.FC = () => {
                             type={showPassword ? "text" : "password"}
                             placeholder="Create a strong password"
                             className={`w-full pl-10 pr-12 py-3 border-2 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
-                              errors.password ? "border-red-300 bg-red-50" : "border-gray-200 hover:border-gray-300"
+                              errors.password
+                                ? "border-red-300 bg-red-50"
+                                : "border-gray-200 hover:border-gray-300"
                             }`}
                           />
                         )}
@@ -512,7 +593,11 @@ const DoctorSignupForm: React.FC = () => {
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                       >
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        {showPassword ? (
+                          <EyeOff className="w-5 h-5" />
+                        ) : (
+                          <Eye className="w-5 h-5" />
+                        )}
                       </button>
                     </div>
                     {errors.password && (
@@ -525,7 +610,9 @@ const DoctorSignupForm: React.FC = () => {
 
                   {/* Confirm Password */}
                   <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">Confirm Password</label>
+                    <label className="block text-sm font-semibold text-gray-700">
+                      Confirm Password
+                    </label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <Controller
@@ -547,10 +634,16 @@ const DoctorSignupForm: React.FC = () => {
                       />
                       <button
                         type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                       >
-                        {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        {showConfirmPassword ? (
+                          <EyeOff className="w-5 h-5" />
+                        ) : (
+                          <Eye className="w-5 h-5" />
+                        )}
                       </button>
                     </div>
                     {errors.confirmPassword && (
@@ -600,14 +693,10 @@ const DoctorSignupForm: React.FC = () => {
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default DoctorSignupForm
-
-
-
-
+export default DoctorSignupForm;
 
 // import React, { useEffect, useState } from "react";
 // import { useDispatch, useSelector } from "react-redux";
@@ -684,9 +773,9 @@ export default DoctorSignupForm
 //   }, [dispatch]);
 
 //   const onSubmit = async (data: FormData) => {
-  
+
 //     setFormData(data);
-  
+
 //     const result = await sendOtp(data.email, dispatch);
 //     if (result.success) {
 //       setShowOtpModal(true);
@@ -695,7 +784,7 @@ export default DoctorSignupForm
 
 //   const completeSingUp = async () => {
 //     if (!formData || !formData.certificationFile) return;
-  
+
 //     const formDataToSend = new FormData();
 //     Object.entries(formData).forEach(([key, value]) => {
 //       if (key !== "confirmPassword") {
@@ -711,11 +800,11 @@ export default DoctorSignupForm
 //     // // if (formData.certificationFile) {
 //     //   formDataToSend.append("certificationFile", formData.certificationFile);
 //     // // }
-  
+
 //     // Set initial approval status to pending
 //     formDataToSend.append("isApproved", "false");
 //     formDataToSend.append("approvalStatus", "pending");
-  
+
 //     try {
 //       dispatch(setLoading());
 //       const response: any = await doctorApi.post("/signup", formDataToSend, {
@@ -723,7 +812,7 @@ export default DoctorSignupForm
 //       });
 
 //       console.log('response',response )
-  
+
 //       dispatch(
 //         setDoctor({
 //           ...response.data.doctor,
@@ -731,9 +820,9 @@ export default DoctorSignupForm
 //           approvalStatus: "pending",
 //         })
 //       );
-  
+
 //       setShowOtpModal(false);
-  
+
 //       // Redirect to doctor home page
 //       navigate("/doctor/login");
 //     } catch (err: any) {
