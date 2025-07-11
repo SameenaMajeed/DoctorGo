@@ -29,7 +29,7 @@ connectDB();
 
 // ✅ Corrected CORS Configuration
 const corsOptions = {
-    origin: ["http://localhost:5173", "http://15.206.150.64"],
+    origin: ["https://doctor-go.vercel.app/", "http://15.206.150.64"],
     // origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"], // Fixed spelling mistake
