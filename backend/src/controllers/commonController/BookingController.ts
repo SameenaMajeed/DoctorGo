@@ -572,6 +572,7 @@ export class BookingController {
         totalPages: result.totalPages,
       });
     } catch (error) {
+      console.error("Controller Error in getUserPayments:", error);
       if (error instanceof AppError) {
         sendError(res, error.status, error.message);
       } else {
