@@ -50,6 +50,7 @@ import PaymentsPage from "../components/Admin/PaymentsPage.tsx";
 import PrescriptionView from "../components/User/PrescriptionView.tsx";
 import WalletPage from "../components/User/WalletPage.tsx";
 import PaymentHistory from "../components/User/PaymentHistory.tsx";
+import PaymentDetails from "../components/Doctor/PaymentDetails.tsx";
 
 export const routes = (
   <>
@@ -111,6 +112,7 @@ export const routes = (
           element={<PatientDashboard />}
         />
         <Route path="/myChats" element={<ChatPage />} />
+        <Route path="/payment" element={<PaymentDetails />} />
         <Route path="/doctor/reviews/:doctorId" element={<DoctorReviews />} />
         {/* <Route
           path="/doctor/slots/emergency-block"
