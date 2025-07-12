@@ -54,7 +54,7 @@ const AppointmentPage: React.FC = () => {
     const fetchDoctor = async () => {
       try {
         const doctorResponse = await api.get(`/doctors/${doctorId}`);
-        console.log(doctorResponse.data.data) 
+        console.log(doctorResponse.data.data);
         setDoctor(doctorResponse.data.data);
         const reviewsResponse = await api.get(`/reviews/doctor/${doctorId}`);
         setReviews(reviewsResponse.data.data || []);
@@ -273,46 +273,41 @@ const AppointmentPage: React.FC = () => {
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-8 mt-16">
         {/* Enhanced Progress Steps */}
-        <div className="mb-16 relative z-10">
-          <div className="flex items-center justify-between max-w-3xl mx-auto">
+        <div className="mb-8 relative z-10">
+          {" "}
+          <div className="flex items-center justify-between">
             {/* Step 1 */}
-            <div className="flex flex-col items-center relative group">
-              <div className="rounded-full h-16 w-16 bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-xl transform hover:scale-110 transition-all duration-300 group-hover:shadow-2xl">
-                <span className="font-bold text-lg">1</span>
+            <div className="flex flex-col items-center">
+              <div className="rounded-full h-8 w-8 bg-blue-600 flex items-center justify-center text-white">
+                1
               </div>
-              <span className="mt-4 text-base font-bold text-blue-600">
+              <span className="mt-2 text-xs font-medium text-blue-600">
                 Select Slot
               </span>
-              <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-blue-500 rounded-full shadow-lg"></div>
             </div>
 
             {/* Progress line */}
-            <div className="flex-auto mx-8 relative">
-              <div className="h-2 bg-gradient-to-r from-blue-500 via-blue-400 to-slate-300 rounded-full shadow-sm"></div>
-              <div className="absolute top-1/2 left-1/4 w-2 h-2 bg-blue-400 rounded-full transform -translate-y-1/2 animate-pulse"></div>
-            </div>
+            <div className="flex-auto mx-4 relative top-4 h-0.5 bg-blue-600"></div>
 
             {/* Step 2 */}
-            <div className="flex flex-col items-center group">
-              <div className="rounded-full h-16 w-16 bg-slate-200 flex items-center justify-center text-slate-500 shadow-lg group-hover:shadow-xl transition-all duration-300">
-                <span className="font-bold text-lg">2</span>
+            <div className="flex flex-col items-center">
+              <div className="rounded-full h-8 w-8 bg-blue-600 flex items-center justify-center text-white">
+                2
               </div>
-              <span className="mt-4 text-base font-semibold text-slate-500">
+              <span className="mt-2 text-xs font-medium text-blue-600">
                 Enter Details
               </span>
             </div>
 
             {/* Progress line */}
-            <div className="flex-auto mx-8 relative">
-              <div className="h-2 bg-slate-300 rounded-full shadow-sm"></div>
-            </div>
+            <div className="flex-auto mx-4 relative top-4 h-0.5 bg-gray-300"></div>
 
             {/* Step 3 */}
-            <div className="flex flex-col items-center group">
-              <div className="rounded-full h-16 w-16 bg-slate-200 flex items-center justify-center text-slate-500 shadow-lg group-hover:shadow-xl transition-all duration-300">
-                <span className="font-bold text-lg">3</span>
+            <div className="flex flex-col items-center">
+              <div className="rounded-full h-8 w-8 bg-gray-300 flex items-center justify-center text-gray-600">
+                3
               </div>
-              <span className="mt-4 text-base font-semibold text-slate-500">
+              <span className="mt-2 text-xs font-medium text-gray-500">
                 Confirmation
               </span>
             </div>
@@ -418,7 +413,8 @@ const AppointmentPage: React.FC = () => {
                     </div>
                     <div>
                       <p className="text-2xl font-bold text-gray-900">
-                        {doctor.averageRating} <span className="text-amber-500">★</span>
+                        {doctor.averageRating}{" "}
+                        <span className="text-amber-500">★</span>
                       </p>
                       <p className="text-gray-600 font-medium">
                         Patient Rating
