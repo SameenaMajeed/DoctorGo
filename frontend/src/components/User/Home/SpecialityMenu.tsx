@@ -44,39 +44,6 @@ import { specialityData } from "../../../assets/assets";
 import { Link } from "react-router-dom";
 
 const SpecialityMenu: React.FC = () => {
-  // const specialities = [
-  //   {
-  //     name: "General Physician",
-  //     image: "./General_physician.svg",
-  //     color: "from-blue-400 to-blue-600",
-  //   },
-  //   {
-  //     name: "Gynecologist",
-  //     image: "./Gastroenterologist.svg",
-  //     color: "from-pink-400 to-pink-600",
-  //   },
-  //   {
-  //     name: "Dermatologist",
-  //     image: "/placeholder.svg?height=80&width=80",
-  //     color: "from-green-400 to-green-600",
-  //   },
-  //   {
-  //     name: "Pediatricians",
-  //     image: "/placeholder.svg?height=80&width=80",
-  //     color: "from-yellow-400 to-yellow-600",
-  //   },
-  //   {
-  //     name: "Neurologist",
-  //     image: "/placeholder.svg?height=80&width=80",
-  //     color: "from-purple-400 to-purple-600",
-  //   },
-  //   {
-  //     name: "Gastroenterologist",
-  //     image: "/placeholder.svg?height=80&width=80",
-  //     color: "from-red-400 to-red-600",
-  //   },
-  // ];
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
