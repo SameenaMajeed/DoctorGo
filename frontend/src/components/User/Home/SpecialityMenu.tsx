@@ -166,7 +166,7 @@ const SpecialityMenu: React.FC = () => {
         </motion.div>
 
         {/* View All Button */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -177,7 +177,7 @@ const SpecialityMenu: React.FC = () => {
             View All Specialities
             <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
           </button>
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   );
