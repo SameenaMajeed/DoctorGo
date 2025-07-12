@@ -141,6 +141,16 @@ const PrescriptionView: React.FC = () => {
     );
   }
 
+  const generateShortBookingId = (id: string): string => {
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+      hash = (hash << 5) - hash + id.charCodeAt(i);
+      hash |= 0; // Convert to 32bit integer
+    }
+    // Convert to base36 (0-9, a-z), remove negatives and slice first 6
+    return Math.abs(hash).toString(36).slice(0, 6).toUpperCase();
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
@@ -174,7 +184,7 @@ const PrescriptionView: React.FC = () => {
           <p className="mt-2 text-sm text-gray-600">
             Booking ID:{" "}
             <span className="font-medium text-indigo-700">
-              {prescription._id}
+              {generateShortBookingId(prescription._id)}
             </span>
           </p>
           <Badge
