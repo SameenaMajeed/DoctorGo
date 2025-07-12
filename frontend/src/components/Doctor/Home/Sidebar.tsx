@@ -193,11 +193,11 @@ const Sidebar: React.FC<SidebarProps> = () => {
   const patientPath = doctorId ? `/doctor/${doctorId}/patients` : "#";
   // const review = doctorId ? `/doctor/reviews/${doctorId}` : "#";
 
-  const handleLogout = () => {
-    // Add your logout logic here
-    toast.success("Logged out successfully");
-    navigate("/doctor/login");
-  };
+  // const handleLogout = () => {
+  //   // Add your logout logic here
+  //   toast.success("Logged out successfully");
+  //   navigate("/doctor/login");
+  // };
 
   return (
     <motion.div
