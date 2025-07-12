@@ -12,8 +12,8 @@ import {
   PlusCircle,
   MessageCircle,
   ChevronRight,
-  LogOut,
-  Shield,
+  // LogOut,
+  // Shield,
   X,
   IndianRupee,
 } from "lucide-react";
