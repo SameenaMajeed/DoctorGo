@@ -156,7 +156,7 @@ const PaymentDetails = () => {
               <h1 className="text-3xl font-extrabold text-gray-900">
                 Payments
               </h1>
-              <div className="flex items-center space-x-4">
+              {/* <div className="flex items-center space-x-4">
                 <label
                   htmlFor="status-filter"
                   className="text-sm font-semibold text-gray-700"
@@ -176,7 +176,7 @@ const PaymentDetails = () => {
                     </option>
                   ))}
                 </select>
-              </div>
+              </div> */}
             </div>
 
             {loading ? (
