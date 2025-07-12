@@ -83,7 +83,10 @@ const PaymentDetails = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<PaymentStatus | "all">(
+//   const [statusFilter, setStatusFilter] = useState<PaymentStatus | "all">(
+//     "all"
+//   );
+  const [statusFilter] = useState<PaymentStatus | "all">(
     "all"
   );
 
@@ -138,10 +141,10 @@ const PaymentDetails = () => {
     );
   }, [currentPage, statusFilter]);
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatusFilter(e.target.value as PaymentStatus | "all");
-    setCurrentPage(1);
-  };
+//   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+//     setStatusFilter(e.target.value as PaymentStatus | "all");
+//     setCurrentPage(1);
+//   };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
