@@ -392,7 +392,8 @@ async findPaymentsByUser(
       .find(query)
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .populate("user_id", "name");
   } catch (err) {
     console.error("🔥 Error in findPaymentsByUser:", err);
     throw err;

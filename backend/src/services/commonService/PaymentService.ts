@@ -109,29 +109,29 @@ export class PaymentService implements IPaymentService {
     }
   }
 
-async getUserPayments(
-  userId: string,
-  page: number,
-  limit: number,
-  status?: PaymentStatus // Only accept valid payment statuses or undefined
-): Promise<{ payments: IBooking[]; totalPages: number }> {
-  const skip = (page - 1) * limit;
+  async getUserPayments(
+    userId: string,
+    page: number,
+    limit: number,
+    status?: PaymentStatus // Only accept valid payment statuses or undefined
+  ): Promise<{ payments: IBooking[]; totalPages: number }> {
+    const skip = (page - 1) * limit;
 
-  try {
-    const [payments, total] = await Promise.all([
-      this.bookingRepo.findPaymentsByUser(userId, skip, limit, status),
-      this.bookingRepo.countUserPayments(userId, status),
-    ]);
+    try {
+      const [payments, total] = await Promise.all([
+        this.bookingRepo.findPaymentsByUser(userId, skip, limit, status),
+        this.bookingRepo.countUserPayments(userId, status),
+      ]);
 
-    console.log('data', payments,total)
+      console.log("data", payments, total);
 
-    return {
-      payments,
-      totalPages: Math.ceil(total / limit),
-    };
-  } catch (err) {
-    console.error("Error in get UserPayments Service:", err);
-    throw err;
+      return {
+        payments,
+        totalPages: Math.ceil(total / limit),
+      };
+    } catch (err) {
+      console.error("Error in get UserPayments Service:", err);
+      throw err;
+    }
   }
-}
 }
