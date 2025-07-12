@@ -222,4 +222,13 @@ doctorRoute.patch('/notifications/mark-all-read' ,authenticateToken("doctor"),
 // ....................online status...........................
 doctorRoute.put("/:id/status" ,(req, res) => doctorController.getDoctorStatus(req , res))
 
+// ...................Earning Deatails.........................
+doctorRoute.get(
+  "/bookings",
+  authenticateToken("doctor"),
+  (req, res) => {
+    bookingController.getAllBookings(req, res);
+  }
+);
+
 export default doctorRoute;
