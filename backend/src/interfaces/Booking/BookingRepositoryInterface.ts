@@ -88,4 +88,6 @@ export interface IBookingRepository {
   ): Promise<IBooking[]>;
 
   countUserPayments(userId: string, status?: string): Promise<number>;
+
+  getDoctorsRevenue(): Promise<any[]>
 }

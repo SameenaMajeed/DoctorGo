@@ -10,15 +10,15 @@ import { generateOtp, hashOtp } from "../../utils/GenerateOtp";
 import { sentMail } from "../../utils/SendMail";
 import { IUserService } from "../../interfaces/user/userServiceInterface";
 import { UserRepositoryInterface } from "../../interfaces/user/UserRepositoryInterface";
-import { OtpRepository } from "../../repositories/commonRepository/otpRepository";
 import { IDoctor } from "../../models/doctorMpdel/DoctorModel";
-import { DoctorRepository } from "../../repositories/doctorRepository/doctorRepository";
 import { AppError } from "../../utils/AppError";
 import { HttpStatus } from "../../constants/Httpstatus";
 import { MessageConstants } from "../../constants/MessageConstants";
 import { googleUserData } from "../../types/google";
 import cloudinary from "../../config/cloudinary";
 import { CloudinaryService } from "../../utils/cloudinary.service";
+import IOtpRepository from "../../interfaces/otp/otpRepositoryInterface";
+import { IDoctorRepository } from "../../interfaces/doctor/doctorRepositoryInterface";
 
 export interface ForgotPasswordResponse {
   success: boolean;
@@ -29,8 +29,8 @@ export interface ForgotPasswordResponse {
 export class UserService implements IUserService {
   constructor(
     private userRepository: UserRepositoryInterface,
-    private otpRepository: OtpRepository,
-    private doctorRepository: DoctorRepository
+    private otpRepository: IOtpRepository,
+    private doctorRepository: IDoctorRepository
   ) {}
 
   async registerUser(
@@ -74,7 +74,7 @@ export class UserService implements IUserService {
         throw new AppError(HttpStatus.Unauthorized, MessageConstants.INVALID_PASSWORD);
       }
       const accessToken = generateAccessToken({ id: user._id.toString(), role: 'user', email: user.email });
-      const refreshToken = generateRefreshToken({ id: user._id.toString(), role: 'user' });
+      const refreshToken = generateRefreshToken({ id: user._id.toString(), role: 'user', email: user.email});
       return { user, accessToken, refreshToken };
     } catch (error: unknown) {
       if (error instanceof AppError) throw error;

@@ -1,4 +1,5 @@
 import { IUser } from "./types/auth";
+import { AppointmentStatus } from "./types/paymentTypes";
 import { ISlotData } from "./types/Slot";
 
 export interface IDoctor {
@@ -152,32 +153,34 @@ export interface Transaction {
   createdAt: Date;
 }
 
-export enum AppointmentStatus {
-  PENDING = "pending",
-  CONFIRMED = "confirmed",
-  PAYMENT_FAILED = "payment_failed",
-  CANCELLED = "cancelled",
-  PAYMENT_PENDING = "payment_pending",
-  EXPIRED = "expired",
-  COMPLETED = "completed",
-}
-
 export interface IBooking {
   createdAt: string;
   _id: string;
   doctor_id: {
     _id: string;
     name: string;
-    specialty: string;
+    specialization: string;
   };
   user_id: {
     _id: string;
     name: string;
   };
   ticketPrice: number;
-  discount?: number;
   status: AppointmentStatus;
   appointmentDate: string;
+  totalAmount: number;
+  platformFee : number
+  appointmentTime: string
+  modeOfAppointment: "online" | "offline"
+  is_paid: boolean
+  paymentMethod?: "razorpay" | "wallet"
+  patientDetails: {
+    patientName: string
+    contactNumber: string
+    district: string
+    locality: string
+  }
+  updatedAt: string
 }
 
 
@@ -220,22 +223,45 @@ export interface IPatientGrowth {
   count: number;
 }
 
-export interface IDashboardData {
-  overview: IDashboardSummary;
-  bookingStats: IBookingStats;
-  bookingTrends: ITrend[];
-  topDoctors: ITopDoctor[];
-  specialtyActivity: ISpecialtyActivity[];
-  pendingApprovals: number;
-  topPatients: IPatient[];
-  patientGrowth: IPatientGrowth[];
-  recentBookings?: IBooking[];
-  platformFreeTotal: number;
+export interface ITopPatient {
+  id: string
+  name: string
+  totalBookings: number
+  totalSpent: number
 }
 
-export interface IPatient {
-  _id: string;
-  name: string;
-  totalBookings: number;
-  totalSpent: number;
+export interface IDashboardData {
+  pendingApprovals: number
+  topPatients: ITopPatient[]
+  recentBookings: IBooking[]
+  platformFreeTotal: number
+  totalBookings : number
+}
+
+export type DashboardFilter = "daily" | "monthly" | "yearly" | "custom"
+
+export interface DashboardFilters {
+  filter: DashboardFilter
+  startDate?: string
+  endDate?: string
+  doctorId?: string
+}
+
+// export interface IPatient {
+//   _id: string;
+//   name: string;
+//   totalBookings: number;
+//   totalSpent: number;
+// }
+
+
+export interface DoctorRevenue {
+  _id: string
+  name: string
+  email: string
+  specialization?: string
+  profilePicture?: string
+  totalAppointments: number
+  totalRevenue: number
+  averageRevenuePerAppointment?: number
 }

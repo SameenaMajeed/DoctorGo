@@ -32,7 +32,7 @@ export class AdminDashboardRepository implements IAdminDashboardRepository {
     return await Booking.find(query)
       .sort({ appointmentDate: -1 })
       .limit(5)
-      .populate("doctor_id", "name specialty")
+      .populate("doctor_id", "name specialization")
       .populate("user_id", "name")
       .lean();
   }
@@ -123,4 +123,12 @@ export class AdminDashboardRepository implements IAdminDashboardRepository {
   
   return result[0]?.total || 0;
 }
+
+  async getTotalBookings(
+    dateFilter: DateRange,
+    doctorId?: string
+  ): Promise<Number> {
+    const query = this.buildBaseQuery(dateFilter, doctorId);
+
+return await Booking.countDocuments(query);  }
 }

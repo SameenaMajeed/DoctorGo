@@ -66,6 +66,7 @@ export class DoctorRepository implements IDoctorRepository {
     status: "pending" | "approved" | "rejected",
     notes?: string
   ): Promise<IDoctor | null> {
+    
     const updateData: any = {
       verificationStatus: status,
       verificationNotes: notes,

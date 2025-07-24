@@ -1,5 +1,4 @@
  
-import { IDoctor } from '../../models/doctorMpdel/DoctorModel';
 import { IUser } from '../../models/userModel/userModel';
 
 export interface UserRepositoryInterface {

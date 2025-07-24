@@ -1,5 +1,10 @@
 import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
+interface WorkExperience {
+  hospital: string;
+  years: number;
+}
+
 export interface IDoctor extends Document {
   _id: ObjectId;
   name: string;
@@ -21,7 +26,9 @@ export interface IDoctor extends Document {
   ticketPrice: number;
   extraCharge: number;
   experience: number;
-  isOnline : boolean;
+  isOnline: boolean;
+  verificationNotes: string;
+  experienceList: WorkExperience[];
 }
 
 const DoctorSchema: Schema = new Schema<IDoctor>(
@@ -37,6 +44,7 @@ const DoctorSchema: Schema = new Schema<IDoctor>(
     registrationNumber: { type: String, required: true, unique: true },
     certificate: { type: String, required: true },
     bio: { type: String },
+    verificationNotes: { type: String, default: "" },
     experience: { type: Number },
     ticketPrice: { type: Number },
     extraCharge: { type: Number },
@@ -49,7 +57,13 @@ const DoctorSchema: Schema = new Schema<IDoctor>(
     blockReason: { type: String },
     submittedAt: { type: Date, default: Date.now },
     verifiedAt: { type: Date },
-    isOnline: { type: Boolean, default: false }
+    isOnline: { type: Boolean, default: false },
+    experienceList: [
+      {
+        hospital: { type: String, required: true },
+        years: { type: Number, required: true },
+      },
+    ],
   },
   { timestamps: true }
 );

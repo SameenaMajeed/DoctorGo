@@ -913,6 +913,10 @@ export class BookingService implements IBookingService {
       endOfDay
     );
   }
+
+   async getAllDoctorsRevenue() : Promise<any[]>{
+    return this._bookingRepo.getDoctorsRevenue();
+  }
 }
 
 // import mongoose, { Types, UpdateQuery } from "mongoose";

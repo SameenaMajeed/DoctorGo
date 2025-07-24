@@ -22,4 +22,9 @@ export interface IAdminDashboardRepository {
   ): Promise<IBooking[]>;
 
   getPlatformFreeTotal(dateFilter: DateRange, doctorId?: string): Promise<number>
+
+  getTotalBookings(
+    dateFilter: DateRange,
+    doctorId?: string
+  ): Promise<Number>;
 }

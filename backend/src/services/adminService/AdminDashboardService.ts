@@ -70,19 +70,22 @@ export class AdminDashboardService implements IAdminDashboardService {
         pendingApprovals,
         topPatients,
         recentBookings,
-        platformFreeTotal
+        platformFreeTotal,
+        totalBookings
       ] = await Promise.all([
         this.repository.getPendingApprovals(),
         this.repository.getTopPatients(dateFilter, doctorId),
         this.repository.getRecentBookings(dateFilter, doctorId),
-        this.repository.getPlatformFreeTotal(dateFilter, doctorId)
+        this.repository.getPlatformFreeTotal(dateFilter, doctorId),
+        this.repository.getTotalBookings(dateFilter, doctorId)
       ]);
 
       return {
         pendingApprovals,
         topPatients,
         recentBookings,
-        platformFreeTotal
+        platformFreeTotal,
+        totalBookings
       };
     } catch (error) {
       throw error instanceof AppError

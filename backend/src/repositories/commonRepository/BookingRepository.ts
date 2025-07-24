@@ -361,9 +361,10 @@ export class BookingRepository
   return total;
 }
 
+
 async findTodaysAppointments(doctorId: string, startOfDay: Date, endOfDay: Date): Promise<IBooking[]> {
   return Booking.find({
-    doctor_id: doctorId, // use correct DB field name
+    doctor_id: doctorId,
     appointmentDate: {
       $gte: startOfDay,
       $lte: endOfDay
@@ -417,6 +418,55 @@ async countUserPayments(userId: string, status?: string): Promise<number> {
   }
 }
 
+  async getDoctorsRevenue(): Promise<any[]> {
+    try {
+      const total =  await Booking.aggregate([
+        {
+          $match: {
+            is_paid: true,
+            status: AppointmentStatus.COMPLETED,
+          },
+        },
+        {
+          $group: {
+            _id: "$doctor_id",
+            totalRevenue: { $sum: "$paymentBreakdown.doctorFee" },
+            totalAppointments: { $sum: 1 },
+          },
+        },
+        {
+          $lookup: {
+            from: "doctors", 
+            localField: "_id",
+            foreignField: "_id",
+            as: "doctor",
+          },
+        },
+        {
+          $unwind: "$doctor",
+        },
+        {
+          $project: {
+            _id: 0,
+            doctorId: "$doctor._id",
+            name: "$doctor.name",
+            email: "$doctor.email",
+            totalRevenue: 1,
+            totalAppointments: 1,
+          },
+        },
+      ]);
+
+      console.log("Total Revenue : ",total)
+      return total 
+    } catch (error) {
+      console.error("Error in getDoctorsRevenue:", error);
+      throw new AppError(
+        HttpStatus.InternalServerError,
+        MessageConstants.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 
 
 

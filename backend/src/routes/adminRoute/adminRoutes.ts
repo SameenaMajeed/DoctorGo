@@ -27,7 +27,7 @@ const adminRepository = new AdminRepository();
 const bookingRepository = new BookingRepository();
 const slotRepository = new SlotRepository();
 const notificationRepository = new NotificationRepository();
-const walletRepository = new WalletRepository()
+const walletRepository = new WalletRepository();
 
 const adminService = new AdminService(
   adminRepository,
@@ -69,7 +69,7 @@ adminRoute.get(
 );
 
 adminRoute.post(
-  "/approve",
+  "/verify",
   authenticateToken("admin"),
   (req: Request, res: Response) => {
     adminController.updateDoctorVerificationStatus(req, res);
@@ -79,9 +79,11 @@ adminRoute.post(
 // adminRoute.post('/update-status' , (req:Request,res:Response)=>{
 //     adminController.updateDoctorStatus(req , res)
 // })
+
 adminRoute.post("/refresh-token", (req: Request, res: Response) => {
   adminController.refreshAccessToken(req, res);
 });
+
 adminRoute.post("/logout", (req: Request, res: Response) => {
   adminController.logout(req, res);
 });
@@ -126,5 +128,15 @@ adminRoute.get(
 adminRoute.get("/dashboard", authenticateToken("admin"), (req, res) =>
   adminDashboardController.getDashboardData(req, res)
 );
+
+// deatils of a doctor
+adminRoute.get("/doctor/:doctorId", authenticateToken("admin"), (req, res) => {
+  adminController.fetchDoctor(req, res);
+});
+
+// Revenue deatils of a doctor
+adminRoute.get("/doctors/revenue", authenticateToken("admin"), (req, res) => {
+  bookingController.getDoctorRevenue(req, res);
+});
 
 export default adminRoute;

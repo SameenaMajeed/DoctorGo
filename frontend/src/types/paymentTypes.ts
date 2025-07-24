@@ -7,7 +7,7 @@ export enum IPaymentMethod {
 export enum AppointmentStatus {
   PENDING = "pending",
   CONFIRMED = "confirmed",
-  FAILED = "failed",
+  PAYMENT_FAILED = "payment_failed",
   CANCELLED = "cancelled",
   PAYMENT_PENDING = "payment_pending",
   EXPIRED = "expired",
@@ -48,6 +48,7 @@ export interface IPayment {
   paymentDate: string;
   originalStatus: AppointmentStatus;
   appointmentDate: string;
-  bookingId: string;
+  bookingId?: string;
   paymentMethod?: IPaymentMethod;
+  platformFee: number;
 }

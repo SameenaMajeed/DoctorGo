@@ -4,18 +4,18 @@ import { IPrescription } from "../../models/commonModel/prescriptionmodel";
 import { AppError } from "../../utils/AppError";
 import { HttpStatus } from "../../constants/Httpstatus";
 import { MessageConstants } from "../../constants/MessageConstants";
-import { DoctorRepository } from "../../repositories/doctorRepository/doctorRepository";
-import { UserRepository } from "../../repositories/userRepository/userRepository";
 import { Types } from "mongoose";
 import pdfkit from "pdfkit";
 import fs from "fs";
 import path from "path";
+import { IDoctorRepository } from "../../interfaces/doctor/doctorRepositoryInterface";
+import { UserRepositoryInterface } from "../../interfaces/user/UserRepositoryInterface";
 
 export default class PrescriptionService {
   constructor(
     private prescriptionRepo: IPrescriptionRepository,
-    private doctorRepo: DoctorRepository,
-    private userRepo: UserRepository
+    private doctorRepo: IDoctorRepository,
+    private userRepo: UserRepositoryInterface
   ) {}
 
   async createPrescription(

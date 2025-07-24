@@ -51,6 +51,9 @@ import PrescriptionView from "../components/User/PrescriptionView.tsx";
 import WalletPage from "../components/User/WalletPage.tsx";
 import PaymentHistory from "../components/User/PaymentHistory.tsx";
 import PaymentDetails from "../components/Doctor/PaymentDetails.tsx";
+import DoctorDetails from "../components/Admin/DoctorDetails.tsx";
+import AdminLayout from "../components/Admin/Home/AdminLayout.tsx";
+import AdminRevenueTable from "../components/Admin/AdminRevenueTable.tsx";
 
 export const routes = (
   <>
@@ -127,14 +130,17 @@ export const routes = (
 
     {/* Admin Route */}
     <Route element={<AdminProtected />}>
-      <Route path="/admin/dashboard" element={<AdminDashBoard />} />
+     <Route path="/admin/dashboard" element={<AdminDashBoard />} />
+     <Route element={<AdminLayout />}>
       <Route path="/admin/approvals" element={<ApproveDoctor />} />
       <Route path="/admin/Doctors" element={<DoctorList />} />
       <Route path="/admin/users" element={<UserList />} />
       <Route path="/admin/appointments" element={<BookingsPage />} />
       <Route path="/admin/payments" element={<PaymentsPage />} />
+      <Route path="/admin/doctorDetails/:id" element={<DoctorDetails />} />
+      <Route path="/admin/analytics" element={<AdminRevenueTable/>} />
+      </Route>
     </Route>
-
     <Route path="*" element={<Page404 />} />
   </>
 );

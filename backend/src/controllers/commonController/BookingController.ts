@@ -558,7 +558,7 @@ export class BookingController {
 
       // Only pass status to service if it's not "all" or undefined
       const filteredStatus = status === "all" ? undefined : status;
-      console.log(filteredStatus)
+      console.log(filteredStatus);
 
       const result = await this.paymentService.getUserPayments(
         userId,
@@ -573,6 +573,27 @@ export class BookingController {
       });
     } catch (error) {
       console.error("Controller Error in getUserPayments:", error);
+      if (error instanceof AppError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(
+          res,
+          HttpStatus.InternalServerError,
+          MessageConstants.INTERNAL_SERVER_ERROR
+        );
+      }
+    }
+  }
+
+  async getDoctorRevenue(req: Request, res: Response) {
+    try {
+      const result = await this.bookingService.getAllDoctorsRevenue();
+
+      sendResponse(res, HttpStatus.OK, "Revenue Fetched successfully", {
+        result,
+      });
+    } catch (error) {
+      console.error("Controller Error :", error);
       if (error instanceof AppError) {
         sendError(res, error.status, error.message);
       } else {

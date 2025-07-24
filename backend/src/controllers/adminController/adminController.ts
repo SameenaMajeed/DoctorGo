@@ -277,6 +277,29 @@ class AdminController {
       sendError(res, HttpStatus.BadRequest, error.message);
     }
   }
+
+  async fetchDoctor(req: Request, res: Response): Promise<void> {
+      try {
+        const { doctorId } = req.params;
+        console.log("doctorId ", doctorId);
+  
+        // Find doctor by ID
+        const doctor = await this.adminService.getDoctorById(doctorId);
+        console.log(doctor);
+  
+        if (!doctor) {
+          throw new AppError(HttpStatus.NotFound, "Doctor not found");
+        }
+  
+        sendResponse(res, HttpStatus.OK, "Doctors fetched successfully", doctor);
+      } catch (error) {
+        console.error("Error fetching doctor:", error);
+  
+        res
+          .status(HttpStatus.InternalServerError)
+          .json({ message: "Internal server error" });
+      }
+    }
 }
 
 export default AdminController;

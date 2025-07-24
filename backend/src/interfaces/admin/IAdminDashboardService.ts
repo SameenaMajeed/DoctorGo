@@ -4,7 +4,8 @@ export interface DashboardData {
   pendingApprovals: number;
   topPatients: Array<{ _id: string; name: string; totalBookings: number; totalSpent: number }>;
   recentBookings?: IBooking[];
-  platformFreeTotal :  number
+  platformFreeTotal :  number;
+  totalBookings :  Number
 }
 
 export interface IAdminDashboardService {

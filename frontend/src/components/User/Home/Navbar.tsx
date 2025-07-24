@@ -1,48 +1,48 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useEffect, useState } from "react"
-import { NavLink, useNavigate } from "react-router-dom"
-import { FiMenu, FiX } from "react-icons/fi"
-import { assets } from "../../../assets/assets"
-import type { RootState } from "../../../slice/Store/Store"
-import { logoutUser } from "../../../slice/user/userSlice"
-import api from "../../../axios/UserInstance"
-import { useDispatch, useSelector } from "react-redux"
-import { User } from "lucide-react"
-import NotificationBell from "../../CommonComponents/NotificationBell"
-import { motion, AnimatePresence } from "framer-motion"
+import type React from "react";
+import { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { FiMenu, FiX } from "react-icons/fi";
+import { assets } from "../../../assets/assets";
+import type { RootState } from "../../../slice/Store/Store";
+import { logoutUser } from "../../../slice/user/userSlice";
+import api from "../../../axios/UserInstance";
+import { useDispatch, useSelector } from "react-redux";
+import { User } from "lucide-react";
+import NotificationBell from "../../CommonComponents/NotificationBell";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar: React.FC = () => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const user = useSelector((state: RootState) => state.user.user)
-  const [showMenu, setShowMenu] = useState(false)
-  const [showMobileDropdown, setShowMobileDropdown] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.user.user);
+  const [showMenu, setShowMenu] = useState(false);
+  const [showMobileDropdown, setShowMobileDropdown] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
-        setIsScrolled(true)
+        setIsScrolled(true);
       } else {
-        setIsScrolled(false)
+        setIsScrolled(false);
       }
-    }
+    };
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleLogout = async () => {
     try {
-      await api.post("/logout")
-      dispatch(logoutUser())
-      navigate("/login")
+      await api.post("/logout");
+      dispatch(logoutUser());
+      navigate("/login");
     } catch (error) {
-      console.error("Logout failed:", error)
+      console.error("Logout failed:", error);
     }
-  }
+  };
 
   const menuVariants = {
     hidden: {
@@ -65,13 +65,13 @@ const Navbar: React.FC = () => {
         staggerDirection: -1,
       },
     },
-  }
+  };
 
   const menuItemVariants = {
     hidden: { opacity: 0, y: -10 },
     visible: { opacity: 1, y: 0 },
     exit: { opacity: 0, y: -10 },
-  }
+  };
 
   const dropdownVariants = {
     hidden: { opacity: 0, y: 10 },
@@ -91,7 +91,7 @@ const Navbar: React.FC = () => {
         ease: "easeIn",
       },
     },
-  }
+  };
 
   return (
     <motion.nav
@@ -106,7 +106,11 @@ const Navbar: React.FC = () => {
         {/* Logo with animation */}
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <NavLink to="/" className="flex items-center">
-            <img src="/logo.png" alt="Logo" className="w-24 transition-transform duration-300 hover:scale-105" />
+            <img
+              src="/logo.png"
+              alt="Logo"
+              className="w-24 transition-transform duration-300 hover:scale-105"
+            />
           </NavLink>
         </motion.div>
 
@@ -115,9 +119,9 @@ const Navbar: React.FC = () => {
           {user ? (
             <>
               {/* Mobile Notification Bell */}
-              <motion.div className="relative" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+              <div className="relative">
                 <NotificationBell />
-              </motion.div>
+              </div>
 
               {/* Mobile User Profile */}
               <div className="relative">
@@ -157,7 +161,9 @@ const Navbar: React.FC = () => {
                       className="absolute top-12 right-0 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50"
                     >
                       <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-800">Hello, {user.name}</p>
+                        <p className="text-sm font-medium text-gray-800">
+                          Hello, {user.name}
+                        </p>
                       </div>
                       {[
                         { label: "My Profile", path: "/my-profile" },
@@ -171,11 +177,11 @@ const Navbar: React.FC = () => {
                           className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 cursor-pointer transition-colors"
                           onClick={() => {
                             if (item.action) {
-                              item.action()
+                              item.action();
                             } else {
-                              navigate(item.path!)
+                              navigate(item.path!);
                             }
-                            setShowMobileDropdown(false)
+                            setShowMobileDropdown(false);
                           }}
                           whileHover={{ x: 5 }}
                           whileTap={{ scale: 0.95 }}
@@ -191,7 +197,10 @@ const Navbar: React.FC = () => {
           ) : (
             /* Mobile Login/Register Buttons */
             <div className="flex items-center space-x-2">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <NavLink
                   to="/signup"
                   className="text-xs text-[#8b5d3b] hover:bg-[#2c2420] hover:text-white py-1.5 px-3 rounded-full transition-colors border border-[#8b5d3b]"
@@ -199,7 +208,10 @@ const Navbar: React.FC = () => {
                   Register
                 </NavLink>
               </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <button
                   onClick={() => navigate("/login")}
                   className="text-xs bg-[#8b5d3b] text-white hover:bg-[#6d4a2f] py-1.5 px-3 rounded-full transition-colors shadow-md"
@@ -239,17 +251,26 @@ const Navbar: React.FC = () => {
                 { path: "/about", label: "ABOUT" },
                 { path: "/contact", label: "CONTACT" },
               ].map((link) => (
-                <motion.li key={link.path} variants={menuItemVariants} className="list-none">
+                <motion.li
+                  key={link.path}
+                  variants={menuItemVariants}
+                  className="list-none"
+                >
                   <NavLink
                     to={link.path}
                     className={({ isActive }) =>
                       `block py-2 px-6 md:px-4 transition-all duration-300 rounded-lg hover:bg-gray-100 md:hover:bg-transparent ${
-                        isActive ? "text-primary font-bold md:bg-gray-100" : "hover:text-primary"
+                        isActive
+                          ? "text-primary font-bold md:bg-gray-100"
+                          : "hover:text-primary"
                       }`
                     }
                     onClick={() => setShowMenu(false)}
                   >
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
                       {link.label}
                     </motion.div>
                   </NavLink>
@@ -264,7 +285,11 @@ const Navbar: React.FC = () => {
           {user ? (
             <div className="flex items-center space-x-6">
               {/* Notifications */}
-              <motion.div className="relative" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+              <motion.div
+                className="relative"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
                 <NotificationBell />
               </motion.div>
 
@@ -315,11 +340,11 @@ const Navbar: React.FC = () => {
                           className="hover:bg-gray-100 px-3 py-2 rounded-md cursor-pointer transition-colors"
                           onClick={() => {
                             if (item.action) {
-                              item.action()
+                              item.action();
                             } else {
-                              navigate(item.path!)
+                              navigate(item.path!);
                             }
-                            setShowMenu(false)
+                            setShowMenu(false);
                           }}
                           whileHover={{ x: 5 }}
                           whileTap={{ scale: 0.95 }}
@@ -334,7 +359,10 @@ const Navbar: React.FC = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-4">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <NavLink
                   to="/signup"
                   className="text-sm text-[#8b5d3b] hover:bg-[#2c2420] hover:text-white py-2 px-4 rounded-full transition-colors border border-[#8b5d3b]"
@@ -342,7 +370,10 @@ const Navbar: React.FC = () => {
                   Register
                 </NavLink>
               </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <button
                   onClick={() => navigate("/login")}
                   className="text-sm bg-[#8b5d3b] text-white hover:bg-[#6d4a2f] py-2 px-4 rounded-full transition-colors shadow-md"
@@ -355,13 +386,10 @@ const Navbar: React.FC = () => {
         </div>
       </div>
     </motion.nav>
-  )
-}
+  );
+};
 
-export default Navbar
-
-
-
+export default Navbar;
 
 // import React, { useEffect, useState } from "react";
 // import { NavLink, useNavigate } from "react-router-dom";

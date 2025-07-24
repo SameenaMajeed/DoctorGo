@@ -49,7 +49,7 @@ const Header: React.FC = () => {
       await doctorApi.post("/logout")
       dispatch(logoutDoctor())
       toast.success("Logged out successfully")
-      navigate("/login")
+      navigate("/doctor")
     } catch (error) {
       console.error("Logout failed:", error)
       toast.error("Logout failed")

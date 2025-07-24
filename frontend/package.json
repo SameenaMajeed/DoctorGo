@@ -23,6 +23,7 @@
     "axios": "^1.7.9",
     "canvas-confetti": "^1.9.3",
     "chart.js": "^4.4.9",
+    "file-saver": "^2.0.5",
     "firebase": "^11.4.0",
     "framer-motion": "^12.4.2",
     "icons": "^1.0.0",
@@ -48,11 +49,13 @@
     "socket.io-client": "^4.8.1",
     "sweetalert2": "^11.17.2",
     "tailwind-merge": "^3.0.1",
+    "xlsx": "^0.18.5",
     "yup": "^1.6.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@types/canvas-confetti": "^1.9.0",
+    "@types/file-saver": "^2.0.7",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@types/simple-peer": "^9.11.8",

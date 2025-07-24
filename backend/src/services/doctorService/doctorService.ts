@@ -160,7 +160,9 @@ export class DoctorService implements IDoctorService {
       image: updatedData.profilePicture,
       bio : updatedData.bio,
       ticketPrice : updatedData.ticketPrice,
-      extraCharge : updatedData.extraCharge
+      extraCharge : updatedData.extraCharge,
+      experienceList: updatedData.experienceList,
+      certificate: updatedData.certificate,
     };
 
     const updatedDoctor = await this.doctorRepository.updateProfile(doctorId, allowedUpdates);
@@ -181,7 +183,9 @@ export class DoctorService implements IDoctorService {
       bio : updatedData.bio,
       ticketPrice : updatedData.ticketPrice,
       extraCharge : updatedData.extraCharge,
-      experience : updatedData.experience
+      experience : updatedData.experience,
+      experienceList: updatedDoctor.experienceList,
+      certificate: updatedDoctor.certificate,
     };
   }
 

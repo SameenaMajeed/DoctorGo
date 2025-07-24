@@ -33,4 +33,5 @@ export interface IAdminService {
 
   doctorBlock(doctorId: string, isBlocked: boolean): Promise<any>;
   userBlock(userId: string, isBlocked: boolean): Promise<any>;
+  getDoctorById(doctorId: string): Promise<IDoctor>
 }

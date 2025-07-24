@@ -1,7 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-
-
 // Define the Doctor interface
 interface Doctor {
   role: string | null;
@@ -21,6 +19,7 @@ interface Doctor {
   extraCharge ?: number,
   bio ?: string,
   isOnline : boolean;
+  certificate?: string; 
   [key: string]: any;
 }
 
@@ -75,6 +74,14 @@ const doctorSlice = createSlice({
       state.profile = action.payload;
       state.loading = false;
       state.error = null;
+    },
+    updateCertificate: (state, action: PayloadAction<string>) => {
+      if (state.doctor) {
+        state.doctor.certificate = action.payload;
+      }
+      if (state.profile) {
+        state.profile.certificate = action.payload;
+      }
     },
     setError: (state, action: PayloadAction<string>) => {
       state.loading = false;

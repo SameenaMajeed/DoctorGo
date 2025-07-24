@@ -1,8 +1,10 @@
+import { HttpStatus } from "../../constants/Httpstatus";
 import { IAdminRepository } from "../../interfaces/admin/adminRepositoryInterface";
 import { IAdminService } from "../../interfaces/admin/adminServiceInterface";
 import { IDoctorRepository } from "../../interfaces/doctor/doctorRepositoryInterface";
 import { UserRepositoryInterface } from "../../interfaces/user/UserRepositoryInterface";
 import { IDoctor } from "../../models/doctorMpdel/DoctorModel";
+import { AppError } from "../../utils/AppError";
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -191,6 +193,16 @@ class AdminService implements IAdminService {
       throw new Error(error.message);
     }
   }
+
+  async getDoctorById(doctorId: string): Promise<IDoctor> {
+      const doctor = await this.doctorRepository.findById(doctorId);
+  
+      if (!doctor) {
+        throw new AppError(HttpStatus.NotFound, "Doctor not found");
+      }
+  
+      return doctor;
+    }
 }
 
 export default AdminService;
