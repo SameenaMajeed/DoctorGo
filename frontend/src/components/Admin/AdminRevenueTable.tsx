@@ -13,7 +13,6 @@ import {
   Download,
   Search,
   Filter,
-  Eye,
 } from "lucide-react";
 import adminApi from "../../axios/AdminInstance";
 import Loader from "./Loader";

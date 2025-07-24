@@ -2,7 +2,6 @@ import React from "react";
 import {
   Calendar,
   IndianRupee,
-  MapPin,
   Phone,
   Stethoscope,
   Users,

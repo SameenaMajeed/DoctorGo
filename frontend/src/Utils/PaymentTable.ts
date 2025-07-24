@@ -8,7 +8,7 @@ export const mapBookingStatusToPaymentStatus = (
   switch (bookingStatus) {
     case AppointmentStatus.COMPLETED:
       return PaymentStatus.SUCCESS;
-    case AppointmentStatus.FAILED:
+    case AppointmentStatus.PAYMENT_FAILED:
       return PaymentStatus.PAYMENT_FAILED;
     case AppointmentStatus.PAYMENT_PENDING:
       return PaymentStatus.PENDING;
@@ -29,7 +29,8 @@ export const transformBookingToPayment = (booking: IBooking): IPayment => ({
     originalStatus: booking.status,
     appointmentDate: booking.appointmentDate,
     bookingId: "",
-    paymentMethod: booking.paymentMethod
+    paymentMethod: booking.paymentMethod,
+    platformFee : booking.ticketPrice
 });
 
 export const getDisplayStatusLabel = (status: string): string =>

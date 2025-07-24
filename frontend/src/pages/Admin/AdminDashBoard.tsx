@@ -33,7 +33,7 @@ const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedBooking, setSelectedBooking] = useState<IBooking | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  // const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const [filters, setFilters] = useState<DashboardFilters>({
     filter: "monthly",
   });
@@ -309,9 +309,9 @@ const AdminDashboard: React.FC = () => {
   return (
     <div
       className={`flex min-h-screen ${
-        isDarkMode
-          ? "bg-gray-900 text-gray-300"
-          : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
+        // isDarkMode
+        //   ? "bg-gray-900 text-gray-300" :
+         "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
       }`}
     >
       <AdminSidebar />

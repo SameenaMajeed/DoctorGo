@@ -10,12 +10,6 @@ import {
   XCircle,
   Loader2,
   Eye,
-  IndianRupee,
-  Users,
-  Phone,
-  MapPin,
-  Stethoscope,
-  Calendar,
 } from "lucide-react";
 import adminApi from "../../axios/AdminInstance";
 import Pagination from "../../Pagination/Pagination";
