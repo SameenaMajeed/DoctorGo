@@ -264,7 +264,7 @@ userRoute.delete(
   (req , res) => notificationController.clearAllNotifications(req , res)
 );
 userRoute.delete(
-  "/notifications//:notificationId",
+  "/notifications/:notificationId",
   authenticateToken("user"),
   blockedUserMiddleware,
   (req , res) => notificationController.deleteNotification(req , res)
