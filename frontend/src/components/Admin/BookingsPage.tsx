@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import adminApi from "../../axios/AdminInstance";
 import Pagination from "../../Pagination/Pagination";
-import { Table } from "./Home/Table";
+import { Table } from "../CommonComponents/Table";
 import { getStatusColor } from "../../types/StatusCode";
 import { IBooking } from "../../Types";
 import { AppointmentStatus } from "../../types/paymentTypes";

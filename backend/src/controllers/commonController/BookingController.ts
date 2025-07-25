@@ -585,6 +585,7 @@ export class BookingController {
     }
   }
 
+  // Adminside revenue displaying
   async getDoctorRevenue(req: Request, res: Response) {
     try {
       const result = await this.bookingService.getAllDoctorsRevenue();
@@ -594,6 +595,35 @@ export class BookingController {
       });
     } catch (error) {
       console.error("Controller Error :", error);
+      if (error instanceof AppError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(
+          res,
+          HttpStatus.InternalServerError,
+          MessageConstants.INTERNAL_SERVER_ERROR
+        );
+      }
+    }
+  }
+ 
+  // Doctor side revenue displaying
+  async getRevenue(req: Request, res: Response) {
+    try {
+      const doctorId = req.data?.id;
+      if (!doctorId) {
+        throw new AppError(
+          HttpStatus.Unauthorized,
+          MessageConstants.UNAUTHORIZED
+        );
+      }
+      const revenue = await this.bookingService.getDoctorRevenue(doctorId);
+      
+      sendResponse(res, HttpStatus.OK, "Payment History Fetched successfully", {
+        revenue,
+      });
+    } catch (error) {
+      console.error("Controller Error:", error);
       if (error instanceof AppError) {
         sendError(res, error.status, error.message);
       } else {

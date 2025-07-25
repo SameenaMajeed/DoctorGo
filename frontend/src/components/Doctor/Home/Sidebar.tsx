@@ -12,10 +12,9 @@ import {
   PlusCircle,
   MessageCircle,
   ChevronRight,
-  // LogOut,
-  // Shield,
   X,
   IndianRupee,
+  Coins,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -355,6 +354,14 @@ const Sidebar: React.FC<SidebarProps> = () => {
               collapsed={collapsed}
               active={location.pathname === "/payment"}
               onClick={(e) => handleRestrictedNavigation(e, "/payment")}
+            />
+            <EnhancedSidebarItem
+              href="/doctor/revenue"
+              icon={<Coins className="w-5 h-5" />}
+              label="Revenue"
+              collapsed={collapsed}
+              active={location.pathname === "/doctor/revenue"}
+              onClick={(e) => handleRestrictedNavigation(e, "/doctor/revenue")}
             />
           </div>
         </div>

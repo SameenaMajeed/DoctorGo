@@ -236,5 +236,12 @@ export const getTodaysAppointments = async (): Promise<IAppointment[]> => {
   const response = await doctorApi.get('/appointments/today');
   const appointment = response.data.data.appointments
   return appointment;
-  return response.data;
+  // return response.data;
+};
+
+
+export const fetchDoctorRevenue = async (): Promise<number> => {
+  const response = await doctorApi.get("/revenue");
+  console.log('Revenue:',response.data.data.revenue)
+  return response.data.data.revenue;
 };

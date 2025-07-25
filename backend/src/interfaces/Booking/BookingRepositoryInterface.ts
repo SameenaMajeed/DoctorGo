@@ -90,4 +90,6 @@ export interface IBookingRepository {
   countUserPayments(userId: string, status?: string): Promise<number>;
 
   getDoctorsRevenue(): Promise<any[]>
+
+  getEachDoctorRevenue(doctorId: string): Promise<number>
 }

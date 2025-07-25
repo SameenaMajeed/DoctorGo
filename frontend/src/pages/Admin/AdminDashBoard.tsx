@@ -25,7 +25,7 @@ import {
 import { AppointmentStatus } from "../../types/paymentTypes";
 import Loader from "../../components/Admin/Loader";
 import ErrorDisplay from "../../components/Admin/Home/ErrorDisplay";
-import { Table } from "../../components/Admin/Home/Table";
+import { Table } from "../../components/CommonComponents/Table";
 import BookingDetailModal from "../../components/Admin/Home/BookingDetailModal";
 
 const AdminDashboard: React.FC = () => {

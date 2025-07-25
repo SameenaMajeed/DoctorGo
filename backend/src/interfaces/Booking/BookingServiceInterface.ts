@@ -60,5 +60,6 @@ export interface IBookingService {
   getTodaysAppointments(doctorId: string): Promise<IBooking[]>;
   createFailedBooking(bookingData: Partial<IBooking>): Promise<IBooking>
   getAllDoctorsRevenue() : Promise<any[]>
+  getDoctorRevenue(doctorId: string): Promise<number>
   // sendAppointmentReminders(): Promise<void>;
 }

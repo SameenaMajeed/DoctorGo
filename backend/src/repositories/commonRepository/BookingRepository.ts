@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { HttpStatus } from "../../constants/Httpstatus";
 import { MessageConstants } from "../../constants/MessageConstants";
 import { IBookingRepository } from "../../interfaces/Booking/BookingRepositoryInterface";
@@ -18,8 +18,7 @@ export class BookingRepository
     super(Booking);
   }
 
-
-   async find(query: any): Promise<IBooking[]> {
+  async find(query: any): Promise<IBooking[]> {
     try {
       return await Booking.find(query)
         .populate("doctor_id", "name specialization")
@@ -34,12 +33,11 @@ export class BookingRepository
     }
   }
 
-
   async findById(id: string): Promise<IBooking | null> {
     try {
       let doctor = await Booking.findById(id)
         .populate("doctor_id", "name")
-        .populate('user_id', 'name')
+        .populate("user_id", "name")
         .exec();
 
       console.log(doctor);
@@ -170,7 +168,7 @@ export class BookingRepository
           "name specialization profilePicture qualification"
         )
         .populate("slot_id", "startTime endTime")
-        .sort({createdAt : -1})
+        .sort({ createdAt: -1 })
         .exec();
     } catch (error) {
       console.error("Error in findByUserId:", error);
@@ -336,8 +334,8 @@ export class BookingRepository
 
       const [bookings, total] = await Promise.all([
         Booking.find(query)
-          .populate("doctor_id", "name") 
-          .populate("user_id", "name") 
+          .populate("doctor_id", "name")
+          .populate("user_id", "name")
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit)
@@ -355,76 +353,80 @@ export class BookingRepository
     }
   }
 
- async countAppointments(filter: any): Promise<number> {
-  const total = await Booking.countDocuments(filter);
-  console.log('Total:', total);
-  return total;
-}
-
-
-async findTodaysAppointments(doctorId: string, startOfDay: Date, endOfDay: Date): Promise<IBooking[]> {
-  return Booking.find({
-    doctor_id: doctorId,
-    appointmentDate: {
-      $gte: startOfDay,
-      $lte: endOfDay
-    },
-    status: { $ne: 'cancelled' }
-  }).sort({ appointmentDate: 1 });
-}
-
-async findPaymentsByUser(
-  userId: string,
-  skip: number,
-  limit: number,
-  status?: string
-): Promise<IBooking[]> {
-  try {
-    const query: any = { user_id: new Types.ObjectId(userId), is_paid: true };
-
-    // ✅ Only add status filter if provided
-    if (status && status !== "all") {
-      query.status = status;
-    }
-
-    console.log("🟡 Final Query:", query);
-
-    return await this.model
-      .find(query)
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 })
-      .populate("user_id", "name");
-  } catch (err) {
-    console.error("🔥 Error in findPaymentsByUser:", err);
-    throw err;
+  async countAppointments(filter: any): Promise<number> {
+    const total = await Booking.countDocuments(filter);
+    console.log("Total:", total);
+    return total;
   }
-}
 
-
-async countUserPayments(userId: string, status?: string): Promise<number> {
-  try {
-    const query: any = { user_id: new Types.ObjectId(userId), is_paid: true };
-
-    // ✅ Only add status filter if not "all"
-    if (status && status !== "all") {
-      query.status = status;
-    }
-
-    return await this.model.countDocuments(query);
-  } catch (err) {
-    console.error("🔥 Error in countUserPayments:", err);
-    throw err;
+  async findTodaysAppointments(
+    doctorId: string,
+    startOfDay: Date,
+    endOfDay: Date
+  ): Promise<IBooking[]> {
+    return Booking.find({
+      doctor_id: doctorId,
+      appointmentDate: {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      },
+      status: { $ne: "cancelled" },
+    }).sort({ appointmentDate: 1 });
   }
-}
+
+  async findPaymentsByUser(
+    userId: string,
+    skip: number,
+    limit: number,
+    status?: string
+  ): Promise<IBooking[]> {
+    try {
+      const query: any = { user_id: new Types.ObjectId(userId), is_paid: true };
+
+      // ✅ Only add status filter if provided
+      if (status && status !== "all") {
+        query.status = status;
+      }
+
+      console.log("🟡 Final Query:", query);
+
+      return await this.model
+        .find(query)
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .populate("user_id", "name");
+    } catch (err) {
+      console.error("🔥 Error in findPaymentsByUser:", err);
+      throw err;
+    }
+  }
+
+  async countUserPayments(userId: string, status?: string): Promise<number> {
+    try {
+      const query: any = { user_id: new Types.ObjectId(userId), is_paid: true };
+
+      // ✅ Only add status filter if not "all"
+      if (status && status !== "all") {
+        query.status = status;
+      }
+
+      return await this.model.countDocuments(query);
+    } catch (err) {
+      console.error("🔥 Error in countUserPayments:", err);
+      throw err;
+    }
+  }
 
   async getDoctorsRevenue(): Promise<any[]> {
     try {
-      const total =  await Booking.aggregate([
+      const total = await Booking.aggregate([
         {
           $match: {
             is_paid: true,
-            status: AppointmentStatus.COMPLETED,
+            status: {
+              $in: [AppointmentStatus.COMPLETED, AppointmentStatus.CONFIRMED],
+            },
           },
         },
         {
@@ -436,7 +438,7 @@ async countUserPayments(userId: string, status?: string): Promise<number> {
         },
         {
           $lookup: {
-            from: "doctors", 
+            from: "doctors",
             localField: "_id",
             foreignField: "_id",
             as: "doctor",
@@ -457,8 +459,8 @@ async countUserPayments(userId: string, status?: string): Promise<number> {
         },
       ]);
 
-      console.log("Total Revenue : ",total)
-      return total 
+      console.log("Total Revenue : ", total);
+      return total;
     } catch (error) {
       console.error("Error in getDoctorsRevenue:", error);
       throw new AppError(
@@ -468,6 +470,24 @@ async countUserPayments(userId: string, status?: string): Promise<number> {
     }
   }
 
+  async getEachDoctorRevenue(doctorId: string): Promise<number> {
+    const result = await Booking.aggregate([
+      {
+        $match: {
+          doctor_id: new mongoose.Types.ObjectId(doctorId),
+          status: { $in: [AppointmentStatus.COMPLETED, AppointmentStatus.CONFIRMED] },
+          is_paid: true,
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: "$paymentBreakdown.doctorFee" },
+        },
+      },
+    ]);
 
+    return result.length ? result[0].totalRevenue : 0;
+  }
 
 }

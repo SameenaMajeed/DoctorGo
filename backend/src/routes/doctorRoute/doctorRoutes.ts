@@ -231,4 +231,9 @@ doctorRoute.get(
   }
 );
 
+doctorRoute.get("/revenue",authenticateToken("doctor"),
+  (req, res) => {
+    bookingController.getRevenue(req, res);
+  })
+
 export default doctorRoute;

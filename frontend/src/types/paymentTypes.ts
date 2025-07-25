@@ -51,4 +51,5 @@ export interface IPayment {
   bookingId?: string;
   paymentMethod?: IPaymentMethod;
   platformFee: number;
+  createdAt?: Date
 }

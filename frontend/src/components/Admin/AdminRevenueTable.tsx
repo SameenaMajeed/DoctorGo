@@ -18,7 +18,7 @@ import adminApi from "../../axios/AdminInstance";
 import Loader from "./Loader";
 import ErrorDisplay from "./Home/ErrorDisplay";
 import { DoctorRevenue } from "../../Types";
-import { Table } from "./Home/Table";
+import { Table } from "../CommonComponents/Table";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 

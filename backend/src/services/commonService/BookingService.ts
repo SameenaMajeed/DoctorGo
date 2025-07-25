@@ -343,15 +343,15 @@ export class BookingService implements IBookingService {
           MessageConstants.BOOKING_NOT_FOUND
         );
 
-      // Exclude cancelled appointments
-      const filteredBookings = bookings.filter(
-        (booking) => booking.status !== "cancelled"
-      );
+      // // Exclude cancelled appointments
+      // const filteredBookings = bookings.filter(
+      //   (booking) => booking.status !== "cancelled"
+      // );
 
-      if (!filteredBookings.length)
-        throw new AppError(HttpStatus.NotFound, "No active appointments found");
+      // if (!filteredBookings.length)
+      //   throw new AppError(HttpStatus.NotFound, "No active appointments found");
 
-      return filteredBookings;
+      return bookings;
     } catch (error) {
       if (error instanceof AppError) throw error;
       throw new AppError(
@@ -916,6 +916,10 @@ export class BookingService implements IBookingService {
 
    async getAllDoctorsRevenue() : Promise<any[]>{
     return this._bookingRepo.getDoctorsRevenue();
+  }
+
+  async getDoctorRevenue(doctorId: string): Promise<number> {
+    return await this._bookingRepo.getEachDoctorRevenue(doctorId);
   }
 }
 

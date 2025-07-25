@@ -54,6 +54,7 @@ import PaymentDetails from "../components/Doctor/PaymentDetails.tsx";
 import DoctorDetails from "../components/Admin/DoctorDetails.tsx";
 import AdminLayout from "../components/Admin/Home/AdminLayout.tsx";
 import AdminRevenueTable from "../components/Admin/AdminRevenueTable.tsx";
+import DoctorRevenue from "../components/Doctor/DoctorRevenue.tsx";
 
 export const routes = (
   <>
@@ -124,6 +125,10 @@ export const routes = (
         <Route
           path="/doctor/:doctorId/appointments"
           element={<Appointments />}
+        />
+        <Route
+          path="/doctor/revenue"
+          element={<DoctorRevenue />}
         />
       </Route>
     </Route>
