@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import AppointmentCard from "./AppointmentCard";
 // import { useNavigate } from "react-router-dom";
-import api from "../../axios/UserInstance";
+// import api from "../../axios/UserInstance";
 import { useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
 import { IAppointment } from "../../Types";
+import { createApiInstance } from "../../axios/apiService";
+
+const api = createApiInstance("user");
+
 
 const AppointmentsList: React.FC = () => {
   // const navigate = useNavigate();

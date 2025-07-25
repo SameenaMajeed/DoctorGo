@@ -244,12 +244,33 @@ userRoute.get(
   blockedUserMiddleware,
   (req , res) => notificationController.getNotifications(req , res)
 );
+
 userRoute.patch(
   "/notifications/:notificationId/read",
   authenticateToken("user"),
   blockedUserMiddleware,
   (req , res) => notificationController.markAsRead(req , res)
 );
+userRoute.patch(
+  "/notifications/mark-all-read",
+  authenticateToken("user"),
+  blockedUserMiddleware,
+  (req , res) => notificationController.markAllAsRead(req , res)
+);
+userRoute.delete(
+  "/notifications/clear-all",
+  authenticateToken("user"),
+  blockedUserMiddleware,
+  (req , res) => notificationController.clearAllNotifications(req , res)
+);
+userRoute.delete(
+  "/notifications//:notificationId",
+  authenticateToken("user"),
+  blockedUserMiddleware,
+  (req , res) => notificationController.deleteNotification(req , res)
+);
+
+
 
 // wallet
 userRoute.get("/wallet",

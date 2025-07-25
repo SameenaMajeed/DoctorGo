@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import api from "../../../axios/UserInstance";
+// import api from "../../../axios/UserInstance";
 import { IDoctor } from "../../../Types";
 import DoctorCard from "./DoctorCard";
+import { createApiInstance } from "../../../axios/apiService";
+
+const api = createApiInstance("user");
+// const slotApi = createApiInstance("slot");
 
 const TopDoctors: React.FC = () => {
   const navigate = useNavigate();

@@ -4,7 +4,10 @@ import { StarIcon, CalendarIcon, ClockIcon, CurrencyRupeeIcon, MagnifyingGlassIc
 import { IDoctor } from "../../../Types";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import api from "../../../axios/UserInstance";
+import { createApiInstance } from "../../../axios/apiService";
+// import api from "../../../axios/UserInstance";
+
+const api = createApiInstance("user");
 
 const DoctorsList: React.FC = () => {
   // State management

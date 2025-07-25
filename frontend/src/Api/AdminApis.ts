@@ -1,4 +1,5 @@
-import adminApi from "../axios/AdminInstance";
+// import adminApi from "../axios/AdminInstance";
+import { createApiInstance } from "../axios/apiService";
 import { IDoctor } from "../Types";
 import { IAxiosError } from "../types/auth";
 
@@ -19,6 +20,8 @@ type AdminLoginResponse = {
   accessToken?: string;
   error?: string;
 };
+
+const adminApi = createApiInstance("admin");
 
 
 export const adminLoginService = async (

@@ -1,6 +1,9 @@
 import toast from "react-hot-toast";
-import slotApi from "../axios/SlotInstance";
+// import slotApi from "../axios/SlotInstance";
 import { ISlot, ISlotData } from "../types/Slot";
+import { createApiInstance } from "../axios/apiService";
+
+const slotApi = createApiInstance("slot");
 
 // Slot API methods
 export const createSlot = async (slotData: ISlotData): Promise<ISlot | ISlot[]> => {

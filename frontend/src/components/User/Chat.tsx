@@ -12,8 +12,9 @@ import { cn } from "../../Utils/Utils"
 import io, { Socket } from "socket.io-client"
 import { useSelector } from "react-redux"
 import type { RootState } from "../../slice/Store/Store"
-import userApi from "../../axios/UserInstance"
+// import userApi from "../../axios/UserInstance"
 import { BaseUrl } from "../../constants"
+import { createApiInstance } from "../../axios/apiService"
 
 interface IMessage {
   userId: string
@@ -39,6 +40,8 @@ interface IDoctor {
 }
 
 const SOCKET_URL = BaseUrl
+
+const userApi = createApiInstance("user");
 
 const Chat: React.FC = () => {
   const [socket, setSocket] = useState<Socket | null>(null)

@@ -1,235 +1,252 @@
-"use client"
+"use client";
 
-import { useEffect, useState, useRef } from "react"
-import { Bell, Check, X, CheckCheck, Trash2 } from "lucide-react"
-import { io } from "socket.io-client"
-import { format, formatDistanceToNow } from "date-fns"
+import { useEffect, useState, useRef } from "react";
+import { Bell, Check, X, CheckCheck, Trash2 } from "lucide-react";
+import { io } from "socket.io-client";
+import { format, formatDistanceToNow } from "date-fns";
 // import { useNavigate } from "react-router-dom"
-import { useSelector } from "react-redux"
-import type { RootState } from "../../slice/Store/Store"
-import api from "../../axios/UserInstance"
-import doctorApi from "../../axios/DoctorInstance"
-import Loader from "../Admin/Loader"
-import { motion, AnimatePresence } from "framer-motion"
+import { useSelector } from "react-redux";
+import type { RootState } from "../../slice/Store/Store";
+// import api from "../../axios/UserInstance";
+// import doctorApi from "../../axios/DoctorInstance";
+import Loader from "../Admin/Loader";
+import { motion, AnimatePresence } from "framer-motion";
+import { createApiInstance } from "../../axios/apiService";
 
 interface Notification {
-  _id: string
-  title: string
-  message: string
-  read: boolean
-  createdAt: string
-  timestamp?: string
-  link?: string
-  type?: "info" | "success" | "warning" | "error"
-  priority?: "low" | "medium" | "high"
+  _id: string;
+  title: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+  timestamp?: string;
+  link?: string;
+  type?: "info" | "success" | "warning" | "error";
+  priority?: "low" | "medium" | "high";
 }
 
+const doctorApi = createApiInstance("doctor");
+const api = createApiInstance("user");
+
 const NotificationBell = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([])
-  const [showDropdown, setShowDropdown] = useState(false)
-  const [unreadCount, setUnreadCount] = useState(0)
-  const [loadingIds, setLoadingIds] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [filter, setFilter] = useState<"all" | "unread" | "read">("unread")
-  const [isMarkingAllRead, setIsMarkingAllRead] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loadingIds, setLoadingIds] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [filter, setFilter] = useState<"all" | "unread" | "read">("unread");
+  const [isMarkingAllRead, setIsMarkingAllRead] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   // const navigate = useNavigate()
 
-  const user = useSelector((state: RootState) => state.user.user)
-  const doctor = useSelector((state: RootState) => state.doctor.doctor)
-  const isDoctorRoute = window.location.pathname.includes("/doctor")
-  const userRole = isDoctorRoute ? "doctor" : "user"
-  const accessToken = isDoctorRoute ? doctor?.accessToken : user?.accessToken
-  const userId = isDoctorRoute ? doctor?._id : user?.id
-  const baseApi = isDoctorRoute ? doctorApi : api
-  const socket = useRef<any>(null)
+  const user = useSelector((state: RootState) => state.user.user);
+  const doctor = useSelector((state: RootState) => state.doctor.doctor);
+  const isDoctorRoute = window.location.pathname.includes("/doctor");
+  const userRole = isDoctorRoute ? "doctor" : "user";
+  const accessToken = isDoctorRoute ? doctor?.accessToken : user?.accessToken;
+  const userId = isDoctorRoute ? doctor?._id : user?.id;
+  const baseApi = isDoctorRoute ? doctorApi : api;
+  const socket = useRef<any>(null);
 
   const fetchNotifications = async () => {
-    console.log("Fetching notifications...")
-    setIsLoading(true)
+    console.log("Fetching notifications...");
+    setIsLoading(true);
     try {
       const response = await baseApi.get(`/notifications`, {
         params: {
           recipientId: userId,
           recipientType: userRole,
         },
-      })
+      });
 
-      const notifications = response.data.data?.notifications || response.data.notifications || []
-      console.log(notifications)
-      const unread = notifications.filter((n: any) => !n.read).length
+      const notifications =
+        response.data.data?.notifications || response.data.notifications || [];
+      console.log(notifications);
+      const unread = notifications.filter((n: any) => !n.read).length;
 
-      setNotifications(notifications)
-      setUnreadCount(unread)
+      setNotifications(notifications);
+      setUnreadCount(unread);
     } catch (error) {
-      console.error("Failed to fetch notifications:", error)
+      console.error("Failed to fetch notifications:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    if (!userId || !accessToken) return
+    if (!userId || !accessToken) return;
 
-    fetchNotifications()
+    fetchNotifications();
 
     // Initialize socket connection
     socket.current = io(import.meta.env.VITE_Base_Url, {
       auth: { token: accessToken, role: userRole },
       query: { isDoctor: isDoctorRoute },
-    })
+    });
 
     socket.current.on("connect", () => {
-      console.log("Socket connected:", socket.current.id)
-    })
+      console.log("Socket connected:", socket.current.id);
+    });
 
     socket.current.on("connect_error", (err: any) => {
-      console.error("Socket connection error:", err)
-    })
+      console.error("Socket connection error:", err);
+    });
 
     socket.current.on("receiveNotification", (data: any) => {
-      console.log("Notification received:", data)
-      setNotifications((prev) => [data, ...prev])
-      setUnreadCount((prev) => prev + 1)
-    })
+      console.log("Notification received:", data);
+      setNotifications((prev) => [data, ...prev]);
+      setUnreadCount((prev) => prev + 1);
+    });
 
     socket.current.on("newNotification", (notification: any) => {
-      console.log("NewNotification received:", notification)
-      setNotifications((prev) => [notification, ...prev])
-      setUnreadCount((prev) => prev + 1)
-    })
+      console.log("NewNotification received:", notification);
+      setNotifications((prev) => [notification, ...prev]);
+      setUnreadCount((prev) => prev + 1);
+    });
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowDropdown(false)
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      socket.current?.off("receiveNotification")
-      socket.current?.off("newNotification")
-      socket.current?.disconnect()
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [userId, accessToken, userRole])
+      socket.current?.off("receiveNotification");
+      socket.current?.off("newNotification");
+      socket.current?.disconnect();
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [userId, accessToken, userRole]);
 
   const markAsRead = async (notificationId: string) => {
-    setLoadingIds((prev) => [...prev, notificationId])
+    setLoadingIds((prev) => [...prev, notificationId]);
     try {
-      await baseApi.patch(`/notifications/${notificationId}/read`)
-      await fetchNotifications()
+      await baseApi.patch(`/notifications/${notificationId}/read`);
+      await fetchNotifications();
     } catch (error) {
-      console.error("Failed to mark notification as read:", error)
+      console.error("Failed to mark notification as read:", error);
     } finally {
-      setLoadingIds((prev) => prev.filter((id) => id !== notificationId))
+      setLoadingIds((prev) => prev.filter((id) => id !== notificationId));
     }
-  }
+  };
 
   const markAllAsRead = async () => {
-    setIsMarkingAllRead(true)
+    setIsMarkingAllRead(true);
     try {
       await baseApi.patch(`/notifications/mark-all-read`, {
         recipientId: userId,
         recipientType: userRole,
-      })
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
-      setUnreadCount(0)
+      });
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      setUnreadCount(0);
     } catch (error) {
-      console.error("Failed to mark all as read:", error)
+      console.error("Failed to mark all as read:", error);
     } finally {
-      setIsMarkingAllRead(false)
+      setIsMarkingAllRead(false);
     }
-  }
+  };
 
   const deleteNotification = async (notificationId: string) => {
-    setLoadingIds((prev) => [...prev, notificationId])
+    setLoadingIds((prev) => [...prev, notificationId]);
     try {
-      await baseApi.delete(`/notifications/${notificationId}`)
-      setNotifications((prev) => prev.filter((n) => n._id !== notificationId))
+      await baseApi.delete(`/notifications/${notificationId}`);
+      setNotifications((prev) => prev.filter((n) => n._id !== notificationId));
       setUnreadCount((prev) => {
-        const notification = notifications.find((n) => n._id === notificationId)
-        return notification && !notification.read ? prev - 1 : prev
-      })
+        const notification = notifications.find(
+          (n) => n._id === notificationId
+        );
+        return notification && !notification.read ? prev - 1 : prev;
+      });
     } catch (error) {
-      console.error("Failed to delete notification:", error)
+      console.error("Failed to delete notification:", error);
     } finally {
-      setLoadingIds((prev) => prev.filter((id) => id !== notificationId))
+      setLoadingIds((prev) => prev.filter((id) => id !== notificationId));
     }
-  }
+  };
 
-  // const handleNotificationClick = (notif: Notification) => {
-  //   if (!notif.read) {
-  //     markAsRead(notif._id)
-  //   }
-  //   if (notif.link) navigate(notif.link)
-  // }
+  const clearAllNotifications = async () => {
+    try {
+      await baseApi.delete(`/notifications/clear-all`, {
+        data: {
+          recipientId: userId,
+          recipientType: userRole,
+        },
+      });
+      setNotifications([]);
+      setUnreadCount(0);
+    } catch (error) {
+      console.error("Failed to clear all notifications:", error);
+    }
+  };
 
   const toggleDropdown = () => {
-    setShowDropdown((prev) => !prev)
-  }
+    setShowDropdown((prev) => !prev);
+  };
 
   const getNotificationTime = (notif: Notification) => {
-    const timestamp = notif.createdAt || notif.timestamp
-    if (!timestamp) return "Just now"
+    const timestamp = notif.createdAt || notif.timestamp;
+    if (!timestamp) return "Just now";
     try {
-      const date = new Date(timestamp)
-      const now = new Date()
-      const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 
       if (diffInHours < 24) {
-        return formatDistanceToNow(date, { addSuffix: true })
+        return formatDistanceToNow(date, { addSuffix: true });
       } else {
-        return format(date, "MMM dd, yyyy")
+        return format(date, "MMM dd, yyyy");
       }
     } catch {
-      return "Just now"
+      return "Just now";
     }
-  }
+  };
 
   const getNotificationIcon = (type?: string) => {
     switch (type) {
       case "success":
-        return "✅"
+        return "✅";
       case "warning":
-        return "⚠️"
+        return "⚠️";
       case "error":
-        return "❌"
+        return "❌";
       default:
-        return "📢"
+        return "📢";
     }
-  }
+  };
 
   const getNotificationColor = (type?: string, priority?: string) => {
-    if (priority === "high") return "border-l-red-500"
+    if (priority === "high") return "border-l-red-500";
     switch (type) {
       case "success":
-        return "border-l-green-500"
+        return "border-l-green-500";
       case "warning":
-        return "border-l-yellow-500"
+        return "border-l-yellow-500";
       case "error":
-        return "border-l-red-500"
+        return "border-l-red-500";
       default:
-        return "border-l-blue-500"
+        return "border-l-blue-500";
     }
-  }
+  };
 
-  console.log("All notifications:", notifications)
+  console.log("All notifications:", notifications);
 
   const filteredNotifications = notifications.filter((notif) => {
     switch (filter) {
       case "unread":
-        return !notif.read
+        return !notif.read;
       case "read":
-        return notif.read
+        return notif.read;
       default:
-        return true
+        return true;
     }
-  })
+  });
 
-  console.log("Filtered notifications:", filteredNotifications)
-
+  console.log("Filtered notifications:", filteredNotifications);
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -268,9 +285,23 @@ const NotificationBell = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <h2 className="text-lg font-semibold">Notifications</h2>
-                  <p className="text-sm opacity-90">{unreadCount > 0 ? `${unreadCount} unread` : "All caught up!"}</p>
+                  <p className="text-sm opacity-90">
+                    {unreadCount > 0
+                      ? `${unreadCount} unread`
+                      : "All caught up!"}
+                  </p>
                 </div>
                 <div className="flex gap-2">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={clearAllNotifications}
+                    disabled={notifications.length === 0}
+                    className="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
+                    title="Clear all notifications"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </motion.button>
                   {unreadCount > 0 && (
                     <motion.button
                       whileHover={{ scale: 1.05 }}
@@ -313,7 +344,9 @@ const NotificationBell = () => {
                 >
                   {filterType}
                   {filterType === "unread" && unreadCount > 0 && (
-                    <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">{unreadCount}</span>
+                    <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                      {unreadCount}
+                    </span>
                   )}
                 </button>
               ))}
@@ -329,7 +362,9 @@ const NotificationBell = () => {
                 <div className="text-center py-8 px-4">
                   <div className="text-4xl mb-2">🎉</div>
                   <p className="text-gray-500 dark:text-gray-400">
-                    {filter === "all" ? "No notifications yet" : `No ${filter} notifications`}
+                    {filter === "all"
+                      ? "No notifications yet"
+                      : `No ${filter} notifications`}
                   </p>
                 </div>
               ) : (
@@ -340,18 +375,27 @@ const NotificationBell = () => {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors border-l-4 ${getNotificationColor(notif.type, notif.priority)} ${
+                      className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors border-l-4 ${getNotificationColor(
+                        notif.type,
+                        notif.priority
+                      )} ${
                         !notif.read ? "bg-blue-50 dark:bg-blue-900/20" : ""
                       }`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className="text-2xl flex-shrink-0">{getNotificationIcon(notif.type)}</div>
+                        <div className="text-2xl flex-shrink-0">
+                          {getNotificationIcon(notif.type)}
+                        </div>
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1">
                               <h4
-                                className={`font-medium text-sm ${!notif.read ? "text-gray-900 dark:text-white" : "text-gray-700 dark:text-gray-300"}`}
+                                className={`font-medium text-sm ${
+                                  !notif.read
+                                    ? "text-gray-900 dark:text-white"
+                                    : "text-gray-700 dark:text-gray-300"
+                                }`}
                               >
                                 {notif.title || "Notification"}
                               </h4>
@@ -364,7 +408,9 @@ const NotificationBell = () => {
                             </div>
 
                             <div className="flex items-center gap-1 flex-shrink-0">
-                              {!notif.read && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
+                              {!notif.read && (
+                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              )}
 
                               {loadingIds.includes(notif._id) ? (
                                 <div className="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
@@ -385,7 +431,9 @@ const NotificationBell = () => {
                                   <motion.button
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
-                                    onClick={() => deleteNotification(notif._id)}
+                                    onClick={() =>
+                                      deleteNotification(notif._id)
+                                    }
                                     className="p-1 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
                                     title="Delete notification"
                                   >
@@ -431,12 +479,10 @@ const NotificationBell = () => {
         )}
       </AnimatePresence>
     </div>
-  )
-}
+  );
+};
 
-export default NotificationBell
-
-
+export default NotificationBell;
 
 // import { useEffect, useState, useRef } from "react";
 // import { Bell, Check } from "lucide-react";

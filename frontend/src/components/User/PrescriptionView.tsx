@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { IPrescription } from "../../Types";
 import toast from "react-hot-toast";
-import api from "../../axios/UserInstance";
+// import api from "../../axios/UserInstance";
 import {
   FaDownload,
   FaUserMd,
@@ -21,6 +21,9 @@ import { Card, CardHeader } from "../CommonComponents/card";
 import { Skeleton } from "../CommonComponents/UI/skeleton";
 import { Badge } from "../CommonComponents/UI/badge";
 import { CardContent, CardTitle } from "../CommonComponents/UI/card";
+import { createApiInstance } from "../../axios/apiService";
+
+const api = createApiInstance("user");
 
 const PrescriptionView: React.FC = () => {
   const { appointmentId } = useParams<{ appointmentId: string }>();

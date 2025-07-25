@@ -5,7 +5,7 @@ import { type FormEvent, useState } from "react"
 import { useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import { setError, setLoading, setUser } from "../../slice/user/userSlice"
-import api from "../../axios/UserInstance"
+// import api from "../../axios/UserInstance"
 import { assets } from "../../assets/assets"
 import Navbar from "../CommonComponents/Navbar"
 import Footer from "../CommonComponents/Footer"
@@ -17,6 +17,9 @@ import type { IGoogleSignInResponse } from "../../types/auth"
 import { loginUser } from "../../Api/UserApis"
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Loader2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { createApiInstance } from "../../axios/apiService"
+
+const api = createApiInstance("user");
 
 const LoginForm: React.FC = () => {
   const dispatch = useDispatch()

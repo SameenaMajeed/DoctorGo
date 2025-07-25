@@ -11,13 +11,16 @@ import {
   Loader2,
   Eye,
 } from "lucide-react";
-import adminApi from "../../axios/AdminInstance";
+// import adminApi from "../../axios/AdminInstance";
 import Pagination from "../../Pagination/Pagination";
 import { Table } from "../CommonComponents/Table";
 import { getStatusColor } from "../../types/StatusCode";
 import { IBooking } from "../../Types";
 import { AppointmentStatus } from "../../types/paymentTypes";
 import BookingDetailModal from "./Home/BookingDetailModal";
+import { createApiInstance } from "../../axios/apiService";
+
+const adminApi = createApiInstance("admin");
 
 const BookingsPage = () => {
   const [bookings, setBookings] = useState<IBooking[]>([]);

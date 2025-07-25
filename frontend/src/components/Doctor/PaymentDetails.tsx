@@ -19,7 +19,8 @@ import {
   IndianRupee,
 } from "lucide-react"
 import Pagination from "../../Pagination/Pagination"
-import doctorApi from "../../axios/DoctorInstance"
+import { createApiInstance } from "../../axios/apiService"
+// import doctorApi from "../../axios/DoctorInstance"
 
 enum AppointmentStatus {
   PENDING = "pending",
@@ -94,6 +95,9 @@ const transformBookingToPayment = (booking: IBooking): IPayment => ({
   originalStatus: booking.status,
   appointmentDate: booking.appointmentDate,
 })
+
+
+const doctorApi = createApiInstance("doctor");
 
 const PaymentDetails: React.FC = () => {
   const [payments, setPayments] = useState<IPayment[]>([])

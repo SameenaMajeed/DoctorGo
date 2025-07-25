@@ -1,5 +1,3 @@
-"use client";
-
 import type React from "react";
 import { AlertTriangle, X } from "lucide-react";
 

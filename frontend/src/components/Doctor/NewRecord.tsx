@@ -30,8 +30,9 @@ import type { IUser } from "../../types/auth"
 import type { IAppointment } from "../../Types"
 import { useSelector } from "react-redux"
 import type { RootState } from "../../slice/Store/Store"
-import doctorApi from "../../axios/DoctorInstance"
+// import doctorApi from "../../axios/DoctorInstance"
 import toast from "react-hot-toast"
+import { createApiInstance } from "../../axios/apiService"
 
 interface IMedicine {
   name: string
@@ -43,6 +44,8 @@ interface IMedicine {
 interface FormErrors {
   [key: string]: string
 }
+
+const doctorApi = createApiInstance("doctor");
 
 const NewRecord: React.FC = () => {
   const navigate = useNavigate()

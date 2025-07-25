@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../slice/Store/Store";
 import { toast } from "react-hot-toast";
-import doctorApi from "../../../axios/DoctorInstance";
+import { createApiInstance } from "../../../axios/apiService";
+// import doctorApi from "../../../axios/DoctorInstance";
 
 interface DashboardStatsData {
   totalPatients: number;
@@ -19,6 +20,8 @@ interface DashboardStatsData {
     profilePicture : string
   }>;
 }
+
+const doctorApi = createApiInstance("doctor");
 
 const DashboardStats: React.FC = () => {
   const  doctor = useSelector((state: RootState) => state.doctor.doctor);

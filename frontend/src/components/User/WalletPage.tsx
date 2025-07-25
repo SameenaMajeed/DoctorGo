@@ -6,10 +6,12 @@ import type { Wallet, Transaction } from "../../Types"
 import { formatCurrency, formatDate } from "../../Utils/formatters"
 import { useSelector } from "react-redux"
 import type { RootState } from "../../slice/Store/Store"
-import api from "../../axios/UserInstance"
+// import api from "../../axios/UserInstance"
 import { ArrowDownCircle, ArrowUpCircle, Loader, CreditCard, TrendingUp, Clock, Receipt } from "lucide-react"
 import Pagination from "../../Pagination/Pagination"
+import { createApiInstance } from "../../axios/apiService"
 
+const api = createApiInstance("user");
 
 const WalletPage: React.FC = () => {
   const userId = useSelector((state: RootState) => state.user.user?.id)

@@ -17,7 +17,7 @@ import OtpModal from "../../components/CommonComponents/OtpModal";
 import Navbar from "../CommonComponents/Navbar";
 import Footer from "../CommonComponents/Footer";
 import type { RootState } from "../../slice/Store/Store";
-import doctorApi from "../../axios/DoctorInstance";
+// import doctorApi from "../../axios/DoctorInstance";
 import {
   User,
   Mail,
@@ -34,6 +34,9 @@ import {
   Users,
 } from "lucide-react";
 import { Specialities } from "../../Utils/Specialities";
+import { createApiInstance } from "../../axios/apiService";
+
+const doctorApi = createApiInstance("doctor");
 
 const validationSchema = yup.object().shape({
   name: yup.string().required("Name is required"),

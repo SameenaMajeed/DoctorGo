@@ -7,11 +7,14 @@ import { FiMenu, FiX } from "react-icons/fi";
 import { assets } from "../../../assets/assets";
 import type { RootState } from "../../../slice/Store/Store";
 import { logoutUser } from "../../../slice/user/userSlice";
-import api from "../../../axios/UserInstance";
+// import api from "../../../axios/UserInstance";
 import { useDispatch, useSelector } from "react-redux";
 import { User } from "lucide-react";
 import NotificationBell from "../../CommonComponents/NotificationBell";
 import { motion, AnimatePresence } from "framer-motion";
+import { createApiInstance } from "../../../axios/apiService";
+
+const api = createApiInstance("user");
 
 const Navbar: React.FC = () => {
   const dispatch = useDispatch();

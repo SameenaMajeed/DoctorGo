@@ -1,7 +1,8 @@
 import { useState } from "react";
-import userApi from "../../axios/UserInstance";
+// import userApi from "../../axios/UserInstance";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { createApiInstance } from "../../axios/apiService";
 
 interface NewPasswordModalProps {
   show: boolean;
@@ -9,6 +10,8 @@ interface NewPasswordModalProps {
   onClose: () => void;
   role: string;
 }
+
+const userApi = createApiInstance("user");
 
 const NewPasswordModal: React.FC<NewPasswordModalProps> = ({
   show,

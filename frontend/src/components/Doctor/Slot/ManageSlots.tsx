@@ -22,11 +22,14 @@ import {
 } from "lucide-react"
 import { useSelector } from "react-redux"
 import type { RootState } from "../../../slice/Store/Store"
-import slotApi from "../../../Api/SlotApis"
+// import slotApi from "../../../Api/SlotApis"
 import toast from "react-hot-toast"
 import useFetchData from "../../../Hooks/useFetchData"
 import Pagination from "../../../Pagination/Pagination"
 import type { ISlot } from "../../../types/Slot"
+import { createApiInstance } from "../../../axios/apiService"
+
+const slotApi = createApiInstance("slot");
 
 const ManageSlots: React.FC = () => {
   const [slots, setSlots] = useState<ISlot[]>([])

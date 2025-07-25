@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import userApi from "../../axios/UserInstance";
+// import userApi from "../../axios/UserInstance";
 import OtpModal from "./OtpModal";
 import NewPasswordModal from "./NewPasswordModel";
+import { createApiInstance } from "../../axios/apiService";
 
 interface ForgotPasswordModelProps {
   show: boolean;
@@ -13,6 +14,8 @@ interface ForgotPasswordResponse {
   success: boolean;
   message?: string;
 }
+
+const userApi = createApiInstance("user");
 
 const ForgotPasswordModel: React.FC<ForgotPasswordModelProps> = ({
   show,

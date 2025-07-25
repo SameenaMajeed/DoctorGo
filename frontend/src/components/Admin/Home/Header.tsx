@@ -11,8 +11,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useDispatch} from "react-redux";
 import toast from "react-hot-toast";
-import adminApi from "../../../axios/AdminInstance";
+// import adminApi from "../../../axios/AdminInstance";
 import { adminLogout } from "../../../slice/admin/adminSlice";
+import { createApiInstance } from "../../../axios/apiService";
+
+const adminApi = createApiInstance("admin");
 
 const Header: React.FC = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);

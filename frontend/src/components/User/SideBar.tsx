@@ -14,15 +14,18 @@ import {
 } from "lucide-react"
 import MenuItem from "./MenuItem"
 import { useNavigate, useLocation } from "react-router-dom"
-import api from "../../axios/UserInstance"
+// import api from "../../axios/UserInstance"
 import { logoutUser } from "../../slice/user/userSlice"
 import { useDispatch } from "react-redux"
+import { createApiInstance } from "../../axios/apiService"
 
 interface IMenuItemType {
   icon: React.ReactNode
   label: string
   path: string
 }
+
+const api = createApiInstance("user");
 
 const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false)

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { IAppointment } from "../../Types";
-import api from "../../axios/UserInstance";
+// import api from "../../axios/UserInstance";
 import "react-toastify/dist/ReactToastify.css";
 import { Link, useNavigate } from "react-router-dom";
 import ReviewForm from "./ReviewForm";
@@ -9,12 +9,15 @@ import { FaInfoCircle, FaStar, FaTrashAlt, FaVideo } from "react-icons/fa";
 import ViewDetails from "./ViewDetails";
 import CancelConfirmationModal from "../CommonComponents/CancelConfirmationModal";
 import { ClipboardList } from "lucide-react";
+import { createApiInstance } from "../../axios/apiService";
 
 interface IAppointmentCardProps {
   appointment: IAppointment;
   onCancel: (id: string) => void;
   isDoctorView?: boolean;
 }
+
+const api = createApiInstance("user");
 
 const AppointmentCard: React.FC<IAppointmentCardProps> = ({
   appointment,

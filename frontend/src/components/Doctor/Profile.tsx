@@ -21,7 +21,7 @@ import toast from "react-hot-toast";
 // Redux and API imports
 import type { RootState } from "../../slice/Store/Store";
 import { setError, setLoading } from "../../slice/user/userSlice";
-import doctorApi from "../../axios/DoctorInstance";
+// import doctorApi from "../../axios/DoctorInstance";
 import {
   setProfile,
   updateProfilePicture,
@@ -39,6 +39,7 @@ import { FinancialInfoTab } from "./Profile/FinancialInfoTab";
 import { DocumentsTab } from "./Profile/DocumentsTab";
 import type { FormData} from "../../types/profile";
 import { profileSchema } from "../../types/profile";
+import { createApiInstance } from "../../axios/apiService";
 
 interface Certificate {
   _id: string;
@@ -47,6 +48,8 @@ interface Certificate {
   uploadedAt: string;
   type: string;
 }
+
+const doctorApi = createApiInstance("doctor");
 
 const Profile: React.FC = () => {
   const dispatch = useDispatch();

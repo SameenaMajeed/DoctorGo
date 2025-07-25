@@ -26,7 +26,10 @@ import { motion, AnimatePresence } from "framer-motion"
 import { fetchDoctorAppointments, updateAppointmentStatus } from "../../Api/DoctorApis"
 import { useSelector } from "react-redux"
 import type { RootState } from "../../slice/Store/Store"
-import doctorApi from "../../axios/DoctorInstance"
+import { createApiInstance } from "../../axios/apiService"
+// import doctorApi from "../../axios/DoctorInstance"
+
+const doctorApi = createApiInstance("doctor");
 
 const Appointments: React.FC = () => {
   const { doctorId } = useParams<{ doctorId: string }>()

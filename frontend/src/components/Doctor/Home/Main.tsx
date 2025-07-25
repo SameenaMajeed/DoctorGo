@@ -8,14 +8,17 @@ import { useNavigate } from "react-router-dom"
 import type { RootState } from "../../../slice/Store/Store"
 import { Calendar, Users, Clock, Eye, MessageCircle, Phone, Video, MapPin, Stethoscope } from "lucide-react"
 import { useTodaysAppointments } from "../../../Hooks/useTodaysAppointments"
-import doctorApi from "../../../axios/DoctorInstance"
+// import doctorApi from "../../../axios/DoctorInstance"
 import { setProfile } from "../../../slice/Doctor/doctorSlice"
 import toast from "react-hot-toast"
 import DashboardStats from "./DashboardStats"
+import { createApiInstance } from "../../../axios/apiService"
 
 interface MainProps {
   onRestrictedAction?: () => void
 }
+
+const doctorApi = createApiInstance("doctor");
 
 const Main: React.FC<MainProps> = () => {
   const { doctor } = useSelector((state: RootState) => state.doctor)

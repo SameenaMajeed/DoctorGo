@@ -26,10 +26,11 @@ import { Button } from "../CommonComponents/Button";
 import { Card, CardContent } from "../CommonComponents/card";
 import type { IUser } from "../../types/auth";
 import type { IAppointment, IPrescription } from "../../Types";
-import doctorApi from "../../axios/DoctorInstance";
+// import doctorApi from "../../axios/DoctorInstance";
 import Pagination from "../../Pagination/Pagination";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../slice/Store/Store";
+import { createApiInstance } from "../../axios/apiService";
 
 interface IMedicalRecord {
   date: string;
@@ -44,6 +45,8 @@ interface ILocationState {
   patient?: IUser;
   appointment?: IAppointment;
 }
+
+const doctorApi = createApiInstance("doctor");
 
 const MedicalRecord: React.FC = () => {
   const navigate = useNavigate();

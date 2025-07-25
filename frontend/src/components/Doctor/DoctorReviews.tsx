@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import api from "../../axios/UserInstance";
+// import api from "../../axios/UserInstance";
 import toast from "react-hot-toast";
+import { createApiInstance } from "../../axios/apiService";
 
 interface IReview {
   _id: string;
@@ -13,6 +14,8 @@ interface IReview {
   updatedAt: string;
   __v: number;
 }
+
+const api = createApiInstance("user");
 
 const DoctorReviews: React.FC = () => {
   const { doctorId } = useParams<{ doctorId: string }>();

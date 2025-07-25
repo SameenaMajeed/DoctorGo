@@ -24,8 +24,9 @@ import io, { type Socket } from "socket.io-client"
 import { useSelector } from "react-redux"
 import { BaseUrl } from "../../constants"
 import type { RootState } from "../../slice/Store/Store"
-import doctorApi from "../../axios/DoctorInstance"
+// import doctorApi from "../../axios/DoctorInstance"
 import toast from "react-hot-toast"
+import { createApiInstance } from "../../axios/apiService"
 
 type IMessage = {
   _id: string
@@ -49,6 +50,8 @@ interface IUser {
 }
 
 const SOCKET_URL = BaseUrl
+
+const doctorApi = createApiInstance("doctor");
 
 const ChatPage: React.FC = () => {
   const [socket, setSocket] = useState<Socket | null>(null)

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setError, setLoading } from "../../slice/user/userSlice";
-import doctorApi from "../../axios/DoctorInstance";
+import { createApiInstance } from "../../axios/apiService";
+// import doctorApi from "../../axios/DoctorInstance";
+
+const doctorApi = createApiInstance("doctor");
 
 interface OtpModalProps {
   doctorId: string;

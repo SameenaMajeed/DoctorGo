@@ -3,7 +3,8 @@ import { useState, FormEvent } from "react";
 // import { RootState } from "../../slice/Store/Store";
 import { IReviewFormData } from "../../Types";
 import { FaStar } from "react-icons/fa";
-import api from "../../axios/UserInstance";
+import { createApiInstance } from "../../axios/apiService";
+// import api from "../../axios/UserInstance";
 
 interface IReviewFormProps {
   doctorId: string;
@@ -17,6 +18,8 @@ interface IReviewFormProps {
     _id?: string;
   };
 }
+
+const api = createApiInstance("user");
 
 const ReviewForm: React.FC<IReviewFormProps> = ({
   doctorId,

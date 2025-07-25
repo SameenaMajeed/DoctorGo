@@ -18,10 +18,13 @@ import {
 import { Link, useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "../../../slice/Store/Store"
-import doctorApi from "../../../axios/DoctorInstance"
+// import doctorApi from "../../../axios/DoctorInstance"
 import { logoutDoctor } from "../../../slice/Doctor/doctorSlice"
 import NotificationBell from "../../CommonComponents/NotificationBell"
 import toast from "react-hot-toast"
+import { createApiInstance } from "../../../axios/apiService"
+
+const doctorApi = createApiInstance("doctor");
 
 const Header: React.FC = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false)

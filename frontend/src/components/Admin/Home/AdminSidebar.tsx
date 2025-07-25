@@ -17,15 +17,18 @@ import {
 import { useNavigate, useLocation } from "react-router-dom"
 import { useDispatch } from "react-redux"
 import Swal from "sweetalert2"
-import adminApi from "../../../axios/AdminInstance"
+// import adminApi from "../../../axios/AdminInstance"
 import { adminLogout } from "../../../slice/admin/adminSlice"
 import MenuItem from "./MenuItem"
+import { createApiInstance } from "../../../axios/apiService"
 
 interface IMenuItemType {
   icon: React.ReactNode
   label: string
   path: string
 }
+
+const adminApi = createApiInstance("admin");
 
 const AdminSidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false)

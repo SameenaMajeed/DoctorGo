@@ -1,9 +1,12 @@
 
 import { useState } from "react";
 import { IPayment } from "../../types/paymentTypes";
-import api from "../../axios/UserInstance";
+// import api from "../../axios/UserInstance";
 import PaymentTable from "../CommonComponents/PaymentTable";
 import { transformBookingToPayment } from "../../Utils/PaymentTable";
+import { createApiInstance } from "../../axios/apiService";
+
+const api = createApiInstance("user");
 
 const PaymentHistory = () => {
   const [totalPages, setTotalPages] = useState(1);

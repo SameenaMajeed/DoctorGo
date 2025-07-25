@@ -1,4 +1,5 @@
-import api from "../axios/UserInstance";
+import { createApiInstance } from "../axios/apiService";
+// import api from "../axios/UserInstance";
 import { setLoading, setError, setUser } from "../slice/user/userSlice";
 import {
   IAxiosError,
@@ -9,6 +10,8 @@ import {
   IReviewResponse,
   IUpdateProfileResponse,
 } from "../types/auth";
+
+const api = createApiInstance("user");
 
 // Signup
 export const registerUser = async (

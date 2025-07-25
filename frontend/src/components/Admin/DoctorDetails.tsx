@@ -3,7 +3,7 @@
 import type React from "react";
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import adminApi from "../../axios/AdminInstance";
+// import adminApi from "../../axios/AdminInstance";
 import Loader from "./Loader";
 import CancelConfirmationModal from "../CommonComponents/CancelConfirmationModal";
 import { toast } from "react-hot-toast";
@@ -31,6 +31,7 @@ import { Button } from "../CommonComponents/Button";
 import { Card, CardContent } from "../CommonComponents/UI/card";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import ErrorDisplay from "./Home/ErrorDisplay";
+import { createApiInstance } from "../../axios/apiService";
 
 interface IDoctor {
   _id: string;
@@ -49,6 +50,8 @@ interface IDoctor {
   verifiedAt?: Date;
   experience?: number;
 }
+
+const adminApi = createApiInstance("admin");
 
 const DoctorDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

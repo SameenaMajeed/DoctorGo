@@ -29,11 +29,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "../CommonComponents/dropdownmenu"
-import doctorApi from "../../axios/DoctorInstance"
+// import doctorApi from "../../axios/DoctorInstance"
 import { useNavigate, useParams } from "react-router-dom"
 import type { IAppointment } from "../../Types"
 import type { IUser } from "../../types/auth"
 import Pagination from "../../Pagination/Pagination"
+import { createApiInstance } from "../../axios/apiService"
+
+const doctorApi = createApiInstance("doctor");
 
 const PatientDashboard: React.FC = () => {
   const navigate = useNavigate()

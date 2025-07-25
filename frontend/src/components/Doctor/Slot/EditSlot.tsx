@@ -28,7 +28,10 @@ import {
 } from "lucide-react"
 import type { RootState } from "../../../slice/Store/Store"
 import { setError } from "../../../slice/Doctor/doctorSlice"
-import slotApi from "../../../Api/SlotApis"
+import { createApiInstance } from "../../../axios/apiService"
+// import slotApi from "../../../Api/SlotApis"
+
+const slotApi = createApiInstance("slot");
 
 const EditSlot: React.FC = () => {
   const dispatch = useDispatch()

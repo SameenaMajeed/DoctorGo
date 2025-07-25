@@ -2,13 +2,17 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "./Home/Navbar";
 import Footer from "../CommonComponents/Footer";
-import api from "../../axios/UserInstance";
+// import api from "../../axios/UserInstance";
 import toast from "react-hot-toast";
 import { ISlot } from "../../types/Slot";
 import { useSelector } from "react-redux";
 import { RootState } from "../../slice/Store/Store";
 import { IDoctor } from "../../Types";
-import slotApi from "../../axios/SlotInstance";
+import { createApiInstance } from "../../axios/apiService";
+// import slotApi from "../../axios/SlotInstance";
+
+const api = createApiInstance("user");
+const slotApi = createApiInstance("slot");
 
 const AppointmentVerification: React.FC = () => {
   const location = useLocation();

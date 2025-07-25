@@ -5,9 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import Navbar from "../User/Home/Navbar";
 import Footer from "../CommonComponents/Footer";
 import { useNavigate, useParams } from "react-router-dom";
-import api from "../../axios/UserInstance";
+// import api from "../../axios/UserInstance";
 import toast from "react-hot-toast";
-import slotApi from "../../axios/SlotInstance";
+// import slotApi from "../../axios/SlotInstance";
 import type { ISlot } from "../../types/Slot";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -31,6 +31,10 @@ import {
   Stethoscope,
   ArrowRight,
 } from "lucide-react";
+import { createApiInstance } from "../../axios/apiService";
+
+const api = createApiInstance("user");
+const slotApi = createApiInstance("slot");
 
 const AppointmentPage: React.FC = () => {
   const { doctorId } = useParams<{ doctorId: string }>();

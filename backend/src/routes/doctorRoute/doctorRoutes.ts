@@ -219,6 +219,19 @@ doctorRoute.patch('/notifications/mark-all-read' ,authenticateToken("doctor"),
   blockedDoctorMiddleware,
   (req, res) => notificationController.markAllAsRead(req, res))
 
+doctorRoute.delete(
+  "/notifications/clear-all",
+  authenticateToken("doctor"),
+  blockedDoctorMiddleware,
+  (req , res) => notificationController.clearAllNotifications(req , res)
+);  
+doctorRoute.delete(
+  "/notifications/:notificationId",
+  authenticateToken("doctor"),
+  blockedDoctorMiddleware,
+  (req , res) => notificationController.deleteNotification(req , res)
+);  
+
 // ....................online status...........................
 doctorRoute.put("/:id/status" ,(req, res) => doctorController.getDoctorStatus(req , res))
 

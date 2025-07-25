@@ -7,10 +7,13 @@ import Navbar from "../CommonComponents/Navbar"
 import { useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import { setLoading } from "../../slice/user/userSlice"
-import doctorApi from "../../axios/DoctorInstance"
+// import doctorApi from "../../axios/DoctorInstance"
 import { setDoctor, setError } from "../../slice/Doctor/doctorSlice"
 import toast from "react-hot-toast"
 import { Mail, Lock, Eye, EyeOff, Stethoscope, ArrowRight, AlertCircle } from "lucide-react"
+import { createApiInstance } from "../../axios/apiService"
+
+const doctorApi = createApiInstance("doctor");
 
 const DoctorLogin: React.FC = () => {
   const [email, setEmail] = useState("")

@@ -1,7 +1,10 @@
-import api from "../axios/UserInstance";
+import { createApiInstance } from "../axios/apiService";
+// import api from "../axios/UserInstance";
 import { setOtpExpired, setOtpSent, setOtpVerified } from "../slice/Otp/otpSlice";
 import { setLoading, setError } from "../slice/user/userSlice";
 import { Dispatch } from 'redux';
+
+const api = createApiInstance("user");
 
 // send
 export const sendOtp = async (email: string, dispatch: Dispatch): Promise<{ success: boolean; message: string }> => {

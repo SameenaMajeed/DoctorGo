@@ -14,13 +14,16 @@ import {
   Search,
   Filter,
 } from "lucide-react";
-import adminApi from "../../axios/AdminInstance";
+// import adminApi from "../../axios/AdminInstance";
 import Loader from "./Loader";
 import ErrorDisplay from "./Home/ErrorDisplay";
 import { DoctorRevenue } from "../../Types";
 import { Table } from "../CommonComponents/Table";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { createApiInstance } from "../../axios/apiService";
+
+const adminApi = createApiInstance("admin");
 
 const AdminRevenueTable: React.FC = () => {
   const [revenueData, setRevenueData] = useState<DoctorRevenue[]>([]);
