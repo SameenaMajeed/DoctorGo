@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { TrendingUp, Calendar, Eye, RefreshCw, AlertCircle, IndianRupee, BarChart3, Wallet } from "lucide-react"
 import { fetchDoctorRevenue } from "../../Api/DoctorApis"
+import { useNavigate } from "react-router-dom"
 
 interface RevenueData {
   totalRevenue: number
@@ -19,7 +20,9 @@ const DoctorRevenue: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
-
+  
+  const navigate = useNavigate();
+  
   const loadRevenue = async (isRefresh = false) => {
     try {
       if (isRefresh) {
@@ -258,6 +261,7 @@ const DoctorRevenue: React.FC = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-medium flex items-center gap-1"
+            onClick={()=>navigate('/payment')}
           >
             <Eye className="w-4 h-4" />
             View Details

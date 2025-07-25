@@ -1,5 +1,5 @@
-import { createApiInstance } from "../axios/apiService";
-// import doctorApi from "../axios/DoctorInstance";
+// import { createApiInstance } from "../axios/apiService";
+import doctorApi from "../axios/DoctorInstance";
 import { IAppointment, IDoctor } from "../Types";
 import { IAxiosError } from "../types/auth";
 
@@ -17,7 +17,7 @@ type IFetchAppointmentsResponse = {
     totalPages?: number;
 };
 
-const doctorApi = createApiInstance("doctor");
+// const doctorApi = createApiInstance("doctor");
 
 // Appointments listing  
 export const fetchDoctorAppointments = async (
