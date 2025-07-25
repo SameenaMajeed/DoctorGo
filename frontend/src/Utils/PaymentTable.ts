@@ -30,7 +30,8 @@ export const transformBookingToPayment = (booking: IBooking): IPayment => ({
     appointmentDate: booking.appointmentDate,
     bookingId: "",
     paymentMethod: booking.paymentMethod,
-    platformFee : booking.ticketPrice
+    platformFee : booking.platformFee,
+    totalAmount : booking.totalAmount
 });
 
 export const getDisplayStatusLabel = (status: string): string =>

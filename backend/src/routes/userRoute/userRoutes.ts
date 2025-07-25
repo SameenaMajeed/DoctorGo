@@ -283,7 +283,7 @@ userRoute.get("/wallet/balance",
   (req, res) => walletController.getWalletBalance(req, res)
 )
 
-userRoute.get("/payments/history", authenticateToken("user"), bookingController.getUserPayments);
+userRoute.get("/payments/history", authenticateToken("user"), (req, res) =>bookingController.getUserPayments(req, res));
 
 
 export default userRoute;

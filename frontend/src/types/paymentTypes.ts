@@ -36,6 +36,8 @@ export interface IBooking {
   createdAt: string;
   appointmentDate: string;
   paymentMethod?: IPaymentMethod;
+  platformFee: number;
+  totalAmount : number
 }
 
 export interface IPayment {
@@ -51,5 +53,7 @@ export interface IPayment {
   bookingId?: string;
   paymentMethod?: IPaymentMethod;
   platformFee: number;
-  createdAt?: Date
+  createdAt?: Date;
+  totalAmount : number
+
 }
