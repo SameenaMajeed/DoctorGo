@@ -51,7 +51,7 @@ const logout = (role: Role): void => {
       window.location.href = "/admin/login";
       break;
     case "slot":
-      dispatch(logoutDoctor()); // assuming slot is also for doctor
+      dispatch(logoutDoctor());
       window.location.href = "/doctor/login";
       break;
   }
