@@ -244,6 +244,11 @@ export default class SlotRepository implements ISlotRepository {
   ): Promise<{ slots: ISlot[]; total: number }> {
     const query: any = { doctorId, isBooked: false, isBlocked: false };
 
+    // Get current date and time
+  const now = new Date();
+  const currentDate = new Date(now.toISOString().split('T')[0]);
+  const currentTime = now.toTimeString().split(' ')[0].substring(0, 5);
+
     if (date) {
       // Create date range for the entire day in UTC
       const startDate = new Date(date);
@@ -256,7 +261,18 @@ export default class SlotRepository implements ISlotRepository {
         $gte: startDate,
         $lte: endDate,
       };
-    }
+    }else {
+    // For all dates, only show future slots
+    query.$or = [
+      {
+        date: { $gt: currentDate }
+      },
+      {
+        date: currentDate,
+        startTime: { $gte: currentTime }
+      }
+    ];
+  }
     console.log("query.date :", query.date);
     const [slots, total] = await Promise.all([
       SlotModel.find(query)

@@ -52,7 +52,16 @@ const ManageSlots: React.FC = () => {
       })
 
       if (response.data.data) {
-        setSlots(response.data.data.slots || [])
+        const currentDate = new Date().toISOString().split('T')[0];
+      const currentTime = new Date().toTimeString().split(' ')[0].substring(0, 5);
+      
+      const filteredSlots = response.data.data.slots.filter((slot: ISlot) => {
+        const slotDate = new Date(slot.date).toISOString().split('T')[0];
+        return slotDate > currentDate || 
+               (slotDate === currentDate && slot.startTime >= currentTime);
+      });
+
+        setSlots(filteredSlots || [])
         setTotalPages(Math.ceil(response.data.data.total / limit))
       }
     } catch (error: any) {
