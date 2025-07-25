@@ -54,6 +54,6 @@ export interface IPayment {
   paymentMethod?: IPaymentMethod;
   platformFee: number;
   createdAt?: Date;
-  totalAmount : number
+  totalAmount?: number
 
 }

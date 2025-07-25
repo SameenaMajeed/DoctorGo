@@ -5,7 +5,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import {
   CreditCard,
-  Filter,
+  // Filter,
   Calendar,
   User,
   CheckCircle,
@@ -107,10 +107,10 @@ const PaymentTable = ({ title, fetchData, totalPages }: Props) => {
       <div className="p-6 bg-gradient-to-r from-gray-50 to-blue-50/30 border-b border-gray-200/60">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-gray-700">
+            {/* <div className="flex items-center space-x-2 text-gray-700">
               <Filter className="w-5 h-5 text-blue-600" />
               <span className="font-semibold">Filter Options</span>
-            </div>
+            </div> */}
           </div>
           <div className="flex items-center space-x-3">
             <label htmlFor="status-filter" className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
@@ -226,7 +226,7 @@ const PaymentTable = ({ title, fetchData, totalPages }: Props) => {
                                 <IndianRupee className="w-4 h-4 text-green-600" />
                               </div>
                               <div>
-                                <p className="text-lg font-bold text-gray-900">₹{payment.totalAmount.toLocaleString()}</p>
+                                <p className="text-lg font-bold text-gray-900">₹{payment.totalAmount?.toLocaleString()}</p>
                                 <p className="text-xs text-gray-500">INR</p>
                               </div>
                             </div>
