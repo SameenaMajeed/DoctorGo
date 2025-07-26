@@ -66,7 +66,6 @@ export class DoctorRepository implements IDoctorRepository {
     status: "pending" | "approved" | "rejected",
     notes?: string
   ): Promise<IDoctor | null> {
-    
     const updateData: any = {
       verificationStatus: status,
       verificationNotes: notes,
@@ -124,45 +123,49 @@ export class DoctorRepository implements IDoctorRepository {
   }
 
   async findAllDoctor(): Promise<any[]> {
-  try {
-    const doctors = await DoctorModel.aggregate([
-      {
-        $lookup: {
-          from: "reviews",
-          localField: "_id",
-          foreignField: "doctor_id",
-          as: "reviews",
-        },
-      },
-      {
-        $addFields: {
-          averageRating: {
-            $cond: [
-              { $gt: [{ $size: "$reviews" }, 0] },
-              { $avg: "$reviews.rating" },
-              null,
-            ],
+    try {
+      const doctors = await DoctorModel.aggregate([
+        {
+          $match: {
+            isApproved: true, 
           },
         },
-      },
-      {
-        $project: {
-          password: 0, // exclude sensitive fields if needed
-          __v: 0,
+        {
+          $lookup: {
+            from: "reviews",
+            localField: "_id",
+            foreignField: "doctor_id",
+            as: "reviews",
+          },
         },
-      },
-    ]);
+        {
+          $addFields: {
+            averageRating: {
+              $cond: [
+                { $gt: [{ $size: "$reviews" }, 0] },
+                { $avg: "$reviews.rating" },
+                null,
+              ],
+            },
+          },
+        },
+        {
+          $project: {
+            password: 0, 
+            __v: 0,
+          },
+        },
+      ]);
 
-    return doctors;
-  } catch (error) {
-    console.error("Error in findAllDoctor:", error);
-    throw new AppError(
-      HttpStatus.InternalServerError,
-      MessageConstants.INTERNAL_SERVER_ERROR
-    );
+      return doctors;
+    } catch (error) {
+      console.error("Error in findAllDoctor:", error);
+      throw new AppError(
+        HttpStatus.InternalServerError,
+        MessageConstants.INTERNAL_SERVER_ERROR
+      );
+    }
   }
-}
-
 
   // async findAllDoctor(): Promise<IDoctor[]> {
   //   try {
@@ -189,14 +192,12 @@ export class DoctorRepository implements IDoctorRepository {
     }
   }
 
-  async updateOnlineStatus(id: string, isOnline: boolean): Promise<IDoctor | null> {
-    return await DoctorModel.findByIdAndUpdate(
-      id,
-      { isOnline },
-      { new: true }
-    );
+  async updateOnlineStatus(
+    id: string,
+    isOnline: boolean
+  ): Promise<IDoctor | null> {
+    return await DoctorModel.findByIdAndUpdate(id, { isOnline }, { new: true });
   }
-
 }
 
 // import { IDoctor } from "../models/DoctorModel";
