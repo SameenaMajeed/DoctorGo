@@ -9,7 +9,11 @@ import { generateOtp, hashOtp } from "../../utils/GenerateOtp";
 import { sentMail } from "../../utils/SendMail";
 import { MessageConstants } from "../../constants/MessageConstants";
 import IOtpRepository from "../../interfaces/otp/otpRepositoryInterface";
-import { IDoctorService, ILoginResponse, PendingVerificationsResult } from "../../interfaces/doctor/doctorServiceInterface";
+import {
+  IDoctorService,
+  ILoginResponse,
+  PendingVerificationsResult,
+} from "../../interfaces/doctor/doctorServiceInterface";
 import { IDoctorRepository } from "../../interfaces/doctor/doctorRepositoryInterface";
 import { AppError } from "../../utils/AppError";
 import { HttpStatus } from "../../constants/Httpstatus";
@@ -23,21 +27,30 @@ export class DoctorService implements IDoctorService {
   ) {}
 
   async registerDoctor(doctorData: Partial<IDoctor>): Promise<IDoctor> {
-    const { 
-      name, 
-      email, 
-      password, 
-      phone, 
-      qualification, 
-      specialization, 
+    const {
+      name,
+      email,
+      password,
+      phone,
+      qualification,
+      specialization,
       registrationNumber,
       certificate,
     } = doctorData;
 
-    console.log('doctorData : ' ,doctorData)
+    console.log("doctorData : ", doctorData);
 
     // Validate required fields
-    if (!name || !email || !password || !phone || !qualification || !specialization || !registrationNumber ||!certificate) {
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !phone ||
+      !qualification ||
+      !specialization ||
+      !registrationNumber ||
+      !certificate
+    ) {
       throw new Error(MessageConstants.MISSING_REQUIRED_FIELDS);
     }
 
@@ -48,7 +61,10 @@ export class DoctorService implements IDoctorService {
     }
 
     // Check for existing registration number
-    const existingRegistration = await this.doctorRepository.findByRegistrationNumber(registrationNumber as string);
+    const existingRegistration =
+      await this.doctorRepository.findByRegistrationNumber(
+        registrationNumber as string
+      );
     if (existingRegistration) {
       throw new Error("Registration number already exists");
     }
@@ -64,14 +80,14 @@ export class DoctorService implements IDoctorService {
       specialization,
       registrationNumber,
       certificate,
-      isBlocked: false, 
+      isBlocked: false,
       isApproved: false,
-      verificationStatus: 'pending',
+      verificationStatus: "pending",
       submittedAt: new Date(),
-      ticketPrice : 0,
-      extraCharge : 0,
-      bio : '',
-      experience :0 ,
+      ticketPrice: 0,
+      extraCharge: 0,
+      bio: "",
+      experience: 0,
     });
   }
 
@@ -136,21 +152,32 @@ export class DoctorService implements IDoctorService {
     };
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string; }> {
+  async refreshAccessToken(
+    refreshToken: string
+  ): Promise<{ accessToken: string }> {
     const decoded: any = verifyToken(refreshToken);
-    if (!decoded || typeof decoded !== 'object') {
+    if (!decoded || typeof decoded !== "object") {
       throw new Error(MessageConstants.INVALID_REFRESH_TOKEN);
     }
 
     // Pass a payload object with id and role
-    return { accessToken: generateAccessToken({ id: decoded.id, role: "doctor" , email : decoded.email}) };
+    return {
+      accessToken: generateAccessToken({
+        id: decoded.id,
+        role: "doctor",
+        email: decoded.email,
+      }),
+    };
   }
 
   async getDoctorProfile(doctorId: string): Promise<IDoctor | null> {
     return this.doctorRepository.findById(doctorId);
   }
 
-  async updatedDoctorProfile(doctorId: string, updatedData: Partial<IDoctor>): Promise<any> {
+  async updatedDoctorProfile(
+    doctorId: string,
+    updatedData: Partial<IDoctor>
+  ): Promise<any> {
     // Don't allow updating verification status or certifications through this method
     const allowedUpdates = {
       name: updatedData.name,
@@ -158,14 +185,17 @@ export class DoctorService implements IDoctorService {
       qualification: updatedData.qualification,
       specialization: updatedData.specialization,
       image: updatedData.profilePicture,
-      bio : updatedData.bio,
-      ticketPrice : updatedData.ticketPrice,
-      extraCharge : updatedData.extraCharge,
+      bio: updatedData.bio,
+      ticketPrice: updatedData.ticketPrice,
+      extraCharge: updatedData.extraCharge,
       experienceList: updatedData.experienceList,
       certificate: updatedData.certificate,
     };
 
-    const updatedDoctor = await this.doctorRepository.updateProfile(doctorId, allowedUpdates);
+    const updatedDoctor = await this.doctorRepository.updateProfile(
+      doctorId,
+      allowedUpdates
+    );
     if (!updatedDoctor) {
       return null;
     }
@@ -180,20 +210,26 @@ export class DoctorService implements IDoctorService {
       profilePicture: updatedDoctor.image,
       registrationNumber: updatedDoctor.registrationNumber,
       verificationStatus: updatedDoctor.verificationStatus,
-      bio : updatedData.bio,
-      ticketPrice : updatedData.ticketPrice,
-      extraCharge : updatedData.extraCharge,
-      experience : updatedData.experience,
+      bio: updatedData.bio,
+      ticketPrice: updatedData.ticketPrice,
+      extraCharge: updatedData.extraCharge,
+      experience: updatedData.experience,
       experienceList: updatedDoctor.experienceList,
       certificate: updatedDoctor.certificate,
     };
   }
 
-  async uploadProfilePicture(doctorId: string, filePath: string): Promise<string> {
+  async uploadProfilePicture(
+    doctorId: string,
+    filePath: string
+  ): Promise<string> {
     try {
-      const doctor = await this.doctorRepository.findById(doctorId)
+      const doctor = await this.doctorRepository.findById(doctorId);
       if (!doctor) {
-        throw new AppError(HttpStatus.NotFound, MessageConstants.DOCTOR_NOT_FOUND);
+        throw new AppError(
+          HttpStatus.NotFound,
+          MessageConstants.DOCTOR_NOT_FOUND
+        );
       }
 
       const result = await cloudinary.uploader.upload(filePath, {
@@ -202,33 +238,49 @@ export class DoctorService implements IDoctorService {
         type: "authenticated", // Restrict access
       });
 
-      const updatedDoctor = await this.doctorRepository.updateProfilePicture(doctorId, result.secure_url);
+      const updatedDoctor = await this.doctorRepository.updateProfilePicture(
+        doctorId,
+        result.secure_url
+      );
 
       if (!updatedDoctor) {
-        throw new AppError(HttpStatus.NotFound, MessageConstants.DOCTOR_NOT_FOUND);
+        throw new AppError(
+          HttpStatus.NotFound,
+          MessageConstants.DOCTOR_NOT_FOUND
+        );
       }
 
       // Return a signed URL instead of the default secure_url
       return CloudinaryService.generateSignedUrl(`user_${doctorId}`);
-
     } catch (error: unknown) {
       if (error instanceof AppError) throw error;
-      throw new AppError(HttpStatus.InternalServerError, "Failed to upload profile picture");
+      throw new AppError(
+        HttpStatus.InternalServerError,
+        "Failed to upload profile picture"
+      );
     }
   }
 
-  async verifyDoctor(doctorId: string, status: 'approved' | 'rejected', notes?: string): Promise<IDoctor | null> {
+  async verifyDoctor(
+    doctorId: string,
+    status: "approved" | "rejected",
+    notes?: string
+  ): Promise<IDoctor | null> {
     const doctor = await this.doctorRepository.findById(doctorId);
     if (!doctor) {
       throw new Error(MessageConstants.DOCTOR_NOT_FOUND);
     }
 
-    const updatedDoctor = await this.doctorRepository.updateVerificationStatus(doctorId, status, notes);
+    const updatedDoctor = await this.doctorRepository.updateVerificationStatus(
+      doctorId,
+      status,
+      notes
+    );
 
     // If doctor is approved, unblock their account
-    if (status === 'approved' && updatedDoctor) {
+    if (status === "approved" && updatedDoctor) {
       await this.doctorRepository.updateDoctorStatus(doctorId, false);
-      
+
       // Send approval email to doctor
       try {
         await sentMail(
@@ -239,13 +291,17 @@ export class DoctorService implements IDoctorService {
       } catch (error) {
         console.error("Failed to send approval email:", error);
       }
-    } else if (status === 'rejected' && updatedDoctor) {
+    } else if (status === "rejected" && updatedDoctor) {
       // Send rejection email with notes
       try {
         await sentMail(
           doctor.email,
           "Account Verification Rejected",
-          `Dear Dr. ${doctor.name},\n\nWe regret to inform you that your account verification has been rejected.\n\nReason: ${notes || 'No specific reason provided.'}\n\nPlease contact our support team for further assistance.\n\nThank you,\nThe Admin Team`
+          `Dear Dr. ${
+            doctor.name
+          },\n\nWe regret to inform you that your account verification has been rejected.\n\nReason: ${
+            notes || "No specific reason provided."
+          }\n\nPlease contact our support team for further assistance.\n\nThank you,\nThe Admin Team`
         );
       } catch (error) {
         console.error("Failed to send rejection email:", error);
@@ -255,18 +311,73 @@ export class DoctorService implements IDoctorService {
     return updatedDoctor;
   }
 
-  async getPendingVerifications(page = 1, limit = 10): Promise<PendingVerificationsResult> {
+  async getPendingVerifications(
+    page = 1,
+    limit = 10
+  ): Promise<PendingVerificationsResult> {
     const skip = (page - 1) * limit;
     return {
       doctors: await this.doctorRepository.findAllPending({}, skip, limit),
-      count: await this.doctorRepository.countAll({ verificationStatus: 'pending' }),
+      count: await this.doctorRepository.countAll({
+        verificationStatus: "pending",
+      }),
     };
   }
 
-  async toggleDoctorOnlineStatus(id: string, isOnline: boolean): Promise<IDoctor | null> {
+  async toggleDoctorOnlineStatus(
+    id: string,
+    isOnline: boolean
+  ): Promise<IDoctor | null> {
     return await this.doctorRepository.updateOnlineStatus(id, isOnline);
   }
 
+  async uploadCertificate(doctorId: string, filePath: string): Promise<string> {
+    try {
+      const doctor = await this.doctorRepository.findById(doctorId);
+      if (!doctor) {
+        throw new AppError(
+          HttpStatus.NotFound,
+          MessageConstants.DOCTOR_NOT_FOUND
+        );
+      }
+
+      // Upload to Cloudinary with specific settings for certificates
+      const result = await cloudinary.uploader.upload(filePath, {
+        public_id: `doctor_certificates/${doctorId}_${Date.now()}`,
+        folder: "doctor_certificates",
+        overwrite: false,
+        type: "authenticated",
+        resource_type: "auto",
+        tags: ["certificate", `doctor_${doctorId}`],
+      });
+
+      // Update doctor record with new certificate URL
+      const updatedDoctor = await this.doctorRepository.updateCertificate(
+        doctorId,
+        result.secure_url
+      );
+
+      if (!updatedDoctor) {
+        throw new AppError(
+          HttpStatus.NotFound,
+          MessageConstants.DOCTOR_NOT_FOUND
+        );
+      }
+
+      // Return a signed URL with expiration
+      return CloudinaryService.generateSignedUrl(`user_${doctorId}`);
+    } catch (error: unknown) {
+      if (error instanceof AppError) throw error;
+      throw new AppError(
+        HttpStatus.InternalServerError,
+        MessageConstants.CERTIFICATE_UPLOAD_FAILED
+      );
+    }
+  }
+
+  async deleteCertificate(doctorId: string): Promise<IDoctor> {
+    return this.doctorRepository.removeCertificate(doctorId);
+  }
 }
 
 // import bcrypt from "bcrypt";
@@ -366,7 +477,6 @@ export class DoctorService implements IDoctorService {
 //     };
 
 //   }
-
 
 //   async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string; }> {
 //       const decoded : any = verifyToken(refreshToken)

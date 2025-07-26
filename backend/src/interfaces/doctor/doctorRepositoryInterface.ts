@@ -27,4 +27,7 @@ export interface IDoctorRepository {
     profilePicture: string
   ): Promise<IDoctor | null>;
   updateOnlineStatus(id: string, isOnline: boolean): Promise<IDoctor | null>;
+
+  updateCertificate(doctorId: string, certificateUrl: string): Promise<IDoctor>;
+  removeCertificate(doctorId: string): Promise<IDoctor>;
 }

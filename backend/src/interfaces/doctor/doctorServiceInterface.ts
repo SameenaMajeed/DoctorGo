@@ -1,28 +1,40 @@
 import { IDoctor } from "../../models/doctorMpdel/DoctorModel";
 
 export interface ILoginResponse {
-    doctor: IDoctor;
-    accessToken: string;
-    refreshToken: string;
-    role: string;
+  doctor: IDoctor;
+  accessToken: string;
+  refreshToken: string;
+  role: string;
 }
 
 export interface PendingVerificationsResult {
-    doctors: IDoctor;
-    count: number;
-  }
+  doctors: IDoctor;
+  count: number;
+}
 
 export interface IDoctorService {
-    registerDoctor(doctorData: Partial<IDoctor>): Promise<IDoctor>
-    loginDoctor(email: string, password: string): Promise<ILoginResponse>;
-    refreshAccessToken(refreshToken: string): Promise<{ accessToken: string }>;
-    getDoctorProfile(doctorId : string) : Promise<IDoctor | null >;
-    updatedDoctorProfile(doctorId : string , updatedData: Partial<IDoctor>): Promise<any>;
-    uploadProfilePicture(doctorId: string, filePath: string): Promise<string>
-    verifyDoctor(doctorId: string, status: 'approved' | 'rejected', notes?: string): Promise<IDoctor | null>
-    getPendingVerifications(
-        page?: number, 
-        limit?: number 
-      ): Promise<PendingVerificationsResult>
-      toggleDoctorOnlineStatus(id: string, isOnline: boolean): Promise<IDoctor | null>;
+  registerDoctor(doctorData: Partial<IDoctor>): Promise<IDoctor>;
+  loginDoctor(email: string, password: string): Promise<ILoginResponse>;
+  refreshAccessToken(refreshToken: string): Promise<{ accessToken: string }>;
+  getDoctorProfile(doctorId: string): Promise<IDoctor | null>;
+  updatedDoctorProfile(
+    doctorId: string,
+    updatedData: Partial<IDoctor>
+  ): Promise<any>;
+  uploadProfilePicture(doctorId: string, filePath: string): Promise<string>;
+  verifyDoctor(
+    doctorId: string,
+    status: "approved" | "rejected",
+    notes?: string
+  ): Promise<IDoctor | null>;
+  getPendingVerifications(
+    page?: number,
+    limit?: number
+  ): Promise<PendingVerificationsResult>;
+  toggleDoctorOnlineStatus(
+    id: string,
+    isOnline: boolean
+  ): Promise<IDoctor | null>;
+  uploadCertificate(doctorId: string, filePath: string): Promise<string>;
+  deleteCertificate(doctorId: string): Promise<IDoctor>;
 }

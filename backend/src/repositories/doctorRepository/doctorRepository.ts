@@ -127,7 +127,7 @@ export class DoctorRepository implements IDoctorRepository {
       const doctors = await DoctorModel.aggregate([
         {
           $match: {
-            isApproved: true, 
+            isApproved: true,
           },
         },
         {
@@ -151,7 +151,7 @@ export class DoctorRepository implements IDoctorRepository {
         },
         {
           $project: {
-            password: 0, 
+            password: 0,
             __v: 0,
           },
         },
@@ -197,6 +197,29 @@ export class DoctorRepository implements IDoctorRepository {
     isOnline: boolean
   ): Promise<IDoctor | null> {
     return await DoctorModel.findByIdAndUpdate(id, { isOnline }, { new: true });
+  }
+
+  async updateCertificate(
+    doctorId: string,
+    certificateUrl: string
+  ): Promise<IDoctor> {
+    const updatedDoctor = await DoctorModel.findByIdAndUpdate(
+      doctorId,
+      { certificate: certificateUrl, certificateUploadedAt: new Date() },
+      { new: true }
+    );
+    if (!updatedDoctor) throw new Error("Doctor not found");
+    return updatedDoctor;
+  }
+
+  async removeCertificate(doctorId: string): Promise<IDoctor> {
+    const updatedDoctor = await DoctorModel.findByIdAndUpdate(
+      doctorId,
+      { $unset: { certificate: 1 } },
+      { new: true }
+    );
+    if (!updatedDoctor) throw new Error("Doctor not found");
+    return updatedDoctor;
   }
 }
 

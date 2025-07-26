@@ -37,17 +37,9 @@ import { PersonalInfoTab } from "./Profile/PersonalInfoTab";
 import { ProfessionalInfoTab } from "./Profile/ProfessionalInfoTab";
 import { FinancialInfoTab } from "./Profile/FinancialInfoTab";
 import { DocumentsTab } from "./Profile/DocumentsTab";
-import type { FormData} from "../../types/profile";
+import type { FormData } from "../../types/profile";
 import { profileSchema } from "../../types/profile";
 import { createApiInstance } from "../../axios/apiService";
-
-interface Certificate {
-  _id: string;
-  name: string;
-  url: string;
-  uploadedAt: string;
-  type: string;
-}
 
 const doctorApi = createApiInstance("doctor");
 
@@ -65,9 +57,12 @@ const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("personal");
   const [uploadLoading, setUploadLoading] = useState(false);
   const [certificateUploading, setCertificateUploading] = useState(false);
-  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [certificate, setCertificate] = useState<{
+    url: string;
+    name: string;
+    uploadedAt?: string;
+  } | null>(null);
 
-  // Form setup
   const {
     control,
     handleSubmit,
@@ -109,14 +104,20 @@ const Profile: React.FC = () => {
       try {
         dispatch(setLoading());
         const response = await doctorApi.get(`/profile/${doctor._id}`);
-        console.log('Profile data :',response.data.data)
+        console.log("Profile data :", response.data.data);
         if (!response.data.data._id) {
           throw new Error("Invalid profile data: _id is missing");
         }
         dispatch(setProfile(response.data.data));
         reset(response.data.data);
-        if (response.data.data.certificates) {
-          setCertificates(response.data.data.certificates);
+        console.log('cert:' ,response.data.data.certificate)
+        if (response.data.data.certificate) {
+          setCertificate({
+            url: response.data.data.certificate,
+            name: "Medical Certificate",
+            uploadedAt:
+              response.data.data.createdAt || new Date().toISOString(),
+          });
         }
       } catch (err) {
         dispatch(setError("Failed to fetch doctor profile."));
@@ -173,6 +174,7 @@ const Profile: React.FC = () => {
       const response = await doctorApi.post("/uploadProfilePicture", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      console.log("After up" , response.data.data)
       const uploadedImageUrl = response.data.data?.profilePicture;
       toast.success("Profile picture uploaded successfully");
       dispatch(updateProfilePicture(uploadedImageUrl));
@@ -191,49 +193,55 @@ const Profile: React.FC = () => {
 
     try {
       setCertificateUploading(true);
-      await doctorApi.post("/uploadCertificate", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      toast.success("Certificate uploaded successfully");
+      const response = await doctorApi.post(
+        `/uploadCertificate/${doctor?._id}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
-      // Refresh certificates list
-      const updatedProfile = await doctorApi.get(`/profile/${doctor?._id}`);
-      if (updatedProfile.data.data.certificates) {
-        setCertificates(updatedProfile.data.data.certificates);
+      toast.success("Certificate updated successfully");
+
+      // Update the certificate state with the new URL
+      if (response.data.data?.certificate) {
+        setCertificate({
+          url: response.data.data.certificate,
+          name: file.name,
+          uploadedAt: new Date().toISOString(),
+        });
       }
     } catch (error) {
       console.error("Error uploading certificate:", error);
-      toast.error("Failed to upload certificate.");
+      toast.error("Failed to update certificate.");
     } finally {
       setCertificateUploading(false);
     }
   };
 
-  const handleDeleteCertificate = async (certificateId: string) => {
+  const handleDeleteCertificate = async () => {
     try {
-      await doctorApi.delete(`/certificate/${certificateId}`);
+      await doctorApi.delete(`/certificate/${doctor?._id}`);
       toast.success("Certificate deleted successfully");
-      setCertificates((prev) =>
-        prev.filter((cert) => cert._id !== certificateId)
-      );
+      setCertificate(null);
     } catch (error) {
       console.error("Error deleting certificate:", error);
       toast.error("Failed to delete certificate");
     }
   };
 
-  const handleDownloadCertificate = (
-    certificateUrl: string,
-    certificateName: string
-  ) => {
-    const link = document.createElement("a");
-    link.href = certificateUrl;
-    link.download = certificateName;
-    link.target = "_blank";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  // const handleDownloadCertificate = (
+  //   certificateUrl: string,
+  //   certificateName: string
+  // ) => {
+  //   const link = document.createElement("a");
+  //   link.href = certificateUrl;
+  //   link.download = certificateName;
+  //   link.target = "_blank";
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // };
 
   // Loading and error states
   if (loading) {
@@ -288,7 +296,7 @@ const Profile: React.FC = () => {
 
               <ProfileInfoCard
                 profile={profile || {}}
-                certificatesCount={certificates.length}
+                // certificatesCount={certificate}
               />
 
               {/* Action Buttons */}
@@ -366,10 +374,9 @@ const Profile: React.FC = () => {
 
                     {activeTab === "documents" && (
                       <DocumentsTab
-                        certificates={certificates}
+                        certificate={certificate}
                         onUpload={handleCertificateUpload}
                         onDelete={handleDeleteCertificate}
-                        onDownload={handleDownloadCertificate}
                         uploading={certificateUploading}
                       />
                     )}

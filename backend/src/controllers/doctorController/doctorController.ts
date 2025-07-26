@@ -310,6 +310,59 @@ export class DoctorController {
     }
   }
 
+  async uploadCertificate(req: Request, res: Response) : Promise<void> {
+    try {
+      if (!req.file) {
+        sendError(res, HttpStatus.NotFound,"No file uploaded");
+        return;
+        // return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const doctorId = req.params.doctorId;
+      const filePath = req.file?.path; 
+
+      const certificateUrl  = await this.doctorService.uploadCertificate(doctorId, filePath);
+      
+      sendResponse(
+        res,
+        HttpStatus.OK,
+        "Certificate uploaded successfully",
+        { certificate: certificateUrl }
+      );
+    }catch (error: any) {
+      sendError(
+        res,
+        HttpStatus.InternalServerError,
+        MessageConstants.INTERNAL_SERVER_ERROR,
+        error.message
+      );
+    }
+  }
+
+  async deleteCertificate(req: Request, res: Response) : Promise<void> {
+    try {
+      const doctorId = req.params.doctorId;
+      const certificateUrl = await this.doctorService.deleteCertificate(doctorId);
+      sendResponse(
+        res,
+        HttpStatus.OK,
+        "Certificate deleted successfully",
+        { certificate: certificateUrl.certificate,}
+      );
+      // res.json({
+      //   message: "Certificate deleted successfully",
+      //   data: { certificate: doctor.certificate }
+      // });
+    } catch (error: any) {
+      sendError(
+        res,
+        HttpStatus.InternalServerError,
+        MessageConstants.INTERNAL_SERVER_ERROR,
+        error.message
+      );
+    }
+  }
+
   // async fetchDoctor(req : Request ,res: Response):Promise<void>{
   //   try {
   //     const { doctorId } = req.params;

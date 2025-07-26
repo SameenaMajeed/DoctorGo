@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { Mail, Phone, Shield, Clock, IndianRupee, Award } from "lucide-react";
+import { Mail, Phone, Shield, Clock, IndianRupee} from "lucide-react";
 import { StatCard } from "../../CommonComponents/UI/StatCard";
 
 interface ProfileData {
@@ -17,12 +17,12 @@ interface ProfileData {
 
 interface ProfileInfoCardProps {
   profile: ProfileData;
-  certificatesCount: number;
+  // certificatesCount: number;
 }
 
 export const ProfileInfoCard: React.FC<ProfileInfoCardProps> = ({
   profile,
-  certificatesCount,
+  // certificatesCount,
 }) => {
   return (
     <div className="mt-6">
@@ -67,7 +67,7 @@ export const ProfileInfoCard: React.FC<ProfileInfoCardProps> = ({
         />
       </div>
 
-      Verification Status
+      {/* Verification Status
       <div className="mt-6 p-3 bg-green-50 dark:bg-green-900/20 rounded-xl">
         <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
           <Award size={16} />
@@ -79,7 +79,7 @@ export const ProfileInfoCard: React.FC<ProfileInfoCardProps> = ({
           {certificatesCount} Certificate{certificatesCount !== 1 ? "s" : ""}{" "}
           Uploaded
         </p>
-      </div>
+      </div> */}
 
       {/* Contact Info */}
       <div className="mt-6 space-y-3">

@@ -85,5 +85,6 @@ export const MessageConstants = {
   INVALID_ID: "Invalid ID provided.",
   WALLET_NOT_FOUND : 'Wallet Amount not fount',
   INSUFFICIENT_BALANCE : 'Balance is insufficient in your wallet',
-  PRESCRIPTION_NOT_FOUND : 'Prescription not found'
+  PRESCRIPTION_NOT_FOUND : 'Prescription not found',
+  CERTIFICATE_UPLOAD_FAILED : 'Certification upload failed'
 };

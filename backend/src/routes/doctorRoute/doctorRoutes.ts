@@ -37,8 +37,7 @@ const PrescriptionRepository = new prescriptionRepository();
 
 const notificationRepository = new NotificationRepository();
 const notificationService = new NotificationService(notificationRepository);
-const walletRepository = new WalletRepository()
-
+const walletRepository = new WalletRepository();
 
 const bookingService = new BookingService(
   bookingRepository,
@@ -215,38 +214,50 @@ doctorRoute.patch(
   (req, res) => notificationController.markAsRead(req, res)
 );
 
-doctorRoute.patch('/notifications/mark-all-read' ,authenticateToken("doctor"),
+doctorRoute.patch(
+  "/notifications/mark-all-read",
+  authenticateToken("doctor"),
   blockedDoctorMiddleware,
-  (req, res) => notificationController.markAllAsRead(req, res))
+  (req, res) => notificationController.markAllAsRead(req, res)
+);
 
 doctorRoute.delete(
   "/notifications/clear-all",
   authenticateToken("doctor"),
   blockedDoctorMiddleware,
-  (req , res) => notificationController.clearAllNotifications(req , res)
-);  
+  (req, res) => notificationController.clearAllNotifications(req, res)
+);
 doctorRoute.delete(
   "/notifications/:notificationId",
   authenticateToken("doctor"),
   blockedDoctorMiddleware,
-  (req , res) => notificationController.deleteNotification(req , res)
-);  
-
-// ....................online status...........................
-doctorRoute.put("/:id/status" ,(req, res) => doctorController.getDoctorStatus(req , res))
-
-// ...................Earning Deatails.........................
-doctorRoute.get(
-  "/bookings",
-  authenticateToken("doctor"),
-  (req, res) => {
-    bookingController.getAllBookings(req, res);
-  }
+  (req, res) => notificationController.deleteNotification(req, res)
 );
 
-doctorRoute.get("/revenue",authenticateToken("doctor"),
-  (req, res) => {
-    bookingController.getRevenue(req, res);
-})
+// ....................online status...........................
+doctorRoute.put("/:id/status", (req, res) =>
+  doctorController.getDoctorStatus(req, res)
+);
+
+// ...................Earning Deatails.........................
+doctorRoute.get("/bookings", authenticateToken("doctor"), (req, res) => {
+  bookingController.getAllBookings(req, res);
+});
+
+doctorRoute.get("/revenue", authenticateToken("doctor"), (req, res) => {
+  bookingController.getRevenue(req, res);
+});
+
+// ..............certificate upload.......................
+
+doctorRoute.post("/uploadCertificate/:doctorId",authenticateToken("doctor"),
+  upload.single("certificate"),
+  (req , res) => doctorController.uploadCertificate(req , res)
+);
+
+
+doctorRoute.delete("/certificate/:doctorId", (req, res) =>
+  doctorController.deleteCertificate(req, res)
+);
 
 export default doctorRoute;
