@@ -8,7 +8,7 @@ export const sentMail = async (
   body: string,
 ): Promise<boolean> => {
   try {
-    // smt server set up
+    // smtp server set up
 
     const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',

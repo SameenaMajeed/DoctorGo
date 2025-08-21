@@ -56,7 +56,9 @@ const logout = (role: Role): void => {
       break;
   }
 
-  toast.error("Your session has expired. Please log in again.", { duration: 5000 });
+  toast.error("Your session has expired. Please log in again.", {
+    duration: 5000,
+  });
 };
 
 // Factory function to create Axios instance

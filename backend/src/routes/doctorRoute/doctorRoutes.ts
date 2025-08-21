@@ -68,12 +68,12 @@ const chatController = new ChatController();
 
 const dashboardService = new DashboardService(
   doctorRepository,
-  userRepository,
+  // userRepository,
   bookingRepository,
   PrescriptionRepository
 );
 const dashboardController = new DoctorDashboardController(
-  doctorService,
+  // doctorService,
   dashboardService
 );
 

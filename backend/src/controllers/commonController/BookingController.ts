@@ -10,8 +10,8 @@ import { Server } from "socket.io";
 
 export class BookingController {
   constructor(
-    private bookingService: IBookingService,
-    private paymentService: IPaymentService
+    private _bookingService: IBookingService,
+    private _paymentService: IPaymentService
   ) {}
 
   private handleError(res: Response, error: unknown): void {
@@ -49,13 +49,13 @@ export class BookingController {
 
       const io = req.app.get("io");
       console.log("io :", io);
-      const { roomId, booking } = await this.bookingService.createVideoCallRoom(
+      const { roomId, booking } = await this._bookingService.createVideoCallRoom(
         bookingId,
         doctorId,
         io
       );
 
-      sendResponse(res, HttpStatus.OK, "Video call room created", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.VIDEO_CALL_ROOM_CREATED, {
         roomId,
         booking,
       });
@@ -80,7 +80,7 @@ export class BookingController {
       console.log("amount : ", amount);
 
       // Create Razorpay order
-      const order = await this.paymentService.createOrder(amount, currency);
+      const order = await this._paymentService.createOrder(amount, currency);
       console.log("order :", order);
 
       // Prepare response with Razorpay options
@@ -126,7 +126,7 @@ export class BookingController {
         );
       }
 
-      const isVerified = await this.paymentService.verifyPayment(
+      const isVerified = await this._paymentService.verifyPayment(
         paymentId,
         orderId,
         signature
@@ -180,7 +180,7 @@ export class BookingController {
       //   },
       // };
 
-      const booking = await this.bookingService.bookAppointment(bookingData);
+      const booking = await this._bookingService.bookAppointment(bookingData);
       console.log("booking:", booking);
 
       sendResponse(
@@ -203,7 +203,7 @@ export class BookingController {
           MessageConstants.REQUIRED_FIELDS_MISSING
         );
 
-      const bookings = await this.bookingService.getAppointments(id);
+      const bookings = await this._bookingService.getAppointments(id);
       if (!bookings.length)
         throw new AppError(
           HttpStatus.NotFound,
@@ -230,7 +230,7 @@ export class BookingController {
           MessageConstants.REQUIRED_FIELDS_MISSING
         );
 
-      const booking = await this.bookingService.cancelAppointment(id);
+      const booking = await this._bookingService.cancelAppointment(id);
       if (!booking)
         throw new AppError(
           HttpStatus.NotFound,
@@ -256,14 +256,14 @@ export class BookingController {
       const bookingData = req.body;
 
       // Create a failed booking record
-      const booking = await this.bookingService.createFailedBooking({
+      const booking = await this._bookingService.createFailedBooking({
         ...bookingData,
         user_id: userId,
         status: "failed",
         is_paid: false,
       });
 
-      sendResponse(res, HttpStatus.Created, "Failed booking recorded", booking);
+      sendResponse(res, HttpStatus.Created, MessageConstants.FAILED_BOOKING_RECORED, booking);
     } catch (error) {
       this.handleError(res, error);
     }
@@ -287,7 +287,7 @@ export class BookingController {
       const pageNum = parseInt(page as string, 10);
       const limitNum = parseInt(limit as string, 10);
 
-      const result = await this.bookingService.getDoctorAppointments(
+      const result = await this._bookingService.getDoctorAppointments(
         doctorId,
         pageNum,
         limitNum,
@@ -330,7 +330,7 @@ export class BookingController {
         );
 
       const appointment =
-        await this.bookingService.updateDoctorAppointmentStatus(
+        await this._bookingService.updateDoctorAppointmentStatus(
           appointmentId,
           doctorId,
           status
@@ -364,14 +364,14 @@ export class BookingController {
       const { userId } = req.params;
       const { doctorId } = req.query;
 
-      const bookings = await this.bookingService.getUserBookings(
+      const bookings = await this._bookingService.getUserBookings(
         userId,
         doctorId as string
       );
       sendResponse(
         res,
         HttpStatus.OK,
-        "User bookings fetched successfully",
+        MessageConstants.USER_BOOKINGS_FETCHED,
         bookings
       );
     } catch (error) {
@@ -391,12 +391,12 @@ export class BookingController {
     try {
       const { userId, slotId } = req.query;
 
-      const hasBooking = await this.bookingService.checkUserBooking(
+      const hasBooking = await this._bookingService.checkUserBooking(
         userId as string,
         slotId as string
       );
 
-      sendResponse(res, HttpStatus.OK, "Booking check completed", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.BOOKING_CHECK_COMPLETED, {
         hasBooking,
       });
     } catch (error) {
@@ -459,18 +459,18 @@ export class BookingController {
       });
 
       if (!doctorId) {
-        return sendError(res, HttpStatus.BadRequest, "Doctor ID is required");
+        return sendError(res, HttpStatus.BadRequest, MessageConstants.DOCTOR_ID_NOT_FOUND);
       }
 
       const { patients, total } =
-        await this.bookingService.getPatientsForDoctor(doctorId, page, limit);
+        await this._bookingService.getPatientsForDoctor(doctorId, page, limit);
       console.log("patients :", patients);
       sendResponse(
         res,
         HttpStatus.OK,
         patients.length > 0
-          ? "Booked Users Populated successfully"
-          : "No Patients available",
+          ? MessageConstants.BOOKED_USER_POPULATED
+          : MessageConstants.NO_PATIENTS_AVAILABLE,
         { patients, total }
       );
     } catch (error) {
@@ -492,13 +492,13 @@ export class BookingController {
       const pageNum = parseInt(page as string, 10);
       const limitNum = parseInt(limit as string, 10);
 
-      const result = await this.bookingService.getAllBookings(
+      const result = await this._bookingService.getAllBookings(
         pageNum,
         limitNum,
         status as AppointmentStatus | undefined
       );
 
-      sendResponse(res, HttpStatus.OK, "Bookings fetched successfully", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.BOOKING_FETCHED, {
         bookings: result.bookings,
         total: result.total,
         page: pageNum,
@@ -521,11 +521,11 @@ export class BookingController {
         );
       }
 
-      const appointments = await this.bookingService.getTodaysAppointments(
+      const appointments = await this._bookingService.getTodaysAppointments(
         doctorId
       );
 
-      sendResponse(res, HttpStatus.OK, "Booking check completed", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.BOOKING_CHECK_COMPLETED, {
         appointments,
       });
     } catch (error) {
@@ -560,14 +560,14 @@ export class BookingController {
       const filteredStatus = status === "all" ? undefined : status;
       console.log(filteredStatus);
 
-      const result = await this.paymentService.getUserPayments(
+      const result = await this._paymentService.getUserPayments(
         userId,
         page,
         limit,
         filteredStatus
       );
 
-      sendResponse(res, HttpStatus.OK, "Payment History Fetched successfully", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.PAYMENT_HISTORY_FETCHED, {
         payments: result.payments,
         totalPages: result.totalPages,
       });
@@ -588,9 +588,9 @@ export class BookingController {
   // Adminside revenue displaying
   async getDoctorRevenue(req: Request, res: Response) {
     try {
-      const result = await this.bookingService.getAllDoctorsRevenue();
+      const result = await this._bookingService.getAllDoctorsRevenue();
 
-      sendResponse(res, HttpStatus.OK, "Revenue Fetched successfully", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.REVENUE_FETCHED, {
         result,
       });
     } catch (error) {
@@ -617,9 +617,9 @@ export class BookingController {
           MessageConstants.UNAUTHORIZED
         );
       }
-      const revenue = await this.bookingService.getDoctorRevenue(doctorId);
+      const revenue = await this._bookingService.getDoctorRevenue(doctorId);
       
-      sendResponse(res, HttpStatus.OK, "Payment History Fetched successfully", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.PAYMENT_HISTORY_FETCHED, {
         revenue,
       });
     } catch (error) {

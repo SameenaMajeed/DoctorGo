@@ -1,6 +1,6 @@
 import {
   IAdminDashboardService,
-  DashboardData,
+  IDashboardData,
 } from "../../interfaces/admin/IAdminDashboardService";
 import { IAdminDashboardRepository } from "../../interfaces/admin/IAdminDashboardRepository";
 import { AppError } from "../../utils/AppError";
@@ -11,7 +11,7 @@ type DateRange = { $gte: Date; $lte: Date };
 type DashboardFilter = "daily" | "monthly" | "yearly";
 
 export class AdminDashboardService implements IAdminDashboardService {
-  constructor(private repository: IAdminDashboardRepository) {}
+  constructor(private _repository: IAdminDashboardRepository) {}
 
   private getDefaultDateRange(filter: DashboardFilter): DateRange {
     const now = new Date();
@@ -52,7 +52,7 @@ export class AdminDashboardService implements IAdminDashboardService {
     filter: DashboardFilter = "daily",
     doctorId?: string,
     bookingId?: string
-  ): Promise<DashboardData> {
+  ): Promise<IDashboardData> {
     try {
       console.log("Received filter:", filter);
       console.log("Start date:", startDate);
@@ -73,11 +73,11 @@ export class AdminDashboardService implements IAdminDashboardService {
         platformFreeTotal,
         totalBookings
       ] = await Promise.all([
-        this.repository.getPendingApprovals(),
-        this.repository.getTopPatients(dateFilter, doctorId),
-        this.repository.getRecentBookings(dateFilter, doctorId),
-        this.repository.getPlatformFreeTotal(dateFilter, doctorId),
-        this.repository.getTotalBookings(dateFilter, doctorId)
+        this._repository.getPendingApprovals(),
+        this._repository.getTopPatients(dateFilter, doctorId),
+        this._repository.getRecentBookings(dateFilter, doctorId),
+        this._repository.getPlatformFreeTotal(dateFilter, doctorId),
+        this._repository.getTotalBookings(dateFilter, doctorId)
       ]);
 
       return {

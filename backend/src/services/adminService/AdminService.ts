@@ -2,7 +2,7 @@ import { HttpStatus } from "../../constants/Httpstatus";
 import { IAdminRepository } from "../../interfaces/admin/adminRepositoryInterface";
 import { IAdminService } from "../../interfaces/admin/adminServiceInterface";
 import { IDoctorRepository } from "../../interfaces/doctor/doctorRepositoryInterface";
-import { UserRepositoryInterface } from "../../interfaces/user/UserRepositoryInterface";
+import { IUserRepositoryInterface } from "../../interfaces/user/UserRepositoryInterface";
 import { IDoctor } from "../../models/doctorMpdel/DoctorModel";
 import { AppError } from "../../utils/AppError";
 import {
@@ -13,16 +13,16 @@ import {
 
 class AdminService implements IAdminService {
   constructor(
-    private adminRepository: IAdminRepository,
-    private userRepository: UserRepositoryInterface,
-    private doctorRepository : IDoctorRepository
+    private _adminRepository: IAdminRepository,
+    private _userRepository: IUserRepositoryInterface,
+    private _doctorRepository : IDoctorRepository
   ) {}
 
   async adminLogin(
     email: string,
     password: string
   ): Promise<{ admin: any; accessToken: string; refreshToken: string }> {
-    const admin = await this.adminRepository.findByEmail(email);
+    const admin = await this._adminRepository.findByEmail(email);
 
     if (!admin) {
       throw new Error("Admin not found");
@@ -66,7 +66,7 @@ class AdminService implements IAdminService {
   }
 
   async updateDoctorStatus(doctorId: string, isBlocked: boolean, blockReason?: string): Promise<any> {
-    return await this.doctorRepository.updateDoctorStatus(doctorId, isBlocked, blockReason);
+    return await this._doctorRepository.updateDoctorStatus(doctorId, isBlocked, blockReason);
   }
 
   async getPendingDoctors(page: number, limit: number, searchTerm: string): Promise<{ doctors: any[]; total: number; }> {
@@ -89,8 +89,8 @@ class AdminService implements IAdminService {
   // };
 
   const [doctors , total ] = await Promise.all([
-    this.doctorRepository.findAllPending(filter, skip, limit),
-    this.doctorRepository.countAll(filter)
+    this._doctorRepository.findAllPending(filter, skip, limit),
+    this._doctorRepository.countAll(filter)
   ])
 
   return { doctors, total}
@@ -101,7 +101,7 @@ class AdminService implements IAdminService {
     status: "approved" | "rejected",
     notes?: string
   ): Promise<IDoctor | null> {
-    return this.doctorRepository.updateVerificationStatus(doctorId, status, notes);
+    return this._doctorRepository.updateVerificationStatus(doctorId, status, notes);
   }
 
   async getAllDoctors(
@@ -127,8 +127,8 @@ class AdminService implements IAdminService {
     }
 
     const [doctors, total] = await Promise.all([
-      this.doctorRepository.findAll(filter, skip, limit),
-      this.doctorRepository.countAll(filter),
+      this._doctorRepository.findAll(filter, skip, limit),
+      this._doctorRepository.countAll(filter),
     ]);
 
     return { doctors, total };
@@ -156,22 +156,22 @@ class AdminService implements IAdminService {
     }
 
     const [users , total] = await Promise.all([
-      this.userRepository.findAll(filter , skip , limit),
-      this.userRepository.countAll(filter)
+      this._userRepository.findAll(filter , skip , limit),
+      this._userRepository.countAll(filter)
     ])
     return {users , total}
   }
 
 
   async doctorBlock(doctorId: string, isBlocked: boolean): Promise<any> {
-    const doctor = await this.doctorRepository.findById(doctorId)
+    const doctor = await this._doctorRepository.findById(doctorId)
 
     if(!doctor){
       throw new Error("Doctor not found")
     }
 
     doctor.isBlocked = isBlocked;
-    const updatedDoctor = await this.doctorRepository.save(doctor)
+    const updatedDoctor = await this._doctorRepository.save(doctor)
 
     return updatedDoctor;
 
@@ -179,14 +179,14 @@ class AdminService implements IAdminService {
 
   async userBlock(userId: string, isBlocked: boolean): Promise<any> {
     try {
-      const user = await this.userRepository.findById(userId);
+      const user = await this._userRepository.findById(userId);
       console.log("Before Update - isBlocked:", user?.isBlocked);
       if (!user) {
         throw new Error("User not found");
       }
       console.log('User is blocking boolean:', isBlocked);
       user.isBlocked = isBlocked;
-      const updatedUser = await this.userRepository.save(user);
+      const updatedUser = await this._userRepository.save(user);
       console.log("After Update - isBlocked:", updatedUser?.isBlocked);
       return updatedUser;
     } catch (error: any) {
@@ -195,7 +195,7 @@ class AdminService implements IAdminService {
   }
 
   async getDoctorById(doctorId: string): Promise<IDoctor> {
-      const doctor = await this.doctorRepository.findById(doctorId);
+      const doctor = await this._doctorRepository.findById(doctorId);
   
       if (!doctor) {
         throw new AppError(HttpStatus.NotFound, "Doctor not found");

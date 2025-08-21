@@ -6,7 +6,7 @@ import { MessageConstants } from "../../constants/MessageConstants";
 import { AppError } from "../../utils/AppError";
 
 export default class SlotController {
-  constructor(private slotService: ISlotService) {}
+  constructor(private _slotService: ISlotService) {}
 
   async createSlot(req: Request, res: Response) {
     try {
@@ -18,7 +18,7 @@ export default class SlotController {
         return sendError(
           res,
           HttpStatus.BadRequest,
-          "Maximum patients must be at least 1"
+          MessageConstants.MAXIMUM_PATIENTS_REQUIRED
         );
       }
 
@@ -27,11 +27,11 @@ export default class SlotController {
         return sendError(
           res,
           HttpStatus.Forbidden,
-          "Doctors can only create slots for themselves"
+          MessageConstants.DOCTORS_CAN_ONLY_CREATE_SLOTS_FOR_THEMSELVES
         );
       }
 
-      const slot = await this.slotService.createSlot(slotData);
+      const slot = await this._slotService.createSlot(slotData);
       sendResponse(
         res,
         HttpStatus.Created,
@@ -72,10 +72,10 @@ export default class SlotController {
       });
 
       if (!doctorId) {
-        return sendError(res, HttpStatus.BadRequest, "Doctor ID is required");
+        return sendError(res, HttpStatus.BadRequest,MessageConstants.DOCTOR_ID_REQUIRED);
       }
 
-      const { slots, total } = await this.slotService.getAvailableSlots(
+      const { slots, total } = await this._slotService.getAvailableSlots(
         doctorId,
         date as string | undefined,
         page,
@@ -98,7 +98,7 @@ export default class SlotController {
         sendError(
           res,
           HttpStatus.INTERNAL_SERVER_ERROR,
-          "Internal server error"
+          MessageConstants.INTERNAL_SERVER_ERROR,
         );
       }
     }
@@ -108,17 +108,17 @@ export default class SlotController {
     try {
       const slotId = req.params.slotId;
       if (!slotId) {
-        return sendError(res, HttpStatus.BadRequest, "Slot ID is required");
+        return sendError(res, HttpStatus.BadRequest, MessageConstants.SLOT_ID_REQUIRED);
       }
 
-      const slot = await this.slotService.bookSlot(slotId);
+      const slot = await this._slotService.bookSlot(slotId);
       sendResponse(res, HttpStatus.OK, MessageConstants.SLOT_BOOKED, slot);
     } catch (error: any) {
       const status =
-        error.message === "Slot not found"
+        error.message === MessageConstants.SLOT_NOT_FOUND
           ? HttpStatus.NotFound
-          : error.message === "Slot is fully booked" ||
-            error.message === "Slot is blocked"
+          : error.message === MessageConstants.SLOT_FULLY_BOOKED ||
+            error.message === MessageConstants.SLOT_BOOKED
           ? HttpStatus.BadRequest
           : HttpStatus.InternalServerError;
 
@@ -134,16 +134,16 @@ export default class SlotController {
     try {
       const slotId = req.params.slotId;
       if (!slotId) {
-        return sendError(res, HttpStatus.BadRequest, "Slot ID is required");
+        return sendError(res, HttpStatus.BadRequest, MessageConstants.SLOT_ID_REQUIRED);
       }
 
-      const slot = await this.slotService.cancelBooking(slotId);
-      sendResponse(res, HttpStatus.OK, "Booking cancelled successfully", slot);
+      const slot = await this._slotService.cancelBooking(slotId);
+      sendResponse(res, HttpStatus.OK, MessageConstants.BOOKING_CANCELLED, slot);
     } catch (error: any) {
       const status =
-        error.message === "Slot not found"
+        error.message === MessageConstants.SLOT_NOT_FOUND
           ? HttpStatus.NotFound
-          : error.message === "No bookings to cancel"
+          : error.message === MessageConstants.NO_BOOKINGS_TO_CANCEL
           ? HttpStatus.BadRequest
           : HttpStatus.InternalServerError;
 
@@ -158,8 +158,8 @@ export default class SlotController {
   async deleteSlot(req: Request, res: Response) {
     try {
       const { slotId } = req.params;
-      await this.slotService.deleteSlot(slotId);
-      sendResponse(res, HttpStatus.OK, "Slot deleted successfully");
+      await this._slotService.deleteSlot(slotId);
+      sendResponse(res, HttpStatus.OK,MessageConstants.SLOT_DELETED);
     } catch (error: any) {
       sendError(res, HttpStatus.InternalServerError, error.message);
     }
@@ -168,7 +168,7 @@ export default class SlotController {
   async getSlot(req: Request, res: Response) {
     try {
       const { slotId } = req.params;
-      const slot = await this.slotService.getSlots(slotId);
+      const slot = await this._slotService.getSlots(slotId);
       console.log(slot);
 
       if (!slot) {
@@ -201,18 +201,18 @@ export default class SlotController {
         return sendError(
           res,
           HttpStatus.BadRequest,
-          "Maximum patients must be at least 1"
+          MessageConstants.MAXIMUM_PATIENTS_REQUIRED
         );
       }
 
-      const slot = await this.slotService.updateSlot(slotId, updates);
-      sendResponse(res, HttpStatus.OK, "Slot updated successfully", slot);
+      const slot = await this._slotService.updateSlot(slotId, updates);
+      sendResponse(res, HttpStatus.OK, MessageConstants.SLOT_UPDATED, slot);
     } catch (error: any) {
       const status =
-        error.message === "Slot not found"
+        error.message === MessageConstants.SLOT_NOT_FOUND
           ? HttpStatus.NotFound
           : error.message ===
-            "Cannot reduce maximum patients below current bookings"
+            MessageConstants.CANNOT_REDUCE_MAXIMUM_PATIENTS_BELOW_CURRENT_BOOKINGS
           ? HttpStatus.BadRequest
           : HttpStatus.InternalServerError;
 
@@ -233,17 +233,17 @@ export default class SlotController {
       if (!slotId) {
         throw new AppError(
           HttpStatus.BadRequest,
-          "Slot ID is required"
+          MessageConstants.SLOT_ID_REQUIRED
         );
       }
 
-      const availability = await this.slotService.checkSlotAvailability(slotId);
+      const availability = await this._slotService.checkSlotAvailability(slotId);
       console.log('availability :' , availability )
 
       sendResponse(
         res,
         HttpStatus.OK,
-        "Slot availability checked successfully",
+        MessageConstants.SLOT_AVAILABILITY_CHECKED,
         availability
       );
     } catch (error) {
@@ -253,7 +253,7 @@ export default class SlotController {
         sendError(
           res,
           HttpStatus.INTERNAL_SERVER_ERROR,
-          "Failed to check slot availability",
+          MessageConstants.FAILED_TO_CHECK_SLOT_AVAILABILITY,
           process.env.NODE_ENV === "development" ? error : undefined
         );
       }

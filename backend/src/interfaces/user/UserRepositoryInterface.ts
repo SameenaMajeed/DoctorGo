@@ -1,7 +1,7 @@
  
 import { IUser } from '../../models/userModel/userModel';
 
-export interface UserRepositoryInterface {
+export interface IUserRepositoryInterface {
   create(userData: Partial<IUser>): Promise<IUser>;
   findByEmail(email: string): Promise<IUser | null>;
   findByGoogleId(googleId: string): Promise<IUser | null>;
@@ -12,5 +12,4 @@ export interface UserRepositoryInterface {
   save(user:IUser):Promise<IUser>
   updateProfilePicture(userId: string, profilePicture: string): Promise<any>;
   update(id: string, updateData: Partial<IUser>): Promise<IUser | null>;
-
 }

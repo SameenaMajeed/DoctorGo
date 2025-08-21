@@ -8,12 +8,12 @@ import { IDoctorService } from "../../interfaces/doctor/doctorServiceInterface";
 import { AppError } from "../../utils/AppError";
 
 // Extend the Request type to include files
-interface MulterRequest extends Request {
-  files: Express.Multer.File[];
-}
+// interface MulterRequest extends Request {
+//   files: Express.Multer.File[];
+// }
 
 export class DoctorController {
-  constructor(private doctorService: IDoctorService) {}
+  constructor(private _doctorService: IDoctorService) {}
 
   async registerDoctor(req: Request, res: Response): Promise<void> {
     try {
@@ -47,7 +47,7 @@ export class DoctorController {
       console.log("certificatePath :", certificatePath);
 
       // Register doctor with certification files
-      const doctor = await this.doctorService.registerDoctor({
+      const doctor = await this._doctorService.registerDoctor({
         name,
         email,
         password,
@@ -84,7 +84,7 @@ export class DoctorController {
         sendError(
           res,
           HttpStatus.BadRequest,
-          "Registration number already exists"
+          MessageConstants.DOCTOR_REGISTRATION_NUMBER_EXISTS
         );
       } else {
         sendError(res, HttpStatus.BadRequest, error.message);
@@ -103,7 +103,7 @@ export class DoctorController {
         );
       }
 
-      const result = await this.doctorService.loginDoctor(email, password);
+      const result = await this._doctorService.loginDoctor(email, password);
       CookieManager.setAuthCookies(res, {
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
@@ -141,7 +141,7 @@ export class DoctorController {
       }
 
       // Generate new access token
-      const tokens = await this.doctorService.refreshAccessToken(refreshToken);
+      const tokens = await this._doctorService.refreshAccessToken(refreshToken);
       res.cookie(
         "accessToken",
         tokens.accessToken,
@@ -167,7 +167,7 @@ export class DoctorController {
   async getProfile(req: Request, res: Response): Promise<void> {
     try {
       const doctorId = req.params.id;
-      const profile = await this.doctorService.getDoctorProfile(doctorId);
+      const profile = await this._doctorService.getDoctorProfile(doctorId);
 
       if (!profile) {
         sendError(res, HttpStatus.NotFound, MessageConstants.USER_NOT_FOUND);
@@ -205,7 +205,7 @@ export class DoctorController {
       const { name, email, phone, qualification, specialization, ticketPrice } =
         req.body;
 
-      const updateDoctor = await this.doctorService.updatedDoctorProfile(
+      const updateDoctor = await this._doctorService.updatedDoctorProfile(
         doctorId,
         req.body
       );
@@ -247,7 +247,7 @@ export class DoctorController {
         return;
       }
 
-      const profilePicture = await this.doctorService.uploadProfilePicture(
+      const profilePicture = await this._doctorService.uploadProfilePicture(
         doctorId,
         req.file.path
       );
@@ -287,7 +287,7 @@ export class DoctorController {
       console.log("isOnline from body:", isOnline);
       console.log('req.params.id:',req.params.id)
 
-      const result = await this.doctorService.toggleDoctorOnlineStatus(
+      const result = await this._doctorService.toggleDoctorOnlineStatus(
         req.params.id,
         isOnline
       );
@@ -297,7 +297,7 @@ export class DoctorController {
       sendResponse(
         res,
         HttpStatus.OK,
-        "Status Changed Successfully",
+        MessageConstants.STATUS_CHANGED,
         { result }
       );
     } catch (error: any) {
@@ -313,7 +313,7 @@ export class DoctorController {
   async uploadCertificate(req: Request, res: Response) : Promise<void> {
     try {
       if (!req.file) {
-        sendError(res, HttpStatus.NotFound,"No file uploaded");
+        sendError(res, HttpStatus.NotFound,MessageConstants.FILE_NOT_FOUND);
         return;
         // return res.status(400).json({ message: "No file uploaded" });
       }
@@ -321,12 +321,12 @@ export class DoctorController {
       const doctorId = req.params.doctorId;
       const filePath = req.file?.path; 
 
-      const certificateUrl  = await this.doctorService.uploadCertificate(doctorId, filePath);
+      const certificateUrl  = await this._doctorService.uploadCertificate(doctorId, filePath);
       
       sendResponse(
         res,
         HttpStatus.OK,
-        "Certificate uploaded successfully",
+        MessageConstants.CERTIFICATE_UPLOADED,
         { certificate: certificateUrl }
       );
     }catch (error: any) {
@@ -342,11 +342,11 @@ export class DoctorController {
   async deleteCertificate(req: Request, res: Response) : Promise<void> {
     try {
       const doctorId = req.params.doctorId;
-      const certificateUrl = await this.doctorService.deleteCertificate(doctorId);
+      const certificateUrl = await this._doctorService.deleteCertificate(doctorId);
       sendResponse(
         res,
         HttpStatus.OK,
-        "Certificate deleted successfully",
+        MessageConstants.CERTIFICATE_DELETED,
         { certificate: certificateUrl.certificate,}
       );
       // res.json({
@@ -362,23 +362,4 @@ export class DoctorController {
       );
     }
   }
-
-  // async fetchDoctor(req : Request ,res: Response):Promise<void>{
-  //   try {
-  //     const { doctorId } = req.params;
-
-  //     // Find doctor by ID
-  //     const doctor = await DoctorModel.findById(doctorId);
-
-  //     if (!doctor) {
-  //       throw new AppError(HttpStatus.NotFound, "Doctor not found");
-  //     }
-
-  //     res.status(HttpStatus.OK).json(doctor);
-  //   } catch (error) {z
-  //     console.error("Error fetching doctor:", error);
-
-  //     res.status(HttpStatus.InternalServerError).json({ message: "Internal server error" });
-  //   }
-  // }
 }

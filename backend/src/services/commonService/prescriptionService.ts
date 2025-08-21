@@ -9,13 +9,13 @@ import pdfkit from "pdfkit";
 import fs from "fs";
 import path from "path";
 import { IDoctorRepository } from "../../interfaces/doctor/doctorRepositoryInterface";
-import { UserRepositoryInterface } from "../../interfaces/user/UserRepositoryInterface";
+import { IUserRepositoryInterface } from "../../interfaces/user/UserRepositoryInterface";
 
 export default class PrescriptionService {
   constructor(
-    private prescriptionRepo: IPrescriptionRepository,
-    private doctorRepo: IDoctorRepository,
-    private userRepo: UserRepositoryInterface
+    private _prescriptionRepo: IPrescriptionRepository,
+    private _doctorRepo: IDoctorRepository,
+    private _userRepo: IUserRepositoryInterface
   ) {}
 
   async createPrescription(
@@ -44,7 +44,7 @@ export default class PrescriptionService {
         throw new Error("Invalid test report image.");
       }
     }
-    const result = await this.prescriptionRepo.createPrescription(prescriptionData);
+    const result = await this._prescriptionRepo.createPrescription(prescriptionData);
     console.log('result : ' , result)
     return result
   }
@@ -57,7 +57,7 @@ export default class PrescriptionService {
     limit: number = 10,
     searchTerm: string = ""
   ): Promise<{ prescriptions: IPrescription[]; total: number }> {
-    const doctor = await this.doctorRepo.findById(doctorId);
+    const doctor = await this._doctorRepo.findById(doctorId);
     console.log("doctor id:", doctor);
 
     if (!doctor)
@@ -65,7 +65,7 @@ export default class PrescriptionService {
         HttpStatus.NotFound,
         MessageConstants.DOCTOR_NOT_FOUND
       );
-    const user = await this.userRepo.findById(userId);
+    const user = await this._userRepo.findById(userId);
     console.log("user id:", user);
 
     if (!user)
@@ -80,7 +80,7 @@ export default class PrescriptionService {
 
     // Fetch prescriptions from repository
     const { prescriptions, total } =
-      await this.prescriptionRepo.findPrescriptions(
+      await this._prescriptionRepo.findPrescriptions(
         doctorId,
         userId,
         date,
@@ -96,13 +96,13 @@ export default class PrescriptionService {
   // Get all prescriptions for a user
   async getUserPrescriptions(userId: string): Promise<IPrescription[]> {
     const userObjectId = new Types.ObjectId(userId);
-    return this.prescriptionRepo.getPrescriptionsByUserId(userObjectId);
+    return this._prescriptionRepo.getPrescriptionsByUserId(userObjectId);
   }
 
   // Generate and save a PDF for a prescription
   async generatePrescriptionPDF(prescriptionId: string): Promise<string> {
     try {
-      const prescription = await this.prescriptionRepo.getPrescriptionById(
+      const prescription = await this._prescriptionRepo.getPrescriptionById(
         new Types.ObjectId(prescriptionId)
       );
       console.log("prescription:", prescription);
@@ -245,7 +245,7 @@ export default class PrescriptionService {
     userId: string
   ): Promise<{ prescription: IPrescription; filePath: string }> {
     const userObjectId = new Types.ObjectId(userId);
-    const prescription = await this.prescriptionRepo.getPrescriptionById(
+    const prescription = await this._prescriptionRepo.getPrescriptionById(
       new Types.ObjectId(prescriptionId)
     );
 
@@ -262,7 +262,7 @@ export default class PrescriptionService {
   }
 
   async getPrescriptionByAppointment(appointmentId: string): Promise<IPrescription> {
-    const prescription = await this.prescriptionRepo.findByAppointmentId(appointmentId);
+    const prescription = await this._prescriptionRepo.findByAppointmentId(appointmentId);
     console.log('prescription form service:',prescription) 
 
     if (!prescription) {

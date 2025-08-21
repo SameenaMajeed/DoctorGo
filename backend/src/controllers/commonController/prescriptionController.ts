@@ -7,7 +7,7 @@ import { AppError } from "../../utils/AppError";
 import fs from "fs";
 
 export default class PrescriptionController {
-  constructor(private prescriptionService: IPrescriptionService) {}
+  constructor(private _prescriptionService: IPrescriptionService) {}
 
   async createPrescription(req: Request, res: Response) {
     try {
@@ -28,7 +28,7 @@ export default class PrescriptionController {
 
       console.log(data);
 
-      const prescription = await this.prescriptionService.createPrescription(
+      const prescription = await this._prescriptionService.createPrescription(
         data
       );
 
@@ -39,7 +39,11 @@ export default class PrescriptionController {
         { prescription }
       );
     } catch (error: any) {
-      sendError(res, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+      sendError(
+        res,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        MessageConstants.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
@@ -55,14 +59,22 @@ export default class PrescriptionController {
       const searchTerm = (req.query.searchTerm as string) || "";
 
       if (!doctorId) {
-        return sendError(res, HttpStatus.BadRequest, "Doctor ID is required");
+        return sendError(
+          res,
+          HttpStatus.BadRequest,
+          MessageConstants.DOCTOR_ID_REQUIRED
+        );
       }
       if (!userId) {
-        return sendError(res, HttpStatus.BadRequest, "User ID is required");
+        return sendError(
+          res,
+          HttpStatus.BadRequest,
+          MessageConstants.USER_ID_REQUIRED
+        );
       }
 
       const { prescriptions, total } =
-        await this.prescriptionService.getPrescriptions(
+        await this._prescriptionService.getPrescriptions(
           doctorId,
           userId,
           date as string | undefined,
@@ -71,7 +83,7 @@ export default class PrescriptionController {
           searchTerm
         );
 
-      sendResponse(res, HttpStatus.OK, "Prescriptions found successfully", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.PRESCRIPTION_FOUNTD, {
         prescriptions,
         total,
       });
@@ -83,7 +95,7 @@ export default class PrescriptionController {
         sendError(
           res,
           HttpStatus.INTERNAL_SERVER_ERROR,
-          "Internal server error"
+          MessageConstants.INTERNAL_SERVER_ERROR
         );
       }
     }
@@ -100,12 +112,23 @@ export default class PrescriptionController {
           MessageConstants.USER_ID_NOT_FOUND
         );
       }
-      const prescriptions = await this.prescriptionService.getUserPrescriptions(
+      const prescriptions = await this._prescriptionService.getUserPrescriptions(
         userId
       );
-      res.status(200).json(prescriptions);
+      sendResponse(res, HttpStatus.OK, MessageConstants.PRESCRIPTION_LISTED, {
+        prescriptions,
+      });
+      // res.status(200).json(prescriptions);
     } catch (error: any) {
-      res.status(500).json({ message: error.message });
+      if (error instanceof AppError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(
+          res,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          MessageConstants.INTERNAL_SERVER_ERROR
+        );
+      }
     }
   }
 
@@ -122,14 +145,14 @@ export default class PrescriptionController {
       }
 
       const { filePath } =
-        await this.prescriptionService.getPrescriptionForDownload(
+        await this._prescriptionService.getPrescriptionForDownload(
           prescriptionId,
           userId
         );
 
       // Verify the file exists before sending
       if (!fs.existsSync(filePath)) {
-        throw new Error("PDF file not found on server");
+        throw new Error(MessageConstants.PDF_NOT_FOUND);
       }
 
       res.download(filePath, `prescription_${prescriptionId}.pdf`, (err) => {
@@ -146,28 +169,33 @@ export default class PrescriptionController {
       });
     } catch (error: any) {
       console.error("Download prescription error:", error);
-      res.status(403).json({ message: error.message });
+      sendError(
+          res,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          MessageConstants.INTERNAL_SERVER_ERROR
+        );
+      // res.status(403).json({ message: error.message });
     }
   }
 
   getPrescriptionByAppointment = async (req: Request, res: Response) => {
     try {
       const { appointmentId } = req.params;
-      console.log('appointmentId :',appointmentId)
+      console.log("appointmentId :", appointmentId);
       if (!appointmentId) {
         return sendError(
           res,
           HttpStatus.BadRequest,
-          "Appointment ID is required"
+          MessageConstants.APPOINTMENT_ID_REQUIRED
         );
       }
       const prescription =
-        await this.prescriptionService.getPrescriptionByAppointment(
+        await this._prescriptionService.getPrescriptionByAppointment(
           appointmentId
         );
 
-      console.log('prescription:',prescription)  
-      sendResponse(res, HttpStatus.OK, "Prescription found successfully", {
+      console.log("prescription:", prescription);
+      sendResponse(res, HttpStatus.OK, MessageConstants.PRESCRIPTION_FOUNTD, {
         prescription,
       });
     } catch (error: any) {
@@ -178,7 +206,7 @@ export default class PrescriptionController {
         sendError(
           res,
           HttpStatus.INTERNAL_SERVER_ERROR,
-          "Internal server error"
+          MessageConstants.INTERNAL_SERVER_ERROR
         );
       }
     }

@@ -8,8 +8,8 @@ import { IDoctorService } from "../../interfaces/doctor/doctorServiceInterface";
 
 export class DoctorDashboardController {
   constructor(
-    private doctorService: IDoctorService,
-    private dashboardService: IDashboardService // Inject dashboard service
+    // private doctorService: IDoctorService,
+    private _dashboardService: IDashboardService // Inject dashboard service
   ) {}
 
 
@@ -21,7 +21,7 @@ export class DoctorDashboardController {
         throw new AppError(HttpStatus.BadRequest, MessageConstants.DOCTOR_ID_NOT_FOUND);
       }
 
-      const stats = await this.dashboardService.getDashboardStats(doctorId);
+      const stats = await this._dashboardService.getDashboardStats(doctorId);
       console.log('stats:',stats)
 
       sendResponse(

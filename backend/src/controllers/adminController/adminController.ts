@@ -10,7 +10,7 @@ import { CookieManager } from "../../utils/cookieManager";
 import { AppError } from "../../utils/AppError";
 
 class AdminController {
-  constructor(private adminService: IAdminService) {}
+  constructor(private _adminService: IAdminService) {}
 
   async login(req: Request, res: Response): Promise<void> {
     try {
@@ -23,7 +23,7 @@ class AdminController {
       }
 
       const { admin, accessToken, refreshToken } =
-        await this.adminService.adminLogin(email, password);
+        await this._adminService.adminLogin(email, password);
       CookieManager.setAuthCookies(res, { accessToken, refreshToken });
       sendResponse(res, HttpStatus.OK, MessageConstants.LOGIN_SUCCESS, {
         admin,
@@ -58,23 +58,18 @@ class AdminController {
       const limit = parseInt(req.query.limit as string) || 10;
       const searchTerm = (req.query.searchTerm as string) || "";
 
-      const { doctors, total } = await this.adminService.getPendingDoctors(
+      const { doctors, total } = await this._adminService.getPendingDoctors(
         page,
         limit,
         searchTerm
       );
 
-      sendResponse(
-        res,
-        HttpStatus.OK,
-        "Pending doctors retrieved successfully",
-        {
-          doctors,
-          total,
-          page,
-          limit,
-        }
-      );
+      sendResponse(res, HttpStatus.OK, MessageConstants.PENDING_DOCTORS, {
+        doctors,
+        total,
+        page,
+        limit,
+      });
     } catch (error: any) {
       sendError(
         res,
@@ -98,15 +93,20 @@ class AdminController {
       }
 
       const updatedDoctor =
-        await this.adminService.updateDoctorVerificationStatus(
+        await this._adminService.updateDoctorVerificationStatus(
           doctorId,
           status,
           notes
         );
 
-      sendResponse(res, HttpStatus.OK, "Doctor verification status updated", {
-        updatedDoctor,
-      });
+      sendResponse(
+        res,
+        HttpStatus.OK,
+        MessageConstants.DOCTOR_VERIFICATION_STATUS_UPDATED,
+        {
+          updatedDoctor,
+        }
+      );
     } catch (error: any) {
       sendError(
         res,
@@ -121,12 +121,16 @@ class AdminController {
 
     // Validate block reason if blocking
     if (isBlocked && !blockReason) {
-      sendError(res, HttpStatus.BadRequest, "Block reason is required.");
+      sendError(
+        res,
+        HttpStatus.BadRequest,
+        MessageConstants.BLOCK_REASON_REQUIRED
+      );
       return;
     }
 
     try {
-      const updatedDoctor = await this.adminService.updateDoctorStatus(
+      const updatedDoctor = await this._adminService.updateDoctorStatus(
         doctorId,
         isBlocked,
         blockReason
@@ -145,7 +149,7 @@ class AdminController {
 
   async refreshAccessToken(req: Request, res: Response): Promise<void> {
     try {
-      console.log('reached at refresh token on doctorside')
+      console.log("reached at refresh token on doctorside");
 
       const refreshToken = req.cookies.refreshToken;
       if (!refreshToken) {
@@ -156,7 +160,7 @@ class AdminController {
         );
         return;
       }
-      const tokens = await this.adminService.refreshAccessToken(refreshToken);
+      const tokens = await this._adminService.refreshAccessToken(refreshToken);
       if (!tokens?.accessToken) {
         sendError(
           res,
@@ -191,14 +195,14 @@ class AdminController {
       const limit = parseInt(req.query.limit as string) || 10;
       const searchTerm = (req.query.searchTerm as string) || "";
       const isBlocked = (req.query.isBlocked as string) || "all";
-      const { doctors, total } = await this.adminService.getAllDoctors(
+      const { doctors, total } = await this._adminService.getAllDoctors(
         page,
         limit,
         searchTerm,
         isBlocked
       );
 
-      sendResponse(res, HttpStatus.OK, "retrieved successfully", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.ALL_DOCTORS_RETRIEVED, {
         doctors,
         total,
         page,
@@ -219,13 +223,13 @@ class AdminController {
       const limit = parseInt(req.query.limit as string) || 10;
       const searchTerm = (req.query.searchTerm as string) || "";
       const isBlocked = (req.query.isBlocked as string) || "all";
-      const { users, total } = await this.adminService.getAllUsers(
+      const { users, total } = await this._adminService.getAllUsers(
         page,
         limit,
         searchTerm,
         isBlocked
       );
-      sendResponse(res, HttpStatus.OK, "Users retrieved successfully", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.ALL_USERS_RETRIEVED, {
         users,
         total,
         page,
@@ -244,10 +248,13 @@ class AdminController {
     try {
       const { doctorId, isBlocked } = req.body;
       if (!doctorId) {
-        throw new AppError(HttpStatus.BadRequest, "Doctor ID is required");
+        throw new AppError(
+          HttpStatus.BadRequest,
+          MessageConstants.DOCTOR_ID_REQUIRED
+        );
       }
 
-      const updatedDoctor = await this.adminService.doctorBlock(
+      const updatedDoctor = await this._adminService.doctorBlock(
         doctorId,
         isBlocked
       );
@@ -264,10 +271,13 @@ class AdminController {
     try {
       const { userId, isBlocked } = req.body;
       if (!userId) {
-        throw new AppError(HttpStatus.BadRequest, "User ID is required");
+        throw new AppError(
+          HttpStatus.BadRequest,
+          MessageConstants.USER_ID_REQUIRED
+        );
       }
 
-      const updatedUser = await this.adminService.userBlock(userId, isBlocked);
+      const updatedUser = await this._adminService.userBlock(userId, isBlocked);
 
       const message = isBlocked
         ? MessageConstants.USER_BLOCKED
@@ -279,27 +289,35 @@ class AdminController {
   }
 
   async fetchDoctor(req: Request, res: Response): Promise<void> {
-      try {
-        const { doctorId } = req.params;
-        console.log("doctorId ", doctorId);
-  
-        // Find doctor by ID
-        const doctor = await this.adminService.getDoctorById(doctorId);
-        console.log(doctor);
-  
-        if (!doctor) {
-          throw new AppError(HttpStatus.NotFound, "Doctor not found");
-        }
-  
-        sendResponse(res, HttpStatus.OK, "Doctors fetched successfully", doctor);
-      } catch (error) {
-        console.error("Error fetching doctor:", error);
-  
-        res
-          .status(HttpStatus.InternalServerError)
-          .json({ message: "Internal server error" });
+    try {
+      const { doctorId } = req.params;
+      console.log("doctorId ", doctorId);
+
+      // Find doctor by ID
+      const doctor = await this._adminService.getDoctorById(doctorId);
+      console.log(doctor);
+
+      if (!doctor) {
+        throw new AppError(
+          HttpStatus.NotFound,
+          MessageConstants.DOCTOR_NOT_FOUND
+        );
       }
+
+      sendResponse(
+        res,
+        HttpStatus.OK,
+        MessageConstants.DOCTOR_FETCHED_SUCCESSFULLY,
+        doctor
+      );
+    } catch (error : any) {
+      console.error("Error fetching doctor:", error);
+      sendError(res, HttpStatus.BadRequest, error.message);
+      // res
+      //   .status(HttpStatus.InternalServerError)
+      //   .json({ message: "Internal server error" });
     }
+  }
 }
 
 export default AdminController;

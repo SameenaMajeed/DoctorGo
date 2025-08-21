@@ -27,12 +27,12 @@ const BookingDetailModal: React.FC<Props> = ({ booking, onClose }) => {
       day: "numeric",
     });
 
-  const formatTime = (timeString: string) =>
-    new Date(`2000-01-01T${timeString}`).toLocaleTimeString("en-IN", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
+  // const formatTime = (timeString: string) =>
+  //   new Date(`2000-01-01T${timeString}`).toLocaleTimeString("en-IN", {
+  //     hour: "2-digit",
+  //     minute: "2-digit",
+  //     hour12: true,
+  //   });
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-IN", {
@@ -126,7 +126,7 @@ const BookingDetailModal: React.FC<Props> = ({ booking, onClose }) => {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Time</p>
-                <p className="font-medium">{formatTime(booking.appointmentTime)}</p>
+                <p className="font-medium">{(booking.appointmentTime)}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Mode</p>

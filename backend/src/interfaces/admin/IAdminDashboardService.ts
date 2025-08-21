@@ -1,6 +1,6 @@
 import { IBooking } from "../../models/commonModel/BookingModel";
 
-export interface DashboardData {
+export interface IDashboardData {
   pendingApprovals: number;
   topPatients: Array<{ _id: string; name: string; totalBookings: number; totalSpent: number }>;
   recentBookings?: IBooking[];
@@ -15,5 +15,5 @@ export interface IAdminDashboardService {
     filter?: "daily" | "monthly" | "yearly",
     doctorId?: string,
     bookingId?: string
-  ): Promise<DashboardData>;
+  ): Promise<IDashboardData>;
 }

@@ -8,8 +8,8 @@ import NodeCache from "node-cache";
 const slotCache = new NodeCache({ stdTTL: 300 });
 
 export default class SlotService {
-  constructor(private slotrepo: ISlotRepository) {}
-
+  constructor(private _slotrepo: ISlotRepository) {}
+  
   async createSlot(slot: ISlot): Promise<ISlot | ISlot[]> {
     console.log("Service received:", JSON.stringify(slot, null, 2));
 
@@ -50,7 +50,7 @@ export default class SlotService {
     }
 
     // Check for overlapping slots
-    const existingSlots = await this.slotrepo.findSlotsByDoctorAndDate(
+    const existingSlots = await this._slotrepo.findSlotsByDoctorAndDate(
       slot.doctorId,
       slot.date
     );
@@ -93,9 +93,9 @@ export default class SlotService {
     let createdSlot;
     if (slot.recurring?.isRecurring) {
       console.log("Recurring slot detected, calling createRecurringSlots");
-      createdSlot = await this.slotrepo.createRecurringSlots(slotData);
+      createdSlot = await this._slotrepo.createRecurringSlots(slotData);
     } else {
-      createdSlot = await this.slotrepo.createSlot(slotData);
+      createdSlot = await this._slotrepo.createSlot(slotData);
     }
 
     // Invalidate all cached slots for this doctor
@@ -137,7 +137,7 @@ export default class SlotService {
 
   async getAvailableSlots(
     doctorId: string,
-    date?: string | undefined,
+    date?: string,
     page: number = 1,
     limit: number = 10,
     searchTerm: string = ""
@@ -145,31 +145,17 @@ export default class SlotService {
     const cacheKey = `slots:${doctorId}:${
       date || "all"
     }:${page}:${limit}:${searchTerm}`;
-
-    // Try to get from cache first
     const cachedData = slotCache.get<{ slots: ISlot[]; total: number }>(
       cacheKey
     );
-    if (cachedData) {
-      return cachedData;
-    }
+    if (cachedData) return cachedData;
 
     if (!doctorId) {
       throw new AppError(HttpStatus.BadRequest, "Doctor ID is required");
     }
 
-    if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      throw new AppError(
-        HttpStatus.BadRequest,
-        "Invalid date format. Expected YYYY-MM-DD"
-      );
-    }
-
-    const now = new Date();
-    const currentDate = new Date(now.toISOString().split("T")[0]);
-    const currentTime = now.toTimeString().split(" ")[0].substring(0, 5);
-
-    const { slots, total } = await this.slotrepo.getAvailableSlots(
+    // Get raw slots + total
+    const { slots, total } = await this._slotrepo.getAvailableSlots(
       doctorId,
       page,
       limit,
@@ -177,24 +163,22 @@ export default class SlotService {
       date
     );
 
+    // Filter expired slots (only for slots in the current page)
+    const now = new Date();
+    const currentDate = new Date(now.toISOString().split("T")[0]);
+    const currentTime = now.toTimeString().split(" ")[0].substring(0, 5);
+
     const filteredSlots = slots.filter((slot) => {
       const slotDate = new Date(slot.date);
       const slotDateStr = slotDate.toISOString().split("T")[0];
-
-      // If slot date is in the future
-      if (slotDateStr > currentDate.toISOString().split("T")[0]) {
-        return true;
-      }
-
-      // If slot date is today, check if time is in the future
+      if (slotDateStr > currentDate.toISOString().split("T")[0]) return true;
       if (slotDateStr === currentDate.toISOString().split("T")[0]) {
         return slot.startTime >= currentTime;
       }
-
-      // Otherwise, it's in the past
       return false;
     });
 
+    // Return filtered slots but keep the correct total for pagination
     const result = {
       slots: filteredSlots.map((slot) => {
         const slotObject = slot.toObject();
@@ -204,24 +188,100 @@ export default class SlotService {
           endTime: this.formatTimeForDisplay(slotObject.endTime),
         };
       }),
-      total: filteredSlots.length, // Update total count after filtering
+      total, // ✅ keep repo’s count, don’t override
     };
-
-    // const result = {
-    //   slots: slots.map((slot) => {
-    //     const slotObject = slot.toObject();
-    //     return {
-    //       ...slotObject,
-    //       startTime: this.formatTimeForDisplay(slotObject.startTime),
-    //       endTime: this.formatTimeForDisplay(slotObject.endTime),
-    //     };
-    //   }),
-    //   total,
-    // };
 
     slotCache.set(cacheKey, result);
     return result;
   }
+
+  // async getAvailableSlots(
+  //   doctorId: string,
+  //   date?: string | undefined,
+  //   page: number = 1,
+  //   limit: number = 10,
+  //   searchTerm: string = ""
+  // ): Promise<{ slots: ISlot[]; total: number }> {
+  //   const cacheKey = `slots:${doctorId}:${
+  //     date || "all"
+  //   }:${page}:${limit}:${searchTerm}`;
+
+  //   // Try to get from cache first
+  //   const cachedData = slotCache.get<{ slots: ISlot[]; total: number }>(
+  //     cacheKey
+  //   );
+  //   if (cachedData) {
+  //     return cachedData;
+  //   }
+
+  //   if (!doctorId) {
+  //     throw new AppError(HttpStatus.BadRequest, "Doctor ID is required");
+  //   }
+
+  //   if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+  //     throw new AppError(
+  //       HttpStatus.BadRequest,
+  //       "Invalid date format. Expected YYYY-MM-DD"
+  //     );
+  //   }
+
+  //   const now = new Date();
+  //   const currentDate = new Date(now.toISOString().split("T")[0]);
+  //   const currentTime = now.toTimeString().split(" ")[0].substring(0, 5);
+
+  //   const { slots, total } = await this._slotrepo.getAvailableSlots(
+  //     doctorId,
+  //     page,
+  //     limit,
+  //     searchTerm,
+  //     date
+  //   );
+
+  //   const filteredSlots = slots.filter((slot) => {
+  //     const slotDate = new Date(slot.date);
+  //     const slotDateStr = slotDate.toISOString().split("T")[0];
+
+  //     // If slot date is in the future
+  //     if (slotDateStr > currentDate.toISOString().split("T")[0]) {
+  //       return true;
+  //     }
+
+  //     // If slot date is today, check if time is in the future
+  //     if (slotDateStr === currentDate.toISOString().split("T")[0]) {
+  //       return slot.startTime >= currentTime;
+  //     }
+
+  //     // Otherwise, it's in the past
+  //     return false;
+  //   });
+
+  //   const result = {
+  //     slots: filteredSlots.map((slot) => {
+  //       const slotObject = slot.toObject();
+  //       return {
+  //         ...slotObject,
+  //         startTime: this.formatTimeForDisplay(slotObject.startTime),
+  //         endTime: this.formatTimeForDisplay(slotObject.endTime),
+  //       };
+  //     }),
+  //     total: filteredSlots.length, // Update total count after filtering
+  //   };
+
+  //   // const result = {
+  //   //   slots: slots.map((slot) => {
+  //   //     const slotObject = slot.toObject();
+  //   //     return {
+  //   //       ...slotObject,
+  //   //       startTime: this.formatTimeForDisplay(slotObject.startTime),
+  //   //       endTime: this.formatTimeForDisplay(slotObject.endTime),
+  //   //     };
+  //   //   }),
+  //   //   total,
+  //   // };
+
+  //   slotCache.set(cacheKey, result);
+  //   return result;
+  // }
 
   //   async getAvailableSlots(
   //     doctorId: string,
@@ -240,7 +300,7 @@ export default class SlotService {
       throw new Error("Slot ID is required");
     }
 
-    const slot = await this.slotrepo.findSlotById(slotId);
+    const slot = await this._slotrepo.findSlotById(slotId);
     if (!slot) {
       throw new Error("Slot not found");
     }
@@ -261,7 +321,7 @@ export default class SlotService {
       slot.isBooked = true;
     }
 
-    const updatedSlot = await this.slotrepo.updateSlot(slotId, slot);
+    const updatedSlot = await this._slotrepo.updateSlot(slotId, slot);
     if (!updatedSlot) {
       throw new Error("Failed to update slot");
     }
@@ -273,7 +333,7 @@ export default class SlotService {
       throw new Error("Slot ID is required");
     }
 
-    const slot = await this.slotrepo.findSlotById(slotId);
+    const slot = await this._slotrepo.findSlotById(slotId);
     if (!slot) {
       throw new Error("Slot not found");
     }
@@ -288,7 +348,7 @@ export default class SlotService {
     // Update isBooked status
     slot.isBooked = slot.bookedCount >= slot.maxPatients;
 
-    const updatedSlot = await this.slotrepo.updateSlot(slotId, slot);
+    const updatedSlot = await this._slotrepo.updateSlot(slotId, slot);
     if (!updatedSlot) {
       throw new Error("Failed to update slot");
     }
@@ -297,11 +357,11 @@ export default class SlotService {
 
   async deleteSlot(slotId: string): Promise<void> {
     // First get the slot to know the doctorId
-    const slot = await this.slotrepo.findSlotById(slotId);
+    const slot = await this._slotrepo.findSlotById(slotId);
     if (!slot) {
       throw new Error("Slot not found");
     }
-    const result = await this.slotrepo.deleteSlot(slotId);
+    const result = await this._slotrepo.deleteSlot(slotId);
     if (!result) {
       throw new Error("Failed to delete slot or slot not found");
     }
@@ -310,11 +370,11 @@ export default class SlotService {
   }
 
   async getSlots(slotId: string): Promise<ISlot | null> {
-    return await this.slotrepo.findSlotById(slotId);
+    return await this._slotrepo.findSlotById(slotId);
   }
 
   async updateSlot(slotId: string, updates: Partial<ISlot>): Promise<ISlot> {
-    const slot = await this.slotrepo.findSlotById(slotId);
+    const slot = await this._slotrepo.findSlotById(slotId);
     if (!slot) {
       throw new Error("Slot not found");
     }
@@ -331,7 +391,7 @@ export default class SlotService {
       }
     }
 
-    const updatedSlot = await this.slotrepo.updateSlot(slotId, updates);
+    const updatedSlot = await this._slotrepo.updateSlot(slotId, updates);
     if (!updatedSlot) {
       throw new Error("Failed to update slot");
     }
@@ -345,7 +405,7 @@ export default class SlotService {
     slotId: string
   ): Promise<{ available: boolean; details: string }> {
     try {
-      const availability = await this.slotrepo.checkSlotAvailability(slotId);
+      const availability = await this._slotrepo.checkSlotAvailability(slotId);
 
       return {
         available: availability.available,

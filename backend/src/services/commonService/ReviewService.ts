@@ -7,8 +7,8 @@ import { AppError } from "../../utils/AppError";
 
 class ReviewService implements IReviewService {
   constructor(
-    private ReviewRepository: IReviewRepository,
-    private AppointmentRepository: IBookingRepository
+    private _ReviewRepository: IReviewRepository,
+    private _AppointmentRepository: IBookingRepository
   ) {}
   async addReview(
     doctor_id: string,
@@ -18,7 +18,7 @@ class ReviewService implements IReviewService {
     rating: number
   ): Promise<IReview> {
     // Validate appointment exists and belongs to this user/doctor
-    const appointment = await this.AppointmentRepository.findAppointmentById(
+    const appointment = await this._AppointmentRepository.findAppointmentById(
       appointment_id
     );
 
@@ -84,7 +84,7 @@ class ReviewService implements IReviewService {
 
     // Check for existing review
     const existingReview =
-      await this.ReviewRepository.findReviewByAppointment(appointment_id);
+      await this._ReviewRepository.findReviewByAppointment(appointment_id);
     if (existingReview) {
       throw new AppError(
         HttpStatus.BadRequest,
@@ -93,7 +93,7 @@ class ReviewService implements IReviewService {
     }
 
     // Create review
-    return await this.ReviewRepository.createReview({
+    return await this._ReviewRepository.createReview({
       doctor_id,
       user_id,
       reviewText,
@@ -107,7 +107,7 @@ class ReviewService implements IReviewService {
     reviewData: Partial<IReview>,
     userId: string
   ): Promise<IReview | null> {
-    const existingReview = await this.ReviewRepository.findReviewById(reviewId);
+    const existingReview = await this._ReviewRepository.findReviewById(reviewId);
 
     if (!existingReview) {
       throw new AppError(HttpStatus.BadRequest, "Review not found");
@@ -120,7 +120,7 @@ class ReviewService implements IReviewService {
       );
     }
 
-    const review = await this.ReviewRepository.updateReview(
+    const review = await this._ReviewRepository.updateReview(
       reviewId,
       reviewData,
       userId
@@ -130,7 +130,7 @@ class ReviewService implements IReviewService {
   }
 
   async getReviewsByDoctorId(doctorId: string): Promise<IReview[]> {
-    return await this.ReviewRepository.getReviewsByDoctorId(doctorId);
+    return await this._ReviewRepository.getReviewsByDoctorId(doctorId);
   }
 
   async checkAppointment(
@@ -138,7 +138,7 @@ class ReviewService implements IReviewService {
     userId: string,
     appointmentId: string
   ): Promise<boolean> {
-    const appointment = await this.AppointmentRepository.findAppointmentById(
+    const appointment = await this._AppointmentRepository.findAppointmentById(
       appointmentId
     );
 
@@ -154,20 +154,20 @@ class ReviewService implements IReviewService {
     doctorId: string,
     userId: string
   ): Promise<IReview | null> {
-    return await this.ReviewRepository.findReviewByDoctorAndPatient(
+    return await this._ReviewRepository.findReviewByDoctorAndPatient(
       doctorId,
       userId
     );
   }
 
   async getReviewById(reviewId: string): Promise<IReview | null> {
-    return await this.ReviewRepository.findReviewById(reviewId);
+    return await this._ReviewRepository.findReviewById(reviewId);
   }
 
   async findReviewByAppointment(
     appointmentId: string
   ): Promise<IReview | null> {
-    return await this.ReviewRepository.findReviewByAppointment(appointmentId);
+    return await this._ReviewRepository.findReviewByAppointment(appointmentId);
   }
 }
 

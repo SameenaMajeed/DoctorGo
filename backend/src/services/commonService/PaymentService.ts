@@ -16,7 +16,7 @@ const razorpayInstance = new Razorpay({
 });
 
 export class PaymentService implements IPaymentService {
-  constructor(private bookingRepo: IBookingRepository) {}
+  constructor(private _bookingRepo: IBookingRepository) {}
   async createOrder(amount: number, currency: string): Promise<any> {
     try {
       const options = {
@@ -119,8 +119,8 @@ export class PaymentService implements IPaymentService {
 
     try {
       const [payments, total] = await Promise.all([
-        this.bookingRepo.findPaymentsByUser(userId, skip, limit, status),
-        this.bookingRepo.countUserPayments(userId, status),
+        this._bookingRepo.findPaymentsByUser(userId, skip, limit, status),
+        this._bookingRepo.countUserPayments(userId, status),
       ]);
 
       console.log("data", payments, total);

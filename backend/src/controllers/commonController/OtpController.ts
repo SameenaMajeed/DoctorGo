@@ -1,23 +1,35 @@
 import { Request, Response } from "express";
 import IOtpService from "../../interfaces/otp/OtpServiceInterface";
+import { AppError } from "../../utils/AppError";
+import { HttpStatus } from "../../constants/Httpstatus";
+import { MessageConstants } from "../../constants/MessageConstants";
+import { sendError, sendResponse } from "../../utils/responseUtils";
 
 export class OtpController {
-  constructor(private otpService: IOtpService) {}
+  constructor(private _otpService: IOtpService) {}
 
   async sendOtp(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.body;
       if (!email) {
-        res.status(400).json({ message: "Email is required" });
-        return;
+        throw new AppError(
+          HttpStatus.BadRequest,
+          MessageConstants.EMAIL_REQUIRED
+        );
       }
-      await this.otpService.sendOtp(email);
-      res.status(200).json({ message: "OTP sent successfully" });
-    } catch (error: any) {
-      console.error(error.message);
-      res
-        .status(500)
-        .json({ message: "Error sending OTP.", error: error.message });
+      await this._otpService.sendOtp(email);
+      sendResponse(res, HttpStatus.OK, MessageConstants.OTP_SEND);
+    } catch (error) {
+      console.error("Controller Error :", error);
+      if (error instanceof AppError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(
+          res,
+          HttpStatus.InternalServerError,
+          MessageConstants.INTERNAL_SERVER_ERROR
+        );
+      }
     }
   }
 
@@ -26,25 +38,30 @@ export class OtpController {
       const { email, otp } = req.body;
 
       if (!email || !otp) {
-        res.status(400).json({ message: "Email and OTP are required." });
-        return;
+        throw new AppError(
+          HttpStatus.BadRequest,
+          MessageConstants.EMAIL_AND_OTP_REQUIRED
+        );
       }
 
-      const isOtpValid = await this.otpService.verifyOtp(email, otp);
+      const isOtpValid = await this._otpService.verifyOtp(email, otp);
 
       if (!isOtpValid) {
-        res.status(400).json({ message: "Invalid OTP." });
-        return;
+        throw new AppError(HttpStatus.BadRequest, MessageConstants.INVALID_OTP);
       }
 
-      res
-        .status(200)
-        .json({ message: "OTP verified and user registered successfully." });
-    } catch (error: any) {
-      console.error(error.message);
-      res
-        .status(500)
-        .json({ message: "Error verifying OTP.", error: error.message });
+      sendResponse(res, HttpStatus.OK, MessageConstants.OTP_VERIFIED);
+    } catch (error) {
+      console.error("Controller Error :", error);
+      if (error instanceof AppError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(
+          res,
+          HttpStatus.InternalServerError,
+          MessageConstants.INTERNAL_SERVER_ERROR
+        );
+      }
     }
   }
 
@@ -53,17 +70,25 @@ export class OtpController {
       const { email } = req.body;
 
       if (!email) {
-        res.status(400).json({ message: "Email is required" });
-        return;
+        throw new AppError(
+          HttpStatus.BadRequest,
+          MessageConstants.EMAIL_REQUIRED
+        );
       }
 
-      await this.otpService.resendOtp(email);
-      res.status(200).json({ message: "OTP resent successfully" });
-    } catch (error: any) {
-      console.error(error.message);
-      res
-        .status(500)
-        .json({ message: "Error resending OTP.", error: error.message });
+      await this._otpService.resendOtp(email);
+      sendResponse(res, HttpStatus.OK, MessageConstants.OTP_RESEND);
+    } catch (error) {
+      console.error("Controller Error :", error);
+      if (error instanceof AppError) {
+        sendError(res, error.status, error.message);
+      } else {
+        sendError(
+          res,
+          HttpStatus.InternalServerError,
+          MessageConstants.INTERNAL_SERVER_ERROR
+        );
+      }
     }
   }
 }

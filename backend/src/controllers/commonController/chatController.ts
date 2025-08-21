@@ -19,7 +19,7 @@ export class ChatController {
         throw new AppError(HttpStatus.Forbidden, MessageConstants.UNAUTHORIZED);
       }
       const doctors = await this.chatService.getDoctorsWhoMessaged(userId);
-      sendResponse(res, HttpStatus.OK, "All doctors fetched successfully", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.DOCTOR_WHO_MESSAGED_FETCHED, {
         doctors,
       });
     } catch (error) {
@@ -67,7 +67,7 @@ export class ChatController {
       sendResponse(
         res,
         HttpStatus.OK,
-        "Users who messaged fetched successfully",
+        MessageConstants.USER_WHO_MESSAGED_FETCHED,
         { users }
       );
       

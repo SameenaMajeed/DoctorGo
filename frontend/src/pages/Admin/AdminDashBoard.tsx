@@ -27,6 +27,7 @@ import Loader from "../../components/Admin/Loader";
 import ErrorDisplay from "../../components/Admin/Home/ErrorDisplay";
 import { Table } from "../../components/CommonComponents/Table";
 import BookingDetailModal from "../../components/Admin/Home/BookingDetailModal";
+// import CustomChart from "../../components/Admin/Home/AdminCharts";
 
 const AdminDashboard: React.FC = () => {
   const [data, setData] = useState<IDashboardData | null>(null);

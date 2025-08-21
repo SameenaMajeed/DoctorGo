@@ -1,5 +1,5 @@
 import { IUser } from "../../models/userModel/userModel";
-import { Signup } from "../../interfaces/user/signUpInterface";
+import { ISignup } from "../../interfaces/user/signUpInterface";
 import bcrypt from "bcrypt";
 import {
   generateAccessToken,
@@ -9,12 +9,12 @@ import {
 import { generateOtp, hashOtp } from "../../utils/GenerateOtp";
 import { sentMail } from "../../utils/SendMail";
 import { IUserService } from "../../interfaces/user/userServiceInterface";
-import { UserRepositoryInterface } from "../../interfaces/user/UserRepositoryInterface";
+import { IUserRepositoryInterface } from "../../interfaces/user/UserRepositoryInterface";
 import { IDoctor } from "../../models/doctorMpdel/DoctorModel";
 import { AppError } from "../../utils/AppError";
 import { HttpStatus } from "../../constants/Httpstatus";
 import { MessageConstants } from "../../constants/MessageConstants";
-import { googleUserData } from "../../types/google";
+import { IGoogleUserData } from "../../types/google";
 import cloudinary from "../../config/cloudinary";
 import { CloudinaryService } from "../../utils/cloudinary.service";
 import IOtpRepository from "../../interfaces/otp/otpRepositoryInterface";
@@ -28,9 +28,9 @@ export interface ForgotPasswordResponse {
 
 export class UserService implements IUserService {
   constructor(
-    private userRepository: UserRepositoryInterface,
-    private otpRepository: IOtpRepository,
-    private doctorRepository: IDoctorRepository
+    private _userRepository: IUserRepositoryInterface,
+    private _otpRepository: IOtpRepository,
+    private _doctorRepository: IDoctorRepository
   ) {}
 
   async registerUser(
@@ -41,7 +41,7 @@ export class UserService implements IUserService {
   ): Promise<IUser> {
     console.log("Register: Checking if user exists for email:", email);
 
-    const existingUser = await this.userRepository.findByEmail(email);
+    const existingUser = await this._userRepository.findByEmail(email);
     if (existingUser) {
       console.log("Register: User already exists for email:", email);
       throw new Error("User with this email already exists.");
@@ -50,7 +50,7 @@ export class UserService implements IUserService {
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log("Register: Hashed password generated for user.");
 
-    const userData: Signup = {
+    const userData: ISignup = {
       name,
       email,
       password: hashedPassword,
@@ -60,12 +60,12 @@ export class UserService implements IUserService {
     };
 
     console.log("Register: Creating new user with data:", userData);
-    return await this.userRepository.create(userData);
+    return await this._userRepository.create(userData);
   }
 
   async authenticateUser(email: string, password: string): Promise<{ user: IUser; accessToken: string; refreshToken: string }> {
     try {
-      const user = await this.userRepository.findByEmail(email);
+      const user = await this._userRepository.findByEmail(email);
       if (!user) {
         throw new AppError(HttpStatus.NotFound, MessageConstants.USER_NOT_FOUND);
       }
@@ -115,9 +115,9 @@ export class UserService implements IUserService {
   // }
 
   async googleSignIn(
-    userData: googleUserData
+    userData: IGoogleUserData
   ): Promise<{ user: IUser; accessToken: string; refreshToken: string }> {
-    const existingUser = await this.userRepository.findByEmail(userData.email);
+    const existingUser = await this._userRepository.findByEmail(userData.email);
     if (existingUser) {
       const accessToken = generateAccessToken({
         id: existingUser._id.toString(),
@@ -131,7 +131,7 @@ export class UserService implements IUserService {
       return { user: existingUser, accessToken, refreshToken };
     }
 
-    const newUser = await this.userRepository.create({
+    const newUser = await this._userRepository.create({
       email: userData.email,
       name: userData.name || "Unknown",
       mobile_no: "",
@@ -190,7 +190,7 @@ export class UserService implements IUserService {
 
   async forgotPasswordVerify(email: string): Promise<ForgotPasswordResponse> {
     try {
-      const userData = await this.userRepository.findByEmail(email);
+      const userData = await this._userRepository.findByEmail(email);
       if (!userData) {
         return { success: false, message: "Mail not registered", data: null };
       }
@@ -205,7 +205,7 @@ export class UserService implements IUserService {
 
       if (mailSent) {
         const hashedOtp = await hashOtp(otp);
-        await this.otpRepository.storeOtp(hashedOtp, userData.email);
+        await this._otpRepository.storeOtp(hashedOtp, userData.email);
       }
 
       return {
@@ -224,7 +224,7 @@ export class UserService implements IUserService {
     newPassword: string
   ): Promise<{ success: boolean; message: string }> {
     console.log(`resetPassword called with email: ${email}`);
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this._userRepository.findByEmail(email);
     if (!user) {
       console.log(`No user found with email: ${email}`);
       return { success: false, message: "User not found" };
@@ -237,7 +237,7 @@ export class UserService implements IUserService {
     console.log(`Password hashed successfully for email: ${email}`);
 
     try {
-      await this.userRepository.updatePassword(user.id, hashedPassword);
+      await this._userRepository.updatePassword(user.id, hashedPassword);
       console.log(`Password updated successfully for email: ${email}`);
       return { success: true, message: "Password updated successfully" };
     } catch (error) {
@@ -263,7 +263,7 @@ export class UserService implements IUserService {
     profilePicture: string;
   } | null> {
     try {
-      const user = await this.userRepository.findById(userId);
+      const user = await this._userRepository.findById(userId);
       if (!user) {
         throw new AppError(
           HttpStatus.NotFound,
@@ -295,7 +295,7 @@ export class UserService implements IUserService {
     filePath: string
   ): Promise<string> {
     try {
-      const user = await this.userRepository.findById(userId);
+      const user = await this._userRepository.findById(userId);
       if (!user) {
         throw new AppError(
           HttpStatus.NotFound,
@@ -307,7 +307,7 @@ export class UserService implements IUserService {
         overwrite: true,
         type: "authenticated", // Restrict access
       });
-      const updatedUser = await this.userRepository.updateProfilePicture(
+      const updatedUser = await this._userRepository.updateProfilePicture(
         userId,
         result.secure_url
       );
@@ -351,7 +351,7 @@ export class UserService implements IUserService {
     profilePicture: string;
   }> {
     try {
-      const updatedUser = await this.userRepository.update(userId, updateData);
+      const updatedUser = await this._userRepository.update(userId, updateData);
       if (!updatedUser) {
         throw new AppError(HttpStatus.NotFound, MessageConstants.USER_NOT_FOUND);
       }
@@ -425,7 +425,7 @@ export class UserService implements IUserService {
 
   async getAllDoctors(): Promise<{ doctors: IDoctor[] }> {
     try {
-      const doctors = await this.doctorRepository.findAllDoctor();
+      const doctors = await this._doctorRepository.findAllDoctor();
 
       return { doctors };
     } catch (error: unknown) {
@@ -438,7 +438,7 @@ export class UserService implements IUserService {
   }
 
   async getDoctorById(doctorId: string): Promise<IDoctor> {
-    const doctor = await this.doctorRepository.findById(doctorId);
+    const doctor = await this._doctorRepository.findById(doctorId);
 
     if (!doctor) {
       throw new AppError(HttpStatus.NotFound, "Doctor not found");

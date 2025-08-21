@@ -17,7 +17,19 @@ export class WalletRepository
 
   async getWalletByUserId(userId: string): Promise<IWallet | null> {
     try {
-      return await Wallet.findOne({ user_id: userId }).exec();
+      const wallet = await Wallet.findOne({ user_id: userId })
+        .lean()
+        .exec();
+
+      if (wallet?.transactions?.length) {
+        wallet.transactions.sort(
+          (a : any, b : any) =>
+            new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+        );
+      }
+
+      return wallet;
+      // return await Wallet.findOne({ user_id: userId }).exec();
     } catch (error) {
       throw new AppError(
         HttpStatus.InternalServerError,
@@ -81,9 +93,8 @@ export class WalletRepository
     description: string,
     bookingId?: string
   ): Promise<IWallet> {
-    
     try {
-      const wallet = await Wallet.findOne({ user_id: userId })
+      const wallet = await Wallet.findOne({ user_id: userId });
 
       if (!wallet) {
         throw new AppError(
@@ -113,8 +124,10 @@ export class WalletRepository
         amount,
         type: "debit",
         description,
-        booking_id: bookingId ? new mongoose.Types.ObjectId(bookingId) : undefined,
-        createdAt: new Date()
+        booking_id: bookingId
+          ? new mongoose.Types.ObjectId(bookingId)
+          : undefined,
+        createdAt: new Date(),
       });
 
       await wallet.save();

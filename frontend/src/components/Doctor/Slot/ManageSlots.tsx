@@ -41,7 +41,7 @@ const ManageSlots: React.FC = () => {
   const [selectedSlots, setSelectedSlots] = useState<string[]>([])
   const [refreshing, setRefreshing] = useState(false)
   // const [viewMode, setViewMode] = useState<"grid" | "table">("grid")
-  const limit = 5
+  const limit = 6
 
   const doctor = useSelector((state: RootState) => state.doctor.doctor)
 
@@ -50,6 +50,8 @@ const ManageSlots: React.FC = () => {
       const response = await slotApi.get(`/time-slots/${doctor?._id}`, {
         params: { page, limit, searchTerm, _: new Date().getTime() },
       })
+
+      console.log("Fetched slots:", response.data)
 
       if (response.data.data) {
         const currentDate = new Date().toISOString().split('T')[0];
@@ -689,8 +691,6 @@ const ManageSlots: React.FC = () => {
 export default ManageSlots
 
 
-
-// import React, { useState, useEffect, useCallback } from "react";
 // import { Link } from "react-router-dom";
 // import { PlusCircle, Edit, Trash2, Search } from "lucide-react";
 // import { useSelector } from "react-redux";

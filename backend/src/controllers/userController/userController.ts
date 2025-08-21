@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { googleUserData } from "../../types/google";
+import { IGoogleUserData } from "../../types/google";
 
 import { IUserService } from "../../interfaces/user/userServiceInterface";
 import { sendError, sendResponse } from "../../utils/responseUtils";
@@ -23,34 +23,52 @@ declare global {
 }
 
 export class Usercontroller {
-  constructor(private userService: IUserService) {}
+  constructor(private _userService: IUserService) {}
 
   async registerUser(req: Request, res: Response): Promise<void> {
     try {
       const { name, email, password, mobile_no } = req.body;
 
       // Calling the UserService to handle the business logic
-      const newUser = await this.userService.registerUser(
+      const newUser = await this._userService.registerUser(
         name,
         email,
         password,
         mobile_no
       );
+      sendResponse(
+        res,
+        HttpStatus.Created,
+        MessageConstants.USER_REGISTER_SUCCESS,
+        {
+          user: {
+            id: newUser._id,
+            name: newUser.name,
+            email: newUser.email,
+            mobile_no: newUser.mobile_no,
+          },
+        }
+      );
 
-      res.status(201).json({
-        message: "User registered successfully",
-        user: {
-          id: newUser._id,
-          name: newUser.name,
-          email: newUser.email,
-          mobile_no: newUser.mobile_no,
-        },
-      });
+      // res.status(201).json({
+      //   message: "User registered successfully",
+      //   user: {
+      //     id: newUser._id,
+      //     name: newUser.name,
+      //     email: newUser.email,
+      //     mobile_no: newUser.mobile_no,
+      //   },
+      // });
     } catch (error: any) {
       console.log(error.message);
-      res
-        .status(500)
-        .json({ message: "Internal Server Error", error: error.message });
+      sendError(
+        res,
+        HttpStatus.BadRequest,
+        MessageConstants.INTERNAL_SERVER_ERROR
+      );
+      // res
+      //   .status(500)
+      //   .json({ message: "Internal Server Error", error: error.message });
     }
   }
 
@@ -65,7 +83,7 @@ export class Usercontroller {
       }
 
       const { user, accessToken, refreshToken } =
-        await this.userService.authenticateUser(email, password);
+        await this._userService.authenticateUser(email, password);
 
       console.log("user:", user);
 
@@ -83,7 +101,12 @@ export class Usercontroller {
         refreshToken,
       });
     } catch (error: any) {
-      res.status(500).json({ message: error.message });
+      sendError(
+        res,
+        HttpStatus.BadRequest,
+        MessageConstants.INTERNAL_SERVER_ERROR
+      );
+      // res.status(500).json({ message: error.message });
     }
   }
 
@@ -100,7 +123,7 @@ export class Usercontroller {
 
       const decodedToken = await admin.auth().verifyIdToken(idToken);
 
-      const userData: googleUserData = {
+      const userData: IGoogleUserData = {
         uid: decodedToken.uid,
         email: decodedToken.email!,
         email_verified: decodedToken.email_verified!,
@@ -108,7 +131,7 @@ export class Usercontroller {
       };
 
       const { user, accessToken, refreshToken } =
-        await this.userService.googleSignIn(userData);
+        await this._userService.googleSignIn(userData);
       CookieManager.setAuthCookies(res, { accessToken, refreshToken });
       const responseData = {
         user: { id: user._id, name: user.name, email: user.email },
@@ -141,7 +164,7 @@ export class Usercontroller {
         return;
       }
 
-      const tokens = await this.userService.refreshAccessToken(refreshToken);
+      const tokens = await this._userService.refreshAccessToken(refreshToken);
       console.log("tokens : ", tokens);
 
       if (!tokens || !tokens.accessToken) {
@@ -181,7 +204,7 @@ export class Usercontroller {
         res.status(400).json({ success: false, message: "Email is required" });
         return;
       }
-      const response = await this.userService.forgotPasswordVerify(email);
+      const response = await this._userService.forgotPasswordVerify(email);
       if (response.success) {
         res.status(200).json(response);
       } else {
@@ -212,7 +235,7 @@ export class Usercontroller {
 
       console.log(`Attempting to reset password for email: ${email}`);
 
-      const response = await this.userService.resetPassword(email, password);
+      const response = await this._userService.resetPassword(email, password);
 
       // Log the response from the userService
       console.log("Response from userService.resetPassword:", response);
@@ -235,9 +258,14 @@ export class Usercontroller {
         error.message,
         error.stack
       );
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      sendError(
+        res,
+        HttpStatus.InternalServerError,
+        MessageConstants.INTERNAL_SERVER_ERROR
+      );
+      // res
+      //   .status(500)
+      //   .json({ success: false, message: "Internal server error" });
     }
   }
 
@@ -254,16 +282,26 @@ export class Usercontroller {
         secure: false,
         //  sameSite: 'none',
       });
+      sendResponse(
+        res,
+        HttpStatus.Created,
+        MessageConstants.SIGNEDOUT_SUCCESS,
+      );
 
-      res
-        .status(200)
-        .json({ success: true, message: "Signed Out Successfully" });
+      // res
+      //   .status(200)
+      //   .json({ success: true, message: "Signed Out Successfully" });
     } catch (error: any) {
       console.error(error.message);
+      sendError(
+        res,
+        HttpStatus.InternalServerError,
+        MessageConstants.INTERNAL_SERVER_ERROR
+      );
 
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      // res
+      //   .status(500)
+      //   .json({ success: false, message: "Internal server error" });
     }
   }
 
@@ -277,7 +315,7 @@ export class Usercontroller {
           MessageConstants.USER_ID_NOT_FOUND
         );
       }
-      const userProfile = await this.userService.getUserProfile(userId);
+      const userProfile = await this._userService.getUserProfile(userId);
       if (!userProfile) {
         throw new AppError(
           HttpStatus.NotFound,
@@ -318,7 +356,7 @@ export class Usercontroller {
           MessageConstants.FILE_NOT_UPLOADED
         );
       }
-      const profilePicture = await this.userService.uploadProfilePicture(
+      const profilePicture = await this._userService.uploadProfilePicture(
         userId,
         req.file.path
       );
@@ -355,7 +393,7 @@ export class Usercontroller {
       const { name, email, mobile_no, address, DOB, age, gender } = req.body;
       console.log("Received update data:", req.body);
 
-      const updatedUser = await this.userService.updateUserProfile(userId, {
+      const updatedUser = await this._userService.updateUserProfile(userId, {
         name,
         email,
         mobile_no, // Changed from mobile to mobile_no
@@ -396,14 +434,14 @@ export class Usercontroller {
   // Doctors fetching
   async getAllDoctors(req: Request, res: Response): Promise<void> {
     try {
-      const result = await this.userService.getAllDoctors();
+      const result = await this._userService.getAllDoctors();
       sendResponse(
         res,
         HttpStatus.OK,
-        "Doctors fetched successfully",
+        MessageConstants.DOCTOR_FETCH_SUCCESSFULL,
         result.doctors
       );
-      console.log('result : ',result)
+      console.log("result : ", result);
     } catch (error: any) {
       sendError(res, HttpStatus.InternalServerError, error.message);
     }
@@ -415,20 +453,25 @@ export class Usercontroller {
       console.log("doctorId ", doctorId);
 
       // Find doctor by ID
-      const doctor = await this.userService.getDoctorById(doctorId);
+      const doctor = await this._userService.getDoctorById(doctorId);
       console.log(doctor);
 
       if (!doctor) {
-        throw new AppError(HttpStatus.NotFound, "Doctor not found");
+        throw new AppError(HttpStatus.NotFound, MessageConstants.DOCTOR_NOT_FOUND);
       }
 
-      sendResponse(res, HttpStatus.OK, "Doctors fetched successfully", doctor);
+      sendResponse(res, HttpStatus.OK, MessageConstants.DOCTOR_FETCHED_SUCCESSFULLY, doctor);
     } catch (error) {
       console.error("Error fetching doctor:", error);
+      sendError(
+        res,
+        HttpStatus.BadRequest,
+        MessageConstants.INTERNAL_SERVER_ERROR
+      );
 
-      res
-        .status(HttpStatus.InternalServerError)
-        .json({ message: "Internal server error" });
+      // res
+      //   .status(HttpStatus.InternalServerError)
+      //   .json({ message: "Internal server error" });
     }
   }
 }

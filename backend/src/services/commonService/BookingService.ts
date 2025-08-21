@@ -9,7 +9,7 @@ import { MessageConstants } from "../../constants/MessageConstants";
 import { AppError } from "../../utils/AppError";
 import { HttpStatus } from "../../constants/Httpstatus";
 import { IDoctorRepository } from "../../interfaces/doctor/doctorRepositoryInterface";
-import { UserRepositoryInterface } from "../../interfaces/user/UserRepositoryInterface";
+import { IUserRepositoryInterface } from "../../interfaces/user/UserRepositoryInterface";
 import { ISlotRepository } from "../../interfaces/Slot/SlotRepositoryInterface";
 import { ISlot } from "../../models/commonModel/SlotModel";
 import { sentMail } from "../../utils/SendMail";
@@ -18,13 +18,13 @@ import { Server } from "socket.io";
 import { io } from "../../server";
 import { INotificationRepository } from "../../interfaces/Notification/INotificationRepositoryInterface";
 import { IWalletRepositoryInterface } from "../../interfaces/wallet/IWalletRepositoryInterface";
-import { IUser } from "../../models/userModel/userModel";
+// import { IUser } from "../../models/userModel/userModel";
 
 export class BookingService implements IBookingService {
   constructor(
     private _bookingRepo: IBookingRepository,
     private _doctorRepo: IDoctorRepository,
-    private _patientRepo: UserRepositoryInterface,
+    private _patientRepo: IUserRepositoryInterface,
     private _slotRepo: ISlotRepository,
     private _notificationRepo: INotificationRepository,
     private _walletRepo: IWalletRepositoryInterface

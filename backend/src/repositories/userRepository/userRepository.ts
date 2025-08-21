@@ -1,21 +1,21 @@
 
-import { UserRepositoryInterface } from '../../interfaces/user/UserRepositoryInterface';
+import { IUserRepositoryInterface } from '../../interfaces/user/UserRepositoryInterface';
 import User, { IUser } from '../../models/userModel/userModel';
-import { googleUserData } from '../../types/google';
-import Doctor , {IDoctor} from '../../models/doctorMpdel/DoctorModel';
+import { IGoogleUserData } from '../../types/google';
+// import Doctor , {IDoctor} from '../../models/doctorMpdel/DoctorModel';
 import { BaseRepository } from '../commonRepository/BaseRepository';
 import mongoose from 'mongoose';
 
-export class UserRepository extends BaseRepository<IUser> implements UserRepositoryInterface {
+export class UserRepository extends BaseRepository<IUser> implements IUserRepositoryInterface {
   constructor() {
     super(User);
   }
   // Create a new user (standard or Google)
-  async create(user: Partial<IUser> | googleUserData): Promise<IUser> {
+  async create(user: Partial<IUser> | IGoogleUserData): Promise<IUser> {
     try {
       // If the user is coming from Google Sign-In, add the google_id
       if ('uid' in user) {
-        const googleUser: googleUserData = user;
+        const googleUser: IGoogleUserData = user;
         const newUser = new User({
           name: googleUser.name,
           email: googleUser.email,

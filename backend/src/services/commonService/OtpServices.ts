@@ -1,19 +1,18 @@
- 
-
 import { generateOtp, hashOtp, compareOtps } from '../../utils/GenerateOtp';
 import IOtpRepository from '../../interfaces/otp/otpRepositoryInterface';
 import { sentMail } from '../../utils/SendMail';
 import IOtpService from '../../interfaces/otp/OtpServiceInterface';
+
 export class OtpService implements IOtpService {
  
-  constructor(  private otpRepository:IOtpRepository) {
+  constructor( private _otpRepository:IOtpRepository) {
                      
   }
 
   async sendOtp(email: string): Promise<boolean> {
     const otp = generateOtp(); // Generate a new OTP
     const hashedOtp = await hashOtp(otp);
-    const stored = await this.otpRepository.storeOtp(hashedOtp, email);
+    const stored = await this._otpRepository.storeOtp(hashedOtp, email);
 
     if (!stored) throw new Error('Error storing OTP.');
     console.log('Generated OTP:', otp);
@@ -30,7 +29,7 @@ export class OtpService implements IOtpService {
   }
 
   async verifyOtp(email: string, otp: string): Promise<boolean> {
-    const storedOtp = await this.otpRepository.findOtp(email);
+    const storedOtp = await this._otpRepository.findOtp(email);
     if (!storedOtp)
       throw new Error(
         'No valid OTP found for this email. It may have expired.',

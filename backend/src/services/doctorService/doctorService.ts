@@ -12,7 +12,7 @@ import IOtpRepository from "../../interfaces/otp/otpRepositoryInterface";
 import {
   IDoctorService,
   ILoginResponse,
-  PendingVerificationsResult,
+  IPendingVerificationsResult,
 } from "../../interfaces/doctor/doctorServiceInterface";
 import { IDoctorRepository } from "../../interfaces/doctor/doctorRepositoryInterface";
 import { AppError } from "../../utils/AppError";
@@ -22,8 +22,8 @@ import { CloudinaryService } from "../../utils/cloudinary.service";
 
 export class DoctorService implements IDoctorService {
   constructor(
-    private doctorRepository: IDoctorRepository,
-    private otpRepository: IOtpRepository
+    private _doctorRepository: IDoctorRepository,
+    private _otpRepository: IOtpRepository
   ) {}
 
   async registerDoctor(doctorData: Partial<IDoctor>): Promise<IDoctor> {
@@ -55,14 +55,14 @@ export class DoctorService implements IDoctorService {
     }
 
     // Check for existing doctor by email
-    const existingDoctor = await this.doctorRepository.findByEmail(email);
+    const existingDoctor = await this._doctorRepository.findByEmail(email);
     if (existingDoctor) {
       throw new Error(MessageConstants.USER_ALREADY_EXISTS);
     }
 
     // Check for existing registration number
     const existingRegistration =
-      await this.doctorRepository.findByRegistrationNumber(
+      await this._doctorRepository.findByRegistrationNumber(
         registrationNumber as string
       );
     if (existingRegistration) {
@@ -71,7 +71,7 @@ export class DoctorService implements IDoctorService {
 
     // Hash password and create new doctor
     const hashedPassword = await bcrypt.hash(password as string, 10);
-    return this.doctorRepository.create({
+    return this._doctorRepository.create({
       name,
       email,
       password: hashedPassword,
@@ -95,7 +95,7 @@ export class DoctorService implements IDoctorService {
     console.log("Attempting login for doctor email:", email);
 
     // Find doctor by email
-    const doctor = await this.doctorRepository.findByEmail(email);
+    const doctor = await this._doctorRepository.findByEmail(email);
     let role = "Doctor";
 
     if (!doctor) {
@@ -171,7 +171,7 @@ export class DoctorService implements IDoctorService {
   }
 
   async getDoctorProfile(doctorId: string): Promise<IDoctor | null> {
-    return this.doctorRepository.findById(doctorId);
+    return this._doctorRepository.findById(doctorId);
   }
 
   async updatedDoctorProfile(
@@ -192,7 +192,7 @@ export class DoctorService implements IDoctorService {
       certificate: updatedData.certificate,
     };
 
-    const updatedDoctor = await this.doctorRepository.updateProfile(
+    const updatedDoctor = await this._doctorRepository.updateProfile(
       doctorId,
       allowedUpdates
     );
@@ -224,7 +224,7 @@ export class DoctorService implements IDoctorService {
     filePath: string
   ): Promise<string> {
     try {
-      const doctor = await this.doctorRepository.findById(doctorId);
+      const doctor = await this._doctorRepository.findById(doctorId);
       if (!doctor) {
         throw new AppError(
           HttpStatus.NotFound,
@@ -238,7 +238,7 @@ export class DoctorService implements IDoctorService {
         type: "authenticated", // Restrict access
       });
 
-      const updatedDoctor = await this.doctorRepository.updateProfilePicture(
+      const updatedDoctor = await this._doctorRepository.updateProfilePicture(
         doctorId,
         result.secure_url
       );
@@ -266,12 +266,12 @@ export class DoctorService implements IDoctorService {
     status: "approved" | "rejected",
     notes?: string
   ): Promise<IDoctor | null> {
-    const doctor = await this.doctorRepository.findById(doctorId);
+    const doctor = await this._doctorRepository.findById(doctorId);
     if (!doctor) {
       throw new Error(MessageConstants.DOCTOR_NOT_FOUND);
     }
 
-    const updatedDoctor = await this.doctorRepository.updateVerificationStatus(
+    const updatedDoctor = await this._doctorRepository.updateVerificationStatus(
       doctorId,
       status,
       notes
@@ -279,7 +279,7 @@ export class DoctorService implements IDoctorService {
 
     // If doctor is approved, unblock their account
     if (status === "approved" && updatedDoctor) {
-      await this.doctorRepository.updateDoctorStatus(doctorId, false);
+      await this._doctorRepository.updateDoctorStatus(doctorId, false);
 
       // Send approval email to doctor
       try {
@@ -314,11 +314,11 @@ export class DoctorService implements IDoctorService {
   async getPendingVerifications(
     page = 1,
     limit = 10
-  ): Promise<PendingVerificationsResult> {
+  ): Promise<IPendingVerificationsResult> {
     const skip = (page - 1) * limit;
     return {
-      doctors: await this.doctorRepository.findAllPending({}, skip, limit),
-      count: await this.doctorRepository.countAll({
+      doctors: await this._doctorRepository.findAllPending({}, skip, limit),
+      count: await this._doctorRepository.countAll({
         verificationStatus: "pending",
       }),
     };
@@ -328,12 +328,12 @@ export class DoctorService implements IDoctorService {
     id: string,
     isOnline: boolean
   ): Promise<IDoctor | null> {
-    return await this.doctorRepository.updateOnlineStatus(id, isOnline);
+    return await this._doctorRepository.updateOnlineStatus(id, isOnline);
   }
 
   async uploadCertificate(doctorId: string, filePath: string): Promise<string> {
     try {
-      const doctor = await this.doctorRepository.findById(doctorId);
+      const doctor = await this._doctorRepository.findById(doctorId);
       if (!doctor) {
         throw new AppError(
           HttpStatus.NotFound,
@@ -352,7 +352,7 @@ export class DoctorService implements IDoctorService {
       });
 
       // Update doctor record with new certificate URL
-      const updatedDoctor = await this.doctorRepository.updateCertificate(
+      const updatedDoctor = await this._doctorRepository.updateCertificate(
         doctorId,
         result.secure_url
       );
@@ -376,7 +376,7 @@ export class DoctorService implements IDoctorService {
   }
 
   async deleteCertificate(doctorId: string): Promise<IDoctor> {
-    return this.doctorRepository.removeCertificate(doctorId);
+    return this._doctorRepository.removeCertificate(doctorId);
   }
 }
 

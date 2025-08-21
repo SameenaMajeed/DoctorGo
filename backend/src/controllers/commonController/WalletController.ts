@@ -15,7 +15,7 @@ export class WalletController {
 
   async getWallet(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.data?.id; // Assuming you have user in request from auth middleware
+      const userId = req.data?.id; 
       if (!userId)
         throw new AppError(
           HttpStatus.Unauthorized,

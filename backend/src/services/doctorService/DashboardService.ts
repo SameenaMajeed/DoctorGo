@@ -1,20 +1,20 @@
 // services/DashboardService.ts
 import { IDoctorRepository } from "../../interfaces/doctor/doctorRepositoryInterface";
-import { UserRepositoryInterface as IPatientRepository } from "../../interfaces/user/UserRepositoryInterface";
+// import { IUserRepositoryInterface as IPatientRepository } from "../../interfaces/user/UserRepositoryInterface";
 import { IBookingRepository as IAppointmentRepository } from "../../interfaces/Booking/BookingRepositoryInterface";
 import IPrescriptionRepository  from "../../interfaces/prescription/IPrescriptionRepository";
 
 export class DashboardService {
   constructor(
-    private doctorRepository: IDoctorRepository,
-    private patientRepository: IPatientRepository,
-    private appointmentRepository: IAppointmentRepository,
-    private prescriptionRepository: IPrescriptionRepository
+    private _doctorRepository: IDoctorRepository,
+    // private patientRepository: IPatientRepository,
+    private _appointmentRepository: IAppointmentRepository,
+    private _prescriptionRepository: IPrescriptionRepository
   ) {}
 
   async getDashboardStats(doctorId: string) {
   // Verify doctor exists
-  const doctor = await this.doctorRepository.findById(doctorId);
+  const doctor = await this._doctorRepository.findById(doctorId);
   if (!doctor) {
     throw new Error("Doctor not found");
   }
@@ -43,7 +43,7 @@ export class DashboardService {
   ] = await Promise.all([
     this.countPatientsByDoctor(doctorId),
     this.countNewPatients(doctorId, thirtyDaysAgo),
-    this.prescriptionRepository.findPrescriptions(doctorId, "", undefined, 1, 1, "").then(res => res.total),
+    this._prescriptionRepository.findPrescriptions(doctorId, "", undefined, 1, 1, "").then(res => res.total),
     this.getRecentAppointmentsWithPatients(doctorId),
     this.countAppointments(doctorId),
     this.countAppointments(doctorId, today, tomorrow),
@@ -73,7 +73,7 @@ private async countAppointments(doctorId: string, startDate?: Date, endDate?: Da
 
   console.log('filter data:', filter)
 
-  return this.appointmentRepository.countAppointments(filter);
+  return this._appointmentRepository.countAppointments(filter);
 }
 
 
@@ -81,20 +81,20 @@ private async countAppointments(doctorId: string, startDate?: Date, endDate?: Da
   private async countPatientsByDoctor(doctorId: string): Promise<number> {
     // Since your patient repository is actually UserRepositoryInterface,
     // we need to count patients through appointments
-    const result = await this.appointmentRepository.getPatientsForDoctor(doctorId, 1, 1);
+    const result = await this._appointmentRepository.getPatientsForDoctor(doctorId, 1, 1);
     return result.total;
   }
 
   private async countNewPatients(doctorId: string, since: Date): Promise<number> {
     // Count new patients through appointments created after 'since' date
-    const result = await this.appointmentRepository.getPatientsForDoctor(doctorId, 1, 1);
+    const result = await this._appointmentRepository.getPatientsForDoctor(doctorId, 1, 1);
     // Note: This might need adjustment based on your actual data model
     // You might need to filter appointments by createdAt date
     return result.total; // Placeholder - adjust based on your needs
   }
 
   private async getRecentAppointmentsWithPatients(doctorId: string): Promise<any[]> {
-    const result = await this.appointmentRepository.getPatientsForDoctor(doctorId, 1, 4);
+    const result = await this._appointmentRepository.getPatientsForDoctor(doctorId, 1, 4);
     console.log('result:',result)
     return result.patients;
   }

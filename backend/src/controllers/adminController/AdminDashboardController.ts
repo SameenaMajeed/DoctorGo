@@ -14,7 +14,7 @@ export class AdminDashboardController {
     if (startDate && endDate && startDate > endDate) {
       throw new AppError(
         HttpStatus.BadRequest,
-        "Start date must be before end date"
+      MessageConstants.START_DATE_MUST_BE_BEFORE_END_DATE
       );
     }
   }
@@ -26,7 +26,7 @@ export class AdminDashboardController {
     if (!validFilters.includes(filterValue)) {
       throw new AppError(
         HttpStatus.BadRequest,
-        "Invalid filter value. Must be 'daily', 'monthly', or 'yearly'"
+        MessageConstants.INVAID_FILTER_VALUE
       );
     }
     
@@ -56,7 +56,7 @@ export class AdminDashboardController {
     } catch (err) {
       throw new AppError(
         HttpStatus.BadRequest,
-        "Invalid date format. Please use ISO format (YYYY-MM-DD)"
+        MessageConstants.INVALID_DATE_FORMAT
       );
     }
 
@@ -75,7 +75,7 @@ export class AdminDashboardController {
       sendResponse(
         res,
         HttpStatus.OK,
-        "Dashboard data fetched successfully",
+        MessageConstants.DASHBOARD_DATA_FETCHED,
         data
       );
     } catch (error: unknown) {

@@ -334,7 +334,7 @@ export class BookingRepository
 
       const [bookings, total] = await Promise.all([
         Booking.find(query)
-          .populate("doctor_id", "name")
+          .populate("doctor_id", "name specialization")
           .populate("user_id", "name")
           .sort({ createdAt: -1 })
           .skip(skip)

@@ -22,7 +22,7 @@ export class NotificationController {
         recipientType as string
       );
 
-      sendResponse(res, HttpStatus.OK, "Notification fetched succesfully", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.NOTIFICATION_FETCHED, {
         notifications,
       });
     } catch (error) {
@@ -45,9 +45,9 @@ export class NotificationController {
       const notification =
         await this._notificationService.markNotificationAsRead(notificationId);
       if (!notification) {
-        throw new AppError(HttpStatus.Unauthorized, "Notification not found");
+        throw new AppError(HttpStatus.Unauthorized, MessageConstants.NOTIFICATION_NOT_FOUND);
       }
-      sendResponse(res, HttpStatus.OK, "Mark as read", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.MARK_AS_READ, {
         notification,
       });
     } catch (error) {
@@ -79,7 +79,7 @@ export class NotificationController {
         recipientType
       );
 
-      sendResponse(res, HttpStatus.OK, "Marked All as read", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.MARK_ALL_AS_READ, {
         result,
       });
     } catch (error) {
@@ -107,7 +107,7 @@ export class NotificationController {
       }
       const result = await this._notificationService.clearAllNotifications(recipientId, recipientType)
 
-      sendResponse(res, HttpStatus.OK, "All notifications cleared", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.ALL_NOTIFICATION_CLEARED, {
         result,
       });
 
@@ -136,7 +136,7 @@ export class NotificationController {
       }
       const result = await this._notificationService.deleteNotification(notificationId )
 
-      sendResponse(res, HttpStatus.OK, "Notification deleted successfully", {
+      sendResponse(res, HttpStatus.OK, MessageConstants.NOTIFICATION_DELETED, {
         result,
       });
 

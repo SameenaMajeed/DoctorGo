@@ -7,7 +7,7 @@ export interface ILoginResponse {
   role: string;
 }
 
-export interface PendingVerificationsResult {
+export interface IPendingVerificationsResult {
   doctors: IDoctor;
   count: number;
 }
@@ -30,7 +30,7 @@ export interface IDoctorService {
   getPendingVerifications(
     page?: number,
     limit?: number
-  ): Promise<PendingVerificationsResult>;
+  ): Promise<IPendingVerificationsResult>;
   toggleDoctorOnlineStatus(
     id: string,
     isOnline: boolean
